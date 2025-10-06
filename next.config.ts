@@ -1,6 +1,7 @@
 import { withPayload } from "@payloadcms/next/withPayload";
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -10,6 +11,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // turbopack: {
+  //   resolveExtensions: [".mdx", ".tsx", ".ts", ".jsx", ".js", ".json"],
+  // },
 };
 
 export default withPayload(nextConfig);

@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import type React from "react";
+import QueryConfig from "@/components/configs/query.config";
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import {
+	SidebarInset,
+	SidebarProvider,
+	SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { AuthProvider } from "@/contexts/auth/auth.provider";
 import { EnvProvider } from "@/contexts/env/env.provider";
 
@@ -27,7 +34,19 @@ export default function RootLayout({
 					disableTransitionOnChange
 				>
 					<EnvProvider>
-						<AuthProvider>{children}</AuthProvider>
+						<AuthProvider>
+							<QueryConfig>
+								<SidebarProvider defaultOpen={false}>
+									<AppSidebar />
+									<SidebarInset>
+										<main>
+											<SidebarTrigger />
+											{children}
+										</main>
+									</SidebarInset>
+								</SidebarProvider>
+							</QueryConfig>
+						</AuthProvider>
 					</EnvProvider>
 				</ThemeProvider>
 			</body>
