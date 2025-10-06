@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import type React from "react";
+import { AuthProvider } from "@/contexts/auth/auth.provider";
 import { EnvProvider } from "@/contexts/env/env.provider";
 
 import "@/styles/globals.css";
@@ -26,7 +27,7 @@ export default function RootLayout({
 					disableTransitionOnChange
 				>
 					<EnvProvider>
-						{children}
+						<AuthProvider>{children}</AuthProvider>
 					</EnvProvider>
 				</ThemeProvider>
 			</body>

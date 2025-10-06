@@ -23,7 +23,7 @@ export function EnvAdapter({ children, envContext }: EnvAdapterProps) {
 		input: envContext,
 	});
 
-  console.log('envContext', envContext)
+  // console.log('envContext', envContext)
 
 	return (
 		<envMachineContext.Provider
