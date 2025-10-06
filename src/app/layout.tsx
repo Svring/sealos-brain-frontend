@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import type React from "react";
-import "./globals.css";
 import { ThemeProvider } from "next-themes";
+import type React from "react";
+import { EnvProvider } from "@/contexts/env/env.provider";
 
-const inter = Inter({ subsets: ["latin"] });
+import "@/styles/globals.css";
 
 export const metadata: Metadata = {
-	title: "Next.js Community Starter",
-	description: "A modern Next.js starter with theme support",
+	title: "Sealos Brain",
+	description: "Sealos Brain",
 	generator: "v0.dev",
 };
 
@@ -19,14 +18,16 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body className={inter.className}>
+			<body>
 				<ThemeProvider
 					attribute="class"
-					defaultTheme="system"
+					defaultTheme="dark"
 					enableSystem
 					disableTransitionOnChange
 				>
-					{children}
+					<EnvProvider>
+						{children}
+					</EnvProvider>
 				</ThemeProvider>
 			</body>
 		</html>
