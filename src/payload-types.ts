@@ -125,6 +125,7 @@ export interface User {
   apiKey: string;
   updatedAt: string;
   createdAt: string;
+  avatar: Media;
   email: string;
   username: string;
   resetPasswordToken?: string | null;

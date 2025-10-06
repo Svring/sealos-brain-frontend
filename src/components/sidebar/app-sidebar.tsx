@@ -1,8 +1,11 @@
-import { LayoutGrid, MessageCirclePlus } from "lucide-react";
+"use client";
+
+import { LayoutGrid, LogOut, MessageCirclePlus } from "lucide-react";
 
 import {
 	Sidebar,
 	SidebarContent,
+	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupContent,
 	SidebarHeader,
@@ -11,6 +14,8 @@ import {
 	SidebarMenuItem,
 	SidebarSeparator,
 } from "@/components/ui/sidebar";
+import { useAuthEvents } from "@/contexts/auth/auth.adapter";
+import { logoutUser } from "@/payload/operations/users-operation";
 
 // Menu items.
 const mainItems = [
@@ -27,6 +32,24 @@ const mainItems = [
 ];
 
 export function AppSidebar() {
+	const { fail } = useAuthEvents();
+
+	const handleLogout = async () => {
+		try {
+			const result = await logoutUser();
+			if (result.success) {
+				// Clear auth state
+				fail();
+				// Redirect to login or home page
+				window.location.href = "/";
+			} else {
+				console.error("Logout failed:", result.error);
+			}
+		} catch (error) {
+			console.error("Logout error:", error);
+		}
+	};
+
 	return (
 		<Sidebar variant="inset" collapsible="icon">
 			<SidebarHeader>
@@ -65,6 +88,16 @@ export function AppSidebar() {
 					</SidebarGroupContent>
 				</SidebarGroup>
 			</SidebarContent>
+			<SidebarFooter>
+				<SidebarMenu>
+					<SidebarMenuItem>
+						<SidebarMenuButton onClick={handleLogout} tooltip="Logout">
+							<LogOut />
+							<span>Logout</span>
+						</SidebarMenuButton>
+					</SidebarMenuItem>
+				</SidebarMenu>
+			</SidebarFooter>
 		</Sidebar>
 	);
 }

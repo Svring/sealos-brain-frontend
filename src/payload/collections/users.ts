@@ -29,5 +29,10 @@ export const Users: CollectionConfig = {
       name: "apiKey",
       type: "text",
     },
+    {
+      name: "avatar",
+      type: "upload",
+      relationTo: "media",
+    },
   ],
 };

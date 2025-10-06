@@ -1,5 +1,5 @@
 import type React from "react";
-import { getUser } from "@/payload/operations/users-operation";
+import { getAllUsers, getUser } from "@/payload/operations/users-operation";
 import { AuthDesktopAdapter, AuthPayloadAdapter } from "./auth.adapter";
 
 interface AuthProviderProps {
@@ -13,10 +13,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
 	// Only render AuthPayloadAdapter in development mode
 	if (mode === "development") {
-		// Create the promise that will be resolved by the adapter
+		// Create the promises that will be resolved by the adapter
 		const userPromise = getUser();
+		const usersPromise = getAllUsers();
 		return (
-			<AuthPayloadAdapter userPromise={userPromise}>
+			<AuthPayloadAdapter userPromise={userPromise} usersPromise={usersPromise}>
 				{children}
 			</AuthPayloadAdapter>
 		);
