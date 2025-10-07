@@ -24,6 +24,21 @@ export function useEnvContext() {
 
 export function useEnvState() {
 	const { state } = useEnvContext();
+
+	// Ensure env is ready, throw error if not
+	if (state.matches("initializing")) {
+		throw new Error("Environment is still initializing");
+	}
+
+	if (state.matches("failed")) {
+		throw new Error("Environment initialization failed");
+	}
+
+	if (!state.context) {
+		throw new Error("No environment configuration available");
+	}
+
+	// Directly expose the data fields
 	return {
 		mode: state.context.mode,
 		variables: state.context.variables,

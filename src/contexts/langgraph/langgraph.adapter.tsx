@@ -22,7 +22,7 @@ export function LangGraphPayloadAdapter({
 			// Read base_url and api_key from user data
 			const base_url = user.baseUrl || "";
 			const api_key = user.apiKey || "";
-			const model_name = "gpt-4"; // Default for now
+			const model_name = "gpt-4.1"; // Default for now
 			const agent = "orca"; // Default for now
 
 			send({
@@ -37,20 +37,9 @@ export function LangGraphPayloadAdapter({
 		}
 	}, [user, send]);
 
-	// If no user found, show user selection
+	// If no user found, throw error
 	if (!user) {
-		return (
-			<div className="flex min-h-screen items-center justify-center p-4">
-				<div className="w-full max-w-sm space-y-3">
-					<h2 className="text-center text-lg font-semibold">
-						Select User for LangGraph
-					</h2>
-					<div className="text-center text-sm text-muted-foreground">
-						Please select a user to configure LangGraph settings
-					</div>
-				</div>
-			</div>
-		);
+		throw new Error("No user found for LangGraph configuration");
 	}
 
 	return (

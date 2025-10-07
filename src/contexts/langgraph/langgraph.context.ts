@@ -24,8 +24,26 @@ export function useLangGraphContext() {
 
 export function useLangGraphState() {
 	const { state } = useLangGraphContext();
+	
+	// Ensure langgraph is ready, throw error if not
+	if (state.matches("initializing")) {
+		throw new Error("LangGraph is still initializing");
+	}
+	
+	if (state.matches("failed")) {
+		throw new Error("LangGraph initialization failed");
+	}
+	
+	if (!state.context) {
+		throw new Error("No LangGraph configuration available");
+	}
+	
+	// Directly expose the four data fields
 	return {
-		langgraph: state.context,
+		base_url: state.context.base_url,
+		api_key: state.context.api_key,
+		model_name: state.context.model_name,
+		agent: state.context.agent,
 		isInitializing: state.matches("initializing"),
 		isReady: state.matches("ready"),
 		isFailed: state.matches("failed"),

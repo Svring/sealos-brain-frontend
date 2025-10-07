@@ -24,6 +24,20 @@ export function useAuthContext() {
 
 export function useAuthState() {
 	const { state } = useAuthContext();
+	
+	// Ensure auth exists, throw error if not ready or failed
+	if (state.matches("initializing")) {
+		throw new Error("Auth is still initializing");
+	}
+	
+	if (state.matches("failed")) {
+		throw new Error("Auth initialization failed");
+	}
+	
+	if (!state.context.auth) {
+		throw new Error("No auth available");
+	}
+	
 	return {
 		auth: state.context.auth,
 		isInitializing: state.matches("initializing"),

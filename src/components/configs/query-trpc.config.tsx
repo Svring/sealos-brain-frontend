@@ -4,6 +4,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import { createTRPCContext } from "@trpc/tanstack-react-query";
 import { useState } from "react";
+import { useAuthState } from "@/contexts/auth/auth.context";
 import type { AiProxyRouter } from "@/trpc/ai-proxy.trpc";
 import type { K8sRouter } from "@/trpc/k8s.trpc";
 
@@ -16,12 +17,11 @@ interface TRPCConfigProps {
 }
 
 export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
-	// For now, we'll use a mock auth object since auth context isn't set up yet
-	// This should be replaced with actual auth context when available
-	const mockAuth = {
-		kubeconfig: "mock-kubeconfig",
-		appToken: "mock-app-token",
-	};
+	const { auth } = useAuthState();
+
+	// Auth is guaranteed to exist by useAuthState
+	const kubeconfig = auth.kubeconfig;
+	const appToken = auth.appToken;
 
 	const [k8sTrpcClient] = useState(() =>
 		createTRPCClient<K8sRouter>({
@@ -30,7 +30,7 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 					url: "/api/trpc/k8s",
 					maxURLLength: 6000,
 					headers: () => ({
-						kubeconfig: mockAuth.kubeconfig,
+						kubeconfig,
 					}),
 				}),
 			],
@@ -44,8 +44,8 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 					url: "/api/trpc/ai-proxy",
 					maxURLLength: 6000,
 					headers: () => ({
-						kubeconfig: mockAuth.kubeconfig,
-						appToken: mockAuth.appToken || "",
+						kubeconfig,
+						appToken,
 					}),
 				}),
 			],
