@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 import { AuthProvider } from "@/contexts/auth/auth.provider";
 import { EnvProvider } from "@/contexts/env/env.provider";
+import { ProxyProvider } from "@/contexts/proxy/proxy.provider";
 
 import "@/styles/globals.css";
 
@@ -35,17 +36,19 @@ export default function RootLayout({
 				>
 					<EnvProvider>
 						<AuthProvider>
-							<QueryConfig>
-								<SidebarProvider defaultOpen={false}>
-									<AppSidebar />
-									<SidebarInset>
-										<main>
-											<SidebarTrigger />
-											{children}
-										</main>
-									</SidebarInset>
-								</SidebarProvider>
-							</QueryConfig>
+							<ProxyProvider>
+								<QueryConfig>
+									<SidebarProvider defaultOpen={false}>
+										<AppSidebar />
+										<SidebarInset>
+											<main>
+												<SidebarTrigger />
+												{children}
+											</main>
+										</SidebarInset>
+									</SidebarProvider>
+								</QueryConfig>
+							</ProxyProvider>
 						</AuthProvider>
 					</EnvProvider>
 				</ThemeProvider>

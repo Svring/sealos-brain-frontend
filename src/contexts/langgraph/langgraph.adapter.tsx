@@ -1,65 +1,57 @@
 "use client";
 
 import { useMachine } from "@xstate/react";
-import { type ReactNode, use, useEffect } from "react";
-import type { User } from "@/payload-types";
+import { type ReactNode, useEffect } from "react";
 import { langgraphMachineContext } from "./langgraph.context";
 import { langgraphMachine } from "./langgraph.state";
 
-export function LangGraphPayloadAdapter({
+interface LangGraphContext {
+	deploymentUrl: string;
+	graphId: string;
+}
+
+export function LangGraphAdapter({
 	children,
-	userPromise,
+	langgraphContext,
 }: {
 	children: ReactNode;
-	userPromise: Promise<User | null>;
+	langgraphContext: LangGraphContext;
 }) {
 	const [state, send] = useMachine(langgraphMachine);
-	const user = use(userPromise);
 
 	// Handle langgraph config updates in useEffect to avoid setState during render
 	useEffect(() => {
-		if (user) {
-			// Read base_url and api_key from user data
-			const base_url = user.baseUrl || "";
-			const api_key = user.apiKey || "";
-			const model_name = "gpt-4.1"; // Default for now
-			const agent = "orca"; // Default for now
+		// Set deployment URL and graph ID from environment
+		send({
+			type: "SET_DEPLOYMENT_URL",
+			deploymentUrl: langgraphContext.deploymentUrl,
+		});
 
-			send({
-				type: "SET_CONFIG",
-				base_url,
-				api_key,
-				model_name,
-				agent,
-			});
-		} else {
-			send({ type: "FAIL" });
-		}
-	}, [user, send]);
+		send({
+			type: "SET_GRAPH_ID",
+			graphId: langgraphContext.graphId,
+		});
 
-	// If no user found, throw error
-	if (!user) {
-		throw new Error("No user found for LangGraph configuration");
-	}
+		// Set initial config with empty values - will be populated by user data later
+		send({
+			type: "SET_CONFIG",
+			base_url: "",
+			api_key: "",
+			model_name: "gpt-4.1",
+			region_url: "",
+			kubeconfig: "",
+		});
+	}, [langgraphContext, send]);
 
 	return (
 		<langgraphMachineContext.Provider
-			value={{ langgraph: state.context, state, send }}
-		>
-			{children}
-		</langgraphMachineContext.Provider>
-	);
-}
-
-export function LangGraphDesktopAdapter({ children }: { children: ReactNode }) {
-	const [state, send] = useMachine(langgraphMachine);
-
-	// Desktop adapter is empty for now
-	// TODO: Implement desktop-specific logic when needed
-
-	return (
-		<langgraphMachineContext.Provider
-			value={{ langgraph: state.context, state, send }}
+			value={{ 
+				graphState: state.context.graphState,
+				deploymentUrl: state.context.deploymentUrl,
+				graphId: state.context.graphId,
+				state, 
+				send 
+			}}
 		>
 			{children}
 		</langgraphMachineContext.Provider>

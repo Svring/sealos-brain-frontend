@@ -1,6 +1,5 @@
 import type React from "react";
-import { getUser } from "@/payload/operations/users-operation";
-import { LangGraphDesktopAdapter, LangGraphPayloadAdapter } from "./langgraph.adapter";
+import { LangGraphAdapter } from "./langgraph.adapter";
 
 interface LangGraphProviderProps {
 	children: React.ReactNode;
@@ -8,20 +7,18 @@ interface LangGraphProviderProps {
 
 export function LangGraphProvider({ children }: LangGraphProviderProps) {
 	// Read environment variables (server-side)
-	const mode =
-		(process.env.MODE as "development" | "production") || "production";
+	const deploymentUrl = process.env.LANGGRAPH_DEPLOYMENT_URL || "";
+	const graphId = process.env.LANGGRAPH_GRAPH_ID || "";
 
-	// Only render LangGraphPayloadAdapter in development mode
-	if (mode === "development") {
-		// Create the promise that will be resolved by the adapter
-		const userPromise = getUser();
-		return (
-			<LangGraphPayloadAdapter userPromise={userPromise}>
-				{children}
-			</LangGraphPayloadAdapter>
-		);
-	}
+	// Create the LangGraph context from environment variables
+	const langgraphContext = {
+		deploymentUrl,
+		graphId,
+	};
 
-	// In production mode, render LangGraphDesktopAdapter
-	return <LangGraphDesktopAdapter>{children}</LangGraphDesktopAdapter>;
+	return (
+		<LangGraphAdapter langgraphContext={langgraphContext}>
+			{children}
+		</LangGraphAdapter>
+	);
 }
