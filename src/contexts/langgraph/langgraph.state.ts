@@ -21,11 +21,15 @@ export const langgraphMachine = createMachine({
 	types: {} as {
 		context: LangGraphContext;
 		events: LangGraphEvent;
-		input: LangGraphContext;
 	},
 	id: "langgraph",
 	initial: "initializing",
-	context: ({ input }) => input,
+	context: {
+		base_url: "",
+		api_key: "",
+		model_name: "gpt-4",
+		agent: "default",
+	},
 	states: {
 		initializing: {
 			on: {

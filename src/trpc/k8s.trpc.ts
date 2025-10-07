@@ -12,11 +12,8 @@ export async function createK8sContext(opts: {
 }): Promise<K8sContext> {
 	const kubeconfig = opts.req.headers.get("kubeconfig");
 
-	// Decode kubeconfig if it was percent-encoded when sent via headers
-	const decodedKubeconfig = decodeURIComponent(kubeconfig as string);
-
 	return {
-		kubeconfig: decodedKubeconfig as string,
+		kubeconfig: kubeconfig as string,
 	};
 }
 

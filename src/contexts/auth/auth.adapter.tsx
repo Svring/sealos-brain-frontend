@@ -4,23 +4,13 @@ import { useMount } from "@reactuses/core";
 import { useMachine } from "@xstate/react";
 import { createSealosApp, sealosApp } from "@zjy365/sealos-desktop-sdk/app";
 import { ChevronRight, User as UserIcon } from "lucide-react";
-import { createContext, type ReactNode, use, useEffect } from "react";
-import type { EventFrom, StateFrom } from "xstate";
+import { type ReactNode, use, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Item, ItemContent, ItemGroup, ItemTitle } from "@/components/ui/item";
 import { loginUser } from "@/payload/operations/users-operation";
 import type { User } from "@/payload-types";
+import { authMachineContext } from "./auth.context";
 import { type Auth, authMachine } from "./auth.state";
-
-interface AuthContextValue {
-	auth: Auth | null;
-	state: StateFrom<typeof authMachine>;
-	send: (event: EventFrom<typeof authMachine>) => void;
-}
-
-const authMachineContext = createContext<AuthContextValue | undefined>(
-	undefined,
-);
 
 export function AuthPayloadAdapter({
 	children,
@@ -147,32 +137,4 @@ export function AuthDesktopAdapter({ children }: { children: ReactNode }) {
 			{children}
 		</authMachineContext.Provider>
 	);
-}
-
-export function useAuthContext() {
-	const ctx = use(authMachineContext);
-	if (!ctx) {
-		throw new Error("useAuthContext must be used within AuthAdapter");
-	}
-	return ctx;
-}
-
-export function useAuthState() {
-	const { state } = useAuthContext();
-	return {
-		auth: state.context.auth,
-		isInitializing: state.matches("initializing"),
-		isReady: state.matches("ready"),
-		isFailed: state.matches("failed"),
-	};
-}
-
-export function useAuthEvents() {
-	const { send } = useAuthContext();
-
-	return {
-		setAuth: (auth: Auth) => send({ type: "SET_AUTH", auth }),
-		fail: () => send({ type: "FAIL" }),
-		retry: () => send({ type: "RETRY" }),
-	};
 }
