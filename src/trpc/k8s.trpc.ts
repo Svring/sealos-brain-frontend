@@ -3,8 +3,8 @@ import { z } from "zod";
 import {
 	resourceTargetSchema,
 	resourceTypeTargetSchema,
-} from "@/mvvm/models/k8s/k8s.model";
-import type { K8sContext } from "@/mvvm/models/k8s/k8s-context.model";
+} from "@/mvvm/k8s/models/k8s.model";
+import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
 
 // Context creation function
 export async function createK8sContext(opts: {
@@ -33,12 +33,10 @@ export const k8sRouter = t.router({
 			throw new Error("Not implemented");
 		}),
 
-	get: t.procedure
-		.input(resourceTargetSchema)
-		.query(async ({ ctx, input }) => {
-			// TODO: Implement getResource
-			throw new Error("Not implemented");
-		}),
+	get: t.procedure.input(resourceTargetSchema).query(async ({ ctx, input }) => {
+		// TODO: Implement getResource
+		throw new Error("Not implemented");
+	}),
 
 	// Quota Management
 	quota: t.procedure.query(async ({ ctx }) => {
@@ -75,10 +73,7 @@ export const k8sRouter = t.router({
 	// Resource Lifecycle Management
 	delete: t.procedure
 		.input(
-			z.union([
-				resourceTypeTargetSchema,
-				z.array(resourceTypeTargetSchema),
-			]),
+			z.union([resourceTypeTargetSchema, z.array(resourceTypeTargetSchema)]),
 		)
 		.mutation(async ({ ctx, input }) => {
 			// TODO: Implement resource deletion
@@ -100,10 +95,7 @@ export const k8sRouter = t.router({
 	// Metadata Management
 	patchMetadata: t.procedure
 		.input(
-			z.union([
-				resourceTypeTargetSchema,
-				z.array(resourceTypeTargetSchema),
-			]),
+			z.union([resourceTypeTargetSchema, z.array(resourceTypeTargetSchema)]),
 		)
 		.mutation(async ({ ctx, input }) => {
 			// TODO: Implement metadata patching
@@ -112,10 +104,7 @@ export const k8sRouter = t.router({
 
 	removeMetadata: t.procedure
 		.input(
-			z.union([
-				resourceTypeTargetSchema,
-				z.array(resourceTypeTargetSchema),
-			]),
+			z.union([resourceTypeTargetSchema, z.array(resourceTypeTargetSchema)]),
 		)
 		.mutation(async ({ ctx, input }) => {
 			// TODO: Implement metadata removal

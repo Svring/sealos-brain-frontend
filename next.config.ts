@@ -11,9 +11,14 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  // turbopack: {
-  //   resolveExtensions: [".mdx", ".tsx", ".ts", ".jsx", ".js", ".json"],
-  // },
+  async rewrites() {
+    return [
+      {
+        source: '/', // Root path
+        destination: '/new', // Map to /new
+      },
+    ];
+  },
 };
 
 export default withPayload(nextConfig);
