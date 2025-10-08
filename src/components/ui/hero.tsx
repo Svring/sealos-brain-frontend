@@ -2,8 +2,44 @@
 
 import { motion } from "framer-motion";
 import * as React from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+interface TextRevealProps {
+	text: string;
+	className?: string;
+	delay?: number;
+}
+
+const TextReveal = ({ text, className, delay = 0 }: TextRevealProps) => {
+	const words = text.split(" ");
+	let charIndex = 0;
+
+	return (
+		<div className={cn("overflow-hidden", className)}>
+			{words.map((word, wordIndex) => (
+				<span key={word} className="inline-block whitespace-nowrap mr-1">
+					{word.split("").map((char, index) => {
+						const currentDelay = delay + charIndex * 0.03;
+						charIndex++;
+						return (
+							<span
+								key={charIndex}
+								className="inline-block animate-text-reveal"
+								style={{
+									animationDelay: `${currentDelay}s`,
+								}}
+							>
+								{char}
+							</span>
+						);
+					})}
+				</span>
+			))}
+		</div>
+	);
+};
 
 interface ActionProps {
 	variant?:
@@ -54,14 +90,7 @@ const Hero = React.forwardRef<HTMLElement, HeroProps>(
 				)}
 				{...props}
 			>
-
-				<motion.div
-					initial={{ y: 100, opacity: 0.5 }}
-					viewport={{ once: true }}
-					transition={{ ease: "easeInOut", delay: 0.3, duration: 0.8 }}
-					whileInView={{ y: 0, opacity: 1 }}
-					className="relative  z-50 container flex justify-center flex-1 flex-col px-5 md:px-10 gap-4 -translate-y-7"
-				>
+				<div className="relative z-50 container flex justify-center flex-1 flex-col px-5 md:px-10 gap-4 -translate-y-7">
 					<div className="flex flex-col items-center text-center gap-2">
 						<h1
 							className={cn(
@@ -69,14 +98,17 @@ const Hero = React.forwardRef<HTMLElement, HeroProps>(
 								titleClassName,
 							)}
 						>
-							{heroTitle}
+							<TextReveal text={String(heroTitle)} delay={0.3} />
 						</h1>
 						{subtitle && (
 							<p
 								className={cn(
-									"text-xl text-muted-foreground p-0 m-0",
+									"text-xl text-muted-foreground p-0 m-0 animate-fade-in",
 									subtitleClassName,
 								)}
+								style={{
+									animationDelay: "0.8s",
+								}}
 							>
 								{subtitle}
 							</p>
@@ -95,7 +127,7 @@ const Hero = React.forwardRef<HTMLElement, HeroProps>(
 							</div>
 						)}
 					</div>
-				</motion.div>
+				</div>
 			</section>
 		);
 	},

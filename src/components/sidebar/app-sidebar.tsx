@@ -21,12 +21,12 @@ import { logoutUser } from "@/payload/operations/users-operation";
 const mainItems = [
 	{
 		title: "New",
-		url: "#",
+		url: "/new",
 		icon: MessageCirclePlus,
 	},
 	{
-		title: "Projects",
-		url: "#",
+		title: "Project",
+		url: "/project",
 		icon: LayoutGrid,
 	},
 ];
