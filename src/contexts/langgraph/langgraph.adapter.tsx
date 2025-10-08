@@ -2,6 +2,7 @@
 
 import { useMachine } from "@xstate/react";
 import { type ReactNode, useEffect } from "react";
+import { useProxyState } from "@/contexts/proxy/proxy.context";
 import { langgraphMachineContext } from "./langgraph.context";
 import { langgraphMachine } from "./langgraph.state";
 
@@ -18,6 +19,7 @@ export function LangGraphAdapter({
 	langgraphContext: LangGraphContext;
 }) {
 	const [state, send] = useMachine(langgraphMachine);
+	const { base_url, api_key, model_name } = useProxyState();
 
 	// Handle langgraph config updates in useEffect to avoid setState during render
 	useEffect(() => {
@@ -32,16 +34,16 @@ export function LangGraphAdapter({
 			graphId: langgraphContext.graphId,
 		});
 
-		// Set initial config with empty values - will be populated by user data later
+		// Set config from proxy state
 		send({
 			type: "SET_CONFIG",
-			base_url: "",
-			api_key: "",
-			model_name: "gpt-4.1",
+			base_url,
+			api_key,
+			model_name,
 			region_url: "",
 			kubeconfig: "",
 		});
-	}, [langgraphContext, send]);
+	}, [langgraphContext, base_url, api_key, model_name, send]);
 
 	return (
 		<langgraphMachineContext.Provider
