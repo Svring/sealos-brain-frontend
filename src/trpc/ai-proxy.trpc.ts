@@ -3,7 +3,7 @@ import { initTRPC } from "@trpc/server";
 import { z } from "zod";
 
 // ===== CONTEXT =====
-export async function useAiProxyContext(opts: { req: Request }) {
+export async function createAiProxyContext(opts: { req: Request }) {
 	const kubeconfig = opts.req.headers.get("kubeconfig");
 	const appToken = opts.req.headers.get("appToken");
 
@@ -37,7 +37,7 @@ export async function useAiProxyContext(opts: { req: Request }) {
 	};
 }
 
-export type AiProxyContext = Awaited<ReturnType<typeof useAiProxyContext>>;
+export type AiProxyContext = Awaited<ReturnType<typeof createAiProxyContext>>;
 
 // ===== SCHEMAS =====
 
