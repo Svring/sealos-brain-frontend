@@ -12,6 +12,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { InputBoxVM } from "@/mvvm/copilot/vms/input-box.vm";
+import { OverlayControl } from "@/mvvm/new/views/overlay-control.view";
 
 export default function NewPage() {
 	const [showMessages, setShowMessages] = useState(false);
@@ -43,7 +44,7 @@ export default function NewPage() {
 	};
 
 	return (
-		<div className="h-screen w-full flex flex-col overflow-hidden">
+		<OverlayControl className="h-full w-full flex flex-col overflow-hidden">
 			<div className="flex-1 flex flex-col min-h-0">
 				{/* Hero overlays the content area and fades out when messages exist */}
 				{!showMessages && (
@@ -140,6 +141,6 @@ export default function NewPage() {
 					</div>
 				</motion.div>
 			</div>
-		</div>
+		</OverlayControl>
 	);
 }

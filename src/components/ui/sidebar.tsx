@@ -282,7 +282,7 @@ const SidebarTrigger = React.forwardRef<
 			data-sidebar="trigger"
 			variant="ghost"
 			size="icon"
-			className={cn("h-7 w-7", className)}
+			className={cn("h-8 w-8 [&_svg]:!size-4.5", className)}
 			onClick={(event) => {
 				onClick?.(event);
 				toggleSidebar();
@@ -369,7 +369,7 @@ const SidebarHeader = React.forwardRef<
 		<div
 			ref={ref}
 			data-sidebar="header"
-			className={cn("flex flex-col gap-2 p-0", className)}
+			className={cn("flex flex-col gap-2 p-0 pt-2.5", className)}
 			{...props}
 		/>
 	);

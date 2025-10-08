@@ -14,7 +14,7 @@ import {
 	SidebarMenuItem,
 	SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { useAuthEvents } from "@/contexts/auth/auth.adapter";
+import { useAuthEvents } from "@/contexts/auth/auth.context";
 import { logoutUser } from "@/payload/operations/users-operation";
 
 // Menu items.

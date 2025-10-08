@@ -42,7 +42,6 @@ export default function RootLayout({
 										<AppSidebar />
 										<SidebarInset>
 											<main>
-												<SidebarTrigger />
 												{children}
 											</main>
 										</SidebarInset>

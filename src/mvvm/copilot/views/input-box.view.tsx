@@ -10,7 +10,6 @@ const cn = (...classes: (string | undefined | null | false)[]) =>
 
 interface InputBoxProps {
 	className?: string;
-	placeholder?: string;
 	disabled?: boolean;
 	isLoading?: boolean;
 	showTypewriter?: boolean;
@@ -32,7 +31,6 @@ export const InputBox = React.forwardRef<HTMLDivElement, InputBoxProps>(
 	(props, ref) => {
 		const {
 			className,
-			placeholder = "Type your message here...",
 			disabled = false,
 			isLoading = false,
 			showTypewriter = false,
@@ -53,15 +51,15 @@ export const InputBox = React.forwardRef<HTMLDivElement, InputBoxProps>(
 		return (
 			<div
 				className={cn(
-					"rounded-xl border border-[#444444] bg-background-secondary p-2 shadow-[0_8px_30px_rgba(0,0,0,0.24)] transition-all duration-300 focus-within:border-border-primary flex flex-col",
+					"rounded-xl border bg-background-secondary p-2 shadow-[0_8px_30px_rgba(0,0,0,0.24)] transition-all duration-300 focus-within:border-border-primary flex flex-col",
 					isLoading && "border-border-primary animate-shimmer-border",
-					className
+					className,
 				)}
 				ref={ref}
 			>
 				<div className="flex-1 relative">
 					<textarea
-						className="flex min-h-[44px] w-full resize-none rounded-md border-none bg-transparent px-3 py-2.5 text-gray-100 placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50"
+						className="flex min-h-[44px] w-full resize-none rounded-md border-none bg-transparent px-3 py-2.5 focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50"
 						disabled={disabled}
 						onChange={onInputChange}
 						onKeyDown={onKeyDown}
@@ -69,7 +67,6 @@ export const InputBox = React.forwardRef<HTMLDivElement, InputBoxProps>(
 						onCompositionEnd={onCompositionEnd}
 						onFocus={onFocus}
 						onBlur={onBlur}
-						placeholder={placeholder}
 						ref={textareaRef}
 						value={value}
 						rows={1}
@@ -91,10 +88,10 @@ export const InputBox = React.forwardRef<HTMLDivElement, InputBoxProps>(
 				<div className="flex items-end justify-end gap-2 p-0 mt-auto">
 					<button
 						className={cn(
-							"h-9 w-9 rounded-lg transition-all duration-100 inline-flex items-center justify-center font-medium focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 border border-[#444444]",
+							"h-9 w-9 rounded-lg transition-all duration-100 inline-flex items-center justify-center font-medium focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 border",
 							isLoading || hasContent
 								? "bg-foreground text-background-secondary hover:bg-foreground/80 cursor-pointer"
-								: "bg-transparent cursor-not-allowed text-foreground"
+								: "bg-transparent cursor-not-allowed text-foreground",
 						)}
 						disabled={isLoading ? false : !hasContent}
 						onClick={isLoading ? onStop : onSubmit}
@@ -109,6 +106,6 @@ export const InputBox = React.forwardRef<HTMLDivElement, InputBoxProps>(
 				</div>
 			</div>
 		);
-	}
+	},
 );
 InputBox.displayName = "InputBox";

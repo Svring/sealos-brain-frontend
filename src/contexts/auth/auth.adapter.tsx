@@ -25,11 +25,10 @@ export function AuthPayloadAdapter({
 	const users = use(usersPromise);
 	const user = use(userPromise);
 
-	// console.log('user', user)
-
 	// Handle auth state updates in useEffect to avoid setState during render
 	useEffect(() => {
 		if (user) {
+			console.log('send auth')
 			send({
 				type: "SET_AUTH",
 				auth: {
@@ -41,8 +40,6 @@ export function AuthPayloadAdapter({
 			send({ type: "FAIL" });
 		}
 	}, [user, send]);
-
-	// console.log("users", users);
 
 	const handleUserSelect = async (selectedUser: User) => {
 		try {
@@ -64,6 +61,11 @@ export function AuthPayloadAdapter({
 			console.error("Login error:", error);
 		}
 	};
+
+	// Block children until auth is ready
+	if (state.matches("initializing") || !state.matches("ready")) {
+		return null;
+	}
 
 	// If no user found, show user selection
 	if (!user) {
@@ -129,6 +131,11 @@ export function AuthDesktopAdapter({ children }: { children: ReactNode }) {
 			send({ type: "FAIL" });
 		}
 	});
+
+	// Block children until auth is ready
+	if (state.matches("initializing") || !state.matches("ready")) {
+		return null;
+	}
 
 	return (
 		<authMachineContext.Provider
