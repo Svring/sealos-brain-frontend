@@ -4,8 +4,8 @@
 
 @theme {
   --color-background-primary: #090909;
-  --color-background-secondary: #101012;
-  --color-background-tertiary: #1C1D1F;
+  --color-background-secondary: #0E0E10;
+  --color-background-tertiary: #17181B;
 }
 
 @theme inline {

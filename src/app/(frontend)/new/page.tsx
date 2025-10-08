@@ -12,7 +12,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { InputBoxVM } from "@/mvvm/copilot/vms/input-box.vm";
-import { OverlayControl } from "@/mvvm/new/views/overlay-control.view";
+import { OverlayControl } from "@/mvvm/pages/new/views/overlay-control.view";
 
 export default function NewPage() {
 	const [showMessages, setShowMessages] = useState(false);
