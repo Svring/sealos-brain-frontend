@@ -1,7 +1,7 @@
 "use client";
 
 import { LayoutGrid, LogOut, MessageCirclePlus } from "lucide-react";
-
+import { useRouter } from "next/navigation";
 import {
 	Sidebar,
 	SidebarContent,
@@ -33,6 +33,7 @@ const mainItems = [
 
 export function AppSidebar() {
 	const { fail } = useAuthEvents();
+	const router = useRouter();
 
 	const handleLogout = async () => {
 		try {
@@ -40,8 +41,9 @@ export function AppSidebar() {
 			if (result.success) {
 				// Clear auth state
 				fail();
-				// Redirect to login or home page
-				window.location.href = "/";
+				// Navigate to home and refresh without full reload to avoid input stream errors
+				router.replace("/");
+				router.refresh();
 			} else {
 				console.error("Logout failed:", result.error);
 			}

@@ -4,6 +4,7 @@ import { useMount } from "@reactuses/core";
 import { useMachine } from "@xstate/react";
 import { createSealosApp, sealosApp } from "@zjy365/sealos-desktop-sdk/app";
 import { ChevronRight, User as UserIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { type ReactNode, use, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Item, ItemContent, ItemGroup, ItemTitle } from "@/components/ui/item";
@@ -22,13 +23,13 @@ export function AuthPayloadAdapter({
 	usersPromise: Promise<User[]>;
 }) {
 	const [state, send] = useMachine(authMachine);
+	const router = useRouter();
 	const users = use(usersPromise);
 	const user = use(userPromise);
 
 	// Handle auth state updates in useEffect to avoid setState during render
 	useEffect(() => {
 		if (user) {
-			console.log('send auth')
 			send({
 				type: "SET_AUTH",
 				auth: {
@@ -44,6 +45,7 @@ export function AuthPayloadAdapter({
 	const handleUserSelect = async (selectedUser: User) => {
 		try {
 			const result = await loginUser(selectedUser.username, "123");
+			console.log("result", result);
 			if (result.success && result.user) {
 				send({
 					type: "SET_AUTH",
@@ -52,8 +54,7 @@ export function AuthPayloadAdapter({
 						appToken: result.user.appToken || "",
 					},
 				});
-				// Refresh the page after successful login
-				window.location.reload();
+				router.refresh();
 			} else {
 				console.error("Login failed:", result.error);
 			}
@@ -61,11 +62,6 @@ export function AuthPayloadAdapter({
 			console.error("Login error:", error);
 		}
 	};
-
-	// Block children until auth is ready
-	if (state.matches("initializing") || !state.matches("ready")) {
-		return null;
-	}
 
 	// If no user found, show user selection
 	if (!user) {
@@ -102,6 +98,12 @@ export function AuthPayloadAdapter({
 				</div>
 			</div>
 		);
+	}
+
+	console.log("state", state.value);
+
+	if (state.matches("initializing") || !state.matches("ready")) {
+		return null;
 	}
 
 	return (

@@ -48,6 +48,10 @@ export const authMachine = createMachine({
 		},
 		failed: {
 			on: {
+				SET_AUTH: {
+					target: "ready",
+					actions: assign({ auth: ({ event }) => event.auth }),
+				},
 				RETRY: "initializing",
 			},
 		},
