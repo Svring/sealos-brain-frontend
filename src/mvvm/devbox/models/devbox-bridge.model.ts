@@ -1,0 +1,214 @@
+import { z } from "zod";
+import {
+	formatDurationToReadable,
+	formatIsoDateToReadable,
+} from "@/lib/date/date-utils";
+import { convertK8sQuantityToUniversalUnit } from "@/lib/k8s/k8s.utils";
+import type { Env, K8sResource } from "@/mvvm/k8s/models/k8s-resource.model";
+
+export const SshSchema = z.object({
+	host: z
+		.any()
+		.nullable()
+		.describe(
+			JSON.stringify({
+				resourceType: "external",
+				note: "current cluster's domain name",
+			}),
+		),
+	port: z.any().describe(
+		JSON.stringify({
+			resourceType: "devbox",
+			path: ["status.network.nodePort"],
+		}),
+	),
+	user: z.any().describe(
+		JSON.stringify({
+			resourceType: "devbox",
+			path: ["spec.config.user"],
+		}),
+	),
+	workingDir: z.any().describe(
+		JSON.stringify({
+			resourceType: "devbox",
+			path: ["spec.config.workingDir"],
+		}),
+	),
+	privateKey: z
+		.any()
+		.describe(
+			JSON.stringify({
+				resourceType: "secret",
+				path: ["data.SEALOS_DEVBOX_PRIVATE_KEY"],
+			}),
+		)
+		.transform((val) => Buffer.from(val, "base64").toString("utf-8"))
+		.optional(),
+});
+
+export type Ssh = z.infer<typeof SshSchema>;
+
+export const DevboxObjectQuerySchema = z.object({
+	name: z.any().describe(
+		JSON.stringify({
+			resourceType: "devbox",
+			path: ["metadata.name"],
+		}),
+	),
+	id: z.any().describe(
+		JSON.stringify({
+			resourceType: "devbox",
+			path: ["metadata.uid"],
+		}),
+	),
+	kind: z.string().describe(
+		JSON.stringify({
+			resourceType: "devbox",
+			path: ["kind"],
+		}),
+	),
+	runtime: z
+		.any()
+		.describe(
+			JSON.stringify({
+				resourceType: "devbox",
+				path: ["spec.image"],
+			}),
+		)
+		.transform((image) => {
+			// console.log("image", image);
+			// Transform the image similar to how devbox node title processes it
+			// First extract the image name (remove registry and tag)
+			const imageName = image.split(":")[0].split("/").pop() || "";
+			// Then apply the same processing as devbox node title: split by "-", remove last part, join back
+			return imageName.split("-").slice(0, 1).join("-");
+		}),
+	image: z.any().describe(
+		JSON.stringify({
+			resourceType: "devbox",
+			path: ["spec.image"],
+		}),
+	),
+	operationalStatus: z
+		.any()
+		.describe(
+			JSON.stringify({
+				resourceType: "devbox",
+				path: [""],
+			}),
+		)
+		.transform((resource) => {
+			const metadata = resource.metadata;
+			const status = resource.status;
+
+			// Get createdAt from metadata and format it
+			const createdAt = formatIsoDateToReadable(metadata.creationTimestamp);
+
+			// Calculate upTime from state.running.startedAt
+			let upTime: string | undefined;
+			if (status?.state?.running?.startedAt) {
+				const startedAt = new Date(status.state.running.startedAt);
+				const currentTime = new Date();
+				const upTimeSeconds = Math.floor(
+					(currentTime.getTime() - startedAt.getTime()) / 1000,
+				); // Convert to seconds
+				upTime = formatDurationToReadable(upTimeSeconds);
+			}
+
+			return {
+				createdAt,
+				upTime,
+			};
+		}),
+	status: z.any().describe(
+		JSON.stringify({
+			resourceType: "devbox",
+			path: ["status.phase"],
+		}),
+	),
+	resources: z
+		.any()
+		.describe(
+			JSON.stringify({
+				resourceType: "devbox",
+				path: ["spec.resource"],
+			}),
+		)
+		.transform((resources) => {
+			// Convert Kubernetes resource strings to universal units
+			const cpu = convertK8sQuantityToUniversalUnit(
+				resources.cpu || "0",
+				"cpu",
+			);
+			const memory = convertK8sQuantityToUniversalUnit(
+				resources.memory || "0",
+				"memory",
+			);
+
+			return {
+				cpu,
+				memory,
+			};
+		}),
+	ssh: SshSchema,
+	env: z
+		.any()
+		.optional()
+		.describe(
+			JSON.stringify({
+				resourceType: "devbox",
+				path: ["spec.config.env"],
+			}),
+		)
+		.transform((envVars: Env[]) => {
+			if (!envVars.length) {
+				return [];
+			}
+			return envVars.map((envVar: Env) => {
+				if (envVar.value) {
+					// Direct value environment variable
+					return {
+						name: envVar.name,
+						value: envVar.value,
+					};
+				} else if (envVar.valueFrom?.secretKeyRef) {
+					// Secret reference environment variable
+					return {
+						name: envVar.name,
+						valueFrom: {
+							secretKeyRef: {
+								name: envVar.valueFrom.secretKeyRef.name,
+								key: envVar.valueFrom.secretKeyRef.key,
+							},
+						},
+					};
+				} else {
+					// Unknown type, return as value with placeholder
+					return {
+						name: envVar.name,
+						value: `[UNKNOWN_ENV_TYPE: ${JSON.stringify(envVar)}]`,
+					};
+				}
+			});
+		}),
+	ports: z.any().optional(),
+	pods: z
+		.any()
+		.optional()
+		.describe(
+			JSON.stringify({
+				resourceType: "pod",
+				label: "app.kubernetes.io/name",
+			}),
+		)
+		.transform((pods) => {
+			return pods.map((pod: K8sResource) => {
+				return {
+					name: pod.metadata?.name,
+					status: pod.status?.phase,
+				};
+			});
+		}),
+});
+
+export type DevboxObjectQuery = z.infer<typeof DevboxObjectQuerySchema>;
