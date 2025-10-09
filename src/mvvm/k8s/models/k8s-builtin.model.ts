@@ -37,6 +37,7 @@ export const BuiltinResourceTargetSchema = z.object({
 	type: z.literal("builtin"),
 	resourceType: z.string(),
 	name: z.string(),
+	labelSelector: z.string().optional(),
 });
 
 export const BuiltinResourceTypeTargetSchema = z.object({

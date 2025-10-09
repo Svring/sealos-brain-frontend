@@ -21,6 +21,10 @@ export const CustomResourceTargetSchema = z.object({
 	type: z.literal("custom"),
 	resourceType: z.string(),
 	name: z.string(),
+	group: z.string(),
+	version: z.string(),
+	plural: z.string(),
+	labelSelector: z.string().optional(),
 });
 
 export const CustomResourceTypeTargetSchema = z.object({
