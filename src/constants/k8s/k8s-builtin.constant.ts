@@ -1,4 +1,4 @@
-import type { BuiltinResourceConfig } from "@/mvvm/models/k8s/k8s.model";
+import type { BuiltinResourceConfig } from "@/mvvm/k8s/models/k8s-builtin.model";
 
 // Builtin resources
 export const BUILTIN_RESOURCES: Record<string, BuiltinResourceConfig> = {
