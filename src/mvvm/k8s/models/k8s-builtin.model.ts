@@ -37,24 +37,23 @@ export const BuiltinResourceTargetSchema = z.object({
 	type: z.literal("builtin"),
 	resourceType: z.string(),
 	name: z.string(),
-	labelSelector: z.string().optional(),
 });
 
 export const BuiltinResourceTypeTargetSchema = z.object({
 	type: z.literal("builtin"),
 	resourceType: z.string(),
 	name: z.string().optional(),
-	labelSelector: z.array(z.string()).optional(),
+	label: z.string().optional(),
 }).refine(
 	(data) => {
-		// If labelSelector is present, name must also be provided
-		if (data.labelSelector && data.labelSelector.length > 0) {
+		// If label is present, name must also be provided
+		if (data.label && data.label !== "") {
 			return data.name !== undefined && data.name !== "";
 		}
 		return true;
 	},
 	{
-		message: "If labelSelector is provided, name must also be provided",
+		message: "If label is provided, name must also be provided",
 		path: ["name"],
 	}
 );

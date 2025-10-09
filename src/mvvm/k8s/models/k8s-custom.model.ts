@@ -21,27 +21,23 @@ export const CustomResourceTargetSchema = z.object({
 	type: z.literal("custom"),
 	resourceType: z.string(),
 	name: z.string(),
-	group: z.string(),
-	version: z.string(),
-	plural: z.string(),
-	labelSelector: z.string().optional(),
 });
 
 export const CustomResourceTypeTargetSchema = z.object({
 	type: z.literal("custom"),
 	resourceType: z.string(),
 	name: z.string().optional(),
-	labelSelector: z.array(z.string()).optional(),
+	label: z.string().optional(),
 }).refine(
 	(data) => {
-		// If labelSelector is present, name must also be provided
-		if (data.labelSelector && data.labelSelector.length > 0) {
+		// If label is present, name must also be provided
+		if (data.label && data.label !== "") {
 			return data.name !== undefined && data.name !== "";
 		}
 		return true;
 	},
 	{
-		message: "If labelSelector is provided, name must also be provided",
+		message: "If label is provided, name must also be provided",
 		path: ["name"],
 	}
 );
