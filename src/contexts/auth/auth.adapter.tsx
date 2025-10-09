@@ -74,10 +74,10 @@ export function AuthPayloadAdapter({
 							<Item
 								size="sm"
 								key={u.id}
-								className="cursor-pointer hover:bg-muted"
+								className="cursor-pointer hover:bg-muted border border-border"
 								onClick={() => handleUserSelect(u)}
 							>
-								<ItemContent className="flex flex-row items-center gap-3 ">
+								<ItemContent className="flex flex-row items-center gap-3">
 									<Avatar className="h-8 w-8">
 										<AvatarImage
 											src={u.avatar?.url || ""}

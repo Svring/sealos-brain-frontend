@@ -4,10 +4,9 @@ import type * as React from "react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
-function ItemGroup({ className, ...props }: React.ComponentProps<"div">) {
+function ItemGroup({ className, ...props }: React.ComponentProps<"ul">) {
 	return (
-		<div
-			role="list"
+		<ul
 			data-slot="item-group"
 			className={cn("group/item-group flex flex-col", className)}
 			{...props}
@@ -40,7 +39,7 @@ const itemVariants = cva(
 			},
 			size: {
 				default: "gap-4 p-4 ",
-				sm: "gap-2.5 px-4 py-3",
+				sm: "gap-2 px-2 py-2",
 			},
 		},
 		defaultVariants: {

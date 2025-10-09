@@ -48,7 +48,7 @@ export const SshSchema = z.object({
 
 export type Ssh = z.infer<typeof SshSchema>;
 
-export const DevboxObjectQuerySchema = z.object({
+export const DevboxBridgeSchema = z.object({
 	name: z.any().describe(
 		JSON.stringify({
 			resourceType: "devbox",
@@ -211,4 +211,4 @@ export const DevboxObjectQuerySchema = z.object({
 		}),
 });
 
-export type DevboxObjectQuery = z.infer<typeof DevboxObjectQuerySchema>;
+export type DevboxObjectQuery = z.infer<typeof DevboxBridgeSchema>;
