@@ -32,12 +32,15 @@ export const listInstances = async (context: K8sContext) => {
 
 	// Convert raw K8s resources to instance objects using parser
 	if (instanceList.items && instanceList.items.length > 0) {
-		const validatedInstances = instanceList.items.map(
-			(rawInstance: unknown) => {
-				// Validate and parse the instance using our schema
-				return InstanceResourceSchema.parse(rawInstance);
-			},
-		);
+		const validatedInstances = _.filter(
+			instanceList.items,
+			(instance) =>
+				instance?.spec?.url !==
+				"https://github.com/nightwhite/own-sealos-templates",
+		).map((rawInstance: unknown) => {
+			// Validate and parse the instance using our schema
+			return InstanceResourceSchema.parse(rawInstance);
+		});
 
 		// Convert to instance objects using parser
 		return instanceParser.toObjects(validatedInstances);

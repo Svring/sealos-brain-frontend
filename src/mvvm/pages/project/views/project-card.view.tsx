@@ -2,13 +2,17 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import React from "react";
 import { AvatarCircles } from "@/components/ui/avatar-circles";
-import type { K8sResource } from "@/mvvm/k8s/models/k8s-resource.model";
+import { CLUSTER_TYPE_ICON_MAP } from "@/constants/cluster/cluster-icons.constant";
+import { DEVBOX_RUNTIME_ICONS } from "@/constants/devbox/devbox-icons.constant";
+import { LAUNCHPAD_DEFAULT_ICON } from "@/constants/launchpad/launchpad-icons.constant";
+import type { K8sItem } from "@/mvvm/k8s/models/k8s-resource.model";
 import type { InstanceObject } from "@/mvvm/sealos/instance/models/instance-object.model";
 
 interface ProjectCardViewProps {
 	project: InstanceObject;
-	resources?: K8sResource[];
+	resources?: K8sItem[];
 	isLoading?: boolean;
 	isError?: boolean;
 }
@@ -16,17 +20,110 @@ interface ProjectCardViewProps {
 export const ProjectCardView = ({
 	project,
 	resources,
-	isLoading,
-	isError,
 }: ProjectCardViewProps) => {
-	// Mock avatar data for UI demonstration
-	const avatarData = {
-		avatarUrls: ["/app_launchpad_icon.svg", "/package_icon.svg"],
-		numPeople: 0,
-	};
+	// Generate avatar data from parsed resources
+	const avatarData = React.useMemo(() => {
+		if (!resources?.length) return { avatarUrls: [], numPeople: 0 };
+
+		// Group resources by type to prioritize showing different types
+		const resourcesByType = resources.reduce(
+			(acc, item) => {
+				const type = item.resourceType;
+				if (!acc[type]) acc[type] = [];
+				acc[type].push(item);
+				return acc;
+			},
+			{} as Record<string, K8sItem[]>,
+		);
+
+		// Generate icons for each resource
+		const allIcons = resources
+			.map((item) => {
+				switch (item.resourceType) {
+					case "devbox":
+						return (
+							DEVBOX_RUNTIME_ICONS[item.runtime as string] ||
+							"/app_launchpad_icon.svg"
+						);
+					case "cluster":
+						return (
+							CLUSTER_TYPE_ICON_MAP[item.type as string] ||
+							"/app_launchpad_icon.svg"
+						);
+					case "deployment":
+					case "statefulset":
+						return LAUNCHPAD_DEFAULT_ICON;
+					default:
+						return "/app_launchpad_icon.svg";
+				}
+			})
+			.filter(Boolean) as string[];
+
+		// If we have 3 or more resources, try to show different types
+		if (allIcons.length >= 3) {
+			const maxDisplayed = 2;
+			const selectedIcons: string[] = [];
+			const resourceTypes = Object.keys(resourcesByType);
+
+			// First, try to pick one icon from each type
+			for (const type of resourceTypes) {
+				if (selectedIcons.length >= maxDisplayed) break;
+
+				const typeResources = resourcesByType[type];
+				if (typeResources && typeResources.length > 0) {
+					const item = typeResources[0] as K8sItem;
+					let iconUrl: string | null = null;
+
+					switch (item.resourceType) {
+						case "devbox":
+							iconUrl =
+								DEVBOX_RUNTIME_ICONS[item.runtime as string] ||
+								"/app_launchpad_icon.svg";
+							break;
+						case "cluster":
+							iconUrl =
+								CLUSTER_TYPE_ICON_MAP[item.type as string] ||
+								"/app_launchpad_icon.svg";
+							break;
+						case "deployment":
+						case "statefulset":
+							iconUrl = LAUNCHPAD_DEFAULT_ICON;
+							break;
+						default:
+							iconUrl = "/app_launchpad_icon.svg";
+					}
+
+					if (iconUrl) {
+						selectedIcons.push(iconUrl);
+					}
+				}
+			}
+
+			// If we still have space and more resources, fill with remaining icons
+			if (selectedIcons.length < maxDisplayed) {
+				const remainingIcons = allIcons.filter(
+					(icon) => !selectedIcons.includes(icon),
+				);
+				selectedIcons.push(
+					...remainingIcons.slice(0, maxDisplayed - selectedIcons.length),
+				);
+			}
+
+			return {
+				avatarUrls: selectedIcons,
+				numPeople: allIcons.length - selectedIcons.length,
+			};
+		}
+
+		// For less than 3 resources, show all icons
+		return {
+			avatarUrls: allIcons,
+			numPeople: 0,
+		};
+	}, [resources]);
 
 	const commonLinkProps = {
-		href: `/project/${encodeURIComponent(project.name)}`,
+		href: `/project/${project.name}`,
 		className: "block h-full w-full",
 	};
 
