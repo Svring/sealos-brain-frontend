@@ -26,7 +26,7 @@ export const ClusterResourceSchema = z.object({
 export const ClusterTerminationPolicySchema = z.enum(["Delete", "WipeOut"]);
 
 // Main cluster create form schema
-export const clusterCreateFormSchema = z.object({
+export const clusterCreateSchema = z.object({
 	name: NameSchema.default(() => `cluster-${nanoid()}`),
 	type: ClusterTypeSchema.default("postgresql"),
 	version: ClusterVersionSchema.default("postgresql-14.8.0"),
@@ -40,4 +40,4 @@ export const clusterCreateFormSchema = z.object({
 });
 
 // Export types
-export type ClusterCreateFormData = z.infer<typeof clusterCreateFormSchema>;
+export type ClusterCreateData = z.infer<typeof clusterCreateSchema>;

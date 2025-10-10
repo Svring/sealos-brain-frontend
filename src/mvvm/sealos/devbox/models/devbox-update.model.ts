@@ -6,7 +6,7 @@ import {
 } from "./devbox-create.model";
 
 // Update form schema (all fields optional for partial updates)
-export const devboxUpdateFormSchema = z.object({
+export const devboxUpdateSchema = z.object({
 	name: NameSchema,
 	resource: DevboxResourceSchema.optional(),
 	ports: z
@@ -17,9 +17,9 @@ export const devboxUpdateFormSchema = z.object({
 				const numbers = ports.map((p) => p.number);
 				return z.set(z.number()).safeParse(numbers).success;
 			},
-			{ message: "All ports must have unique port numbers" }
+			{ message: "All ports must have unique port numbers" },
 		)
 		.optional(),
 });
 
-export type DevboxUpdateFormData = z.infer<typeof devboxUpdateFormSchema>;
+export type DevboxUpdateData = z.infer<typeof devboxUpdateSchema>;

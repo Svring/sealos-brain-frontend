@@ -1,18 +1,17 @@
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
-import { INSTANCE_LABELS } from "@/constants/instance/instance-labels.constant";
-import { selectResources } from "@/lib/k8s/k8s-service.api";
-import { getInstance, listInstances } from "@/lib/sealos/instance/instance.api";
+import {
+	getInstance,
+	getInstanceResources,
+	listInstances,
+} from "@/lib/sealos/instance/instance.api";
 import { createErrorFormatter } from "@/lib/trpc/trpc.utils";
 import {
 	CustomResourceTargetSchema,
 	resourceTargetSchema,
 } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
-import {
-	K8sResourceListSchema,
-	K8sResourceSchema,
-} from "@/mvvm/k8s/models/k8s-resource.model";
+import { K8sResourceSchema } from "@/mvvm/k8s/models/k8s-resource.model";
 import { InstanceObjectSchema } from "@/mvvm/sealos/instance/models/instance-object.model";
 import { InstanceResourceSchema } from "@/mvvm/sealos/instance/models/instance-resource.model";
 
@@ -20,10 +19,12 @@ import { InstanceResourceSchema } from "@/mvvm/sealos/instance/models/instance-r
 export async function createInstanceContext(opts: {
 	req: Request;
 }): Promise<K8sContext> {
-	const kubeconfigEncoded = opts.req.headers.get("kubeconfig");
-	const kubeconfig = kubeconfigEncoded
-		? decodeURIComponent(kubeconfigEncoded)
-		: "";
+	const kubeconfigEncoded = opts.req.headers.get("kubeconfigEncoded");
+	if (!kubeconfigEncoded) {
+		throw new Error("kubeconfigEncoded header is required");
+	}
+	
+	const kubeconfig = decodeURIComponent(kubeconfigEncoded);
 
 	return {
 		kubeconfig,
@@ -60,35 +61,7 @@ export const instanceRouter = t.router({
 		.input(CustomResourceTargetSchema)
 		.output(z.array(K8sResourceSchema))
 		.query(async ({ ctx, input }) => {
-			// Create a ResourceTypeTarget with the instance name and label
-			const resourceTypeTarget = {
-				type: "custom" as const,
-				resourceType: "instance" as const,
-				name: input.name,
-				label: INSTANCE_LABELS.DEPLOY_ON_SEALOS,
-			};
-
-			// Use selectResources to get the specified resource types
-			const selectedResources = await selectResources(
-				ctx,
-				resourceTypeTarget,
-				["deployment", "statefulset"], // builtin resource types
-				["devbox", "cluster", "objectstoragebucket"], // custom resource types
-			);
-
-			// Flatten and spread all resources
-			const resources: z.infer<typeof K8sResourceSchema>[] = [];
-
-			// Process each resource type
-			for (const [_, resourceList] of Object.entries(selectedResources)) {
-				if (resourceList) {
-					// Parse and validate the resource list
-					const parsedList = K8sResourceListSchema.parse(resourceList);
-					resources.push(...parsedList.items);
-				}
-			}
-
-			return resources;
+			return await getInstanceResources(ctx, input.name);
 		}),
 
 	// ===== MUTATION PROCEDURES =====

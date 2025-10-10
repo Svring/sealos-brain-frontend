@@ -30,7 +30,7 @@ export const ProjectDashboard = () => {
 	}
 
 	if (isError) {
-		return <div>Error loading projects</div>;
+		return null;
 	}
 
 	return (

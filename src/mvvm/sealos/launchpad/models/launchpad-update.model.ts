@@ -22,7 +22,7 @@ export const LaunchpadResourceUpdateSchema = z.object({
 });
 
 // Update form schema (all fields optional for partial updates)
-export const launchpadUpdateFormSchema = z.object({
+export const launchpadUpdateSchema = z.object({
 	name: NameSchema.optional(),
 	image: ImageSchema.optional(),
 	launchCommand: LaunchCommandSchema.optional(),
@@ -43,4 +43,4 @@ export const launchpadUpdateFormSchema = z.object({
 	configMap: z.array(ConfigMapSchema).optional(),
 });
 
-export type LaunchpadUpdateFormData = z.infer<typeof launchpadUpdateFormSchema>;
+export type LaunchpadUpdateData = z.infer<typeof launchpadUpdateSchema>;

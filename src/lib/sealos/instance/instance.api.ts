@@ -1,10 +1,18 @@
 "use server";
 
+import type { z } from "zod";
+import { INSTANCE_LABELS } from "@/constants/instance/instance-labels.constant";
 import { k8sParser } from "@/lib/k8s/k8s.parser";
-import { getResource, listResources } from "@/lib/k8s/k8s-service.api";
+import {
+	getResource,
+	listResources,
+	selectResources,
+} from "@/lib/k8s/k8s-service.api";
 import { instanceParser } from "@/lib/sealos/instance/instance.parser";
 import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
+import type { K8sResourceSchema } from "@/mvvm/k8s/models/k8s-resource.model";
+import { K8sResourceListSchema } from "@/mvvm/k8s/models/k8s-resource.model";
 import type { InstanceObject } from "@/mvvm/sealos/instance/models/instance-object.model";
 import { InstanceResourceSchema } from "@/mvvm/sealos/instance/models/instance-resource.model";
 
@@ -55,14 +63,36 @@ export const getInstance = async (
  * Get instance resources (related resources with instance label)
  */
 export const getInstanceResources = async (
-	_context: K8sContext,
-	_instanceName: string,
-) => {
-	// TODO: Implement getting related resources
-	// This would involve querying for resources with the instance label
-	// For now, return empty arrays as placeholders
-	return {
-		targets: [],
-		resources: [],
+	context: K8sContext,
+	instanceName: string,
+): Promise<z.infer<typeof K8sResourceSchema>[]> => {
+	// Create a ResourceTypeTarget with the instance name and label
+	const resourceTypeTarget = {
+		type: "custom" as const,
+		resourceType: "instance" as const,
+		name: instanceName,
+		label: INSTANCE_LABELS.DEPLOY_ON_SEALOS,
 	};
+
+	// Use selectResources to get the specified resource types
+	const selectedResources = await selectResources(
+		context,
+		resourceTypeTarget,
+		["deployment", "statefulset"], // builtin resource types
+		["devbox", "cluster", "objectstoragebucket"], // custom resource types
+	);
+
+	// Flatten and spread all resources
+	const resources: z.infer<typeof K8sResourceSchema>[] = [];
+
+	// Process each resource type
+	for (const [_, resourceList] of Object.entries(selectedResources)) {
+		if (resourceList) {
+			// Parse and validate the resource list
+			const parsedList = K8sResourceListSchema.parse(resourceList);
+			resources.push(...parsedList.items);
+		}
+	}
+
+	return resources;
 };

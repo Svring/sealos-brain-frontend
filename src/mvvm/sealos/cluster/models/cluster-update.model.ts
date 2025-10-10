@@ -17,9 +17,9 @@ export const ClusterResourceUpdateSchema = z.object({
 });
 
 // Update form schema (all fields optional for partial updates)
-export const clusterUpdateFormSchema = z.object({
+export const clusterUpdateSchema = z.object({
 	name: NameSchema,
 	resource: ClusterResourceUpdateSchema.optional(),
 });
 
-export type ClusterUpdateFormData = z.infer<typeof clusterUpdateFormSchema>;
+export type ClusterUpdateData = z.infer<typeof clusterUpdateSchema>;

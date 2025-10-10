@@ -28,10 +28,12 @@ import { QuotaResourceSchema } from "@/mvvm/sealos/quota/models/quota-resource.m
 export async function createK8sContext(opts: {
 	req: Request;
 }): Promise<K8sContext> {
-	const kubeconfigEncoded = opts.req.headers.get("kubeconfig");
-	const kubeconfig = kubeconfigEncoded
-		? decodeURIComponent(kubeconfigEncoded)
-		: "";
+	const kubeconfigEncoded = opts.req.headers.get("kubeconfigEncoded");
+	if (!kubeconfigEncoded) {
+		throw new Error("kubeconfigEncoded header is required");
+	}
+
+	const kubeconfig = decodeURIComponent(kubeconfigEncoded);
 
 	return {
 		kubeconfig,

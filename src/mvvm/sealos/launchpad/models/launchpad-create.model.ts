@@ -47,7 +47,7 @@ export const ConfigMapSchema = z.object({
 });
 
 // Main launchpad create form schema
-export const launchpadCreateFormSchema = z.object({
+export const launchpadCreateSchema = z.object({
 	name: NameSchema.default(() => `launchpad-${nanoid()}`),
 	image: ImageSchema.default({
 		imageName: "nginx",
@@ -81,4 +81,4 @@ export const launchpadCreateFormSchema = z.object({
 });
 
 // Export types
-export type LaunchpadCreateFormData = z.infer<typeof launchpadCreateFormSchema>;
+export type LaunchpadCreateData = z.infer<typeof launchpadCreateSchema>;

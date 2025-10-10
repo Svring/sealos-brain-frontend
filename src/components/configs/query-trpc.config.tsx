@@ -6,11 +6,13 @@ import { createTRPCContext } from "@trpc/tanstack-react-query";
 import { useState } from "react";
 import { useAuthState } from "@/contexts/auth/auth.context";
 import type { AiProxyRouter } from "@/trpc/ai-proxy.trpc";
+import type { DevboxRouter } from "@/trpc/devbox.trpc";
 import type { InstanceRouter } from "@/trpc/instance.trpc";
 import type { K8sRouter } from "@/trpc/k8s.trpc";
 
 export const k8sClient = createTRPCContext<K8sRouter>();
 export const instanceClient = createTRPCContext<InstanceRouter>();
+export const devboxClient = createTRPCContext<DevboxRouter>();
 export const aiProxyClient = createTRPCContext<AiProxyRouter>();
 
 interface TRPCConfigProps {
@@ -32,7 +34,7 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 					url: "/api/trpc/k8s",
 					maxURLLength: 6000,
 					headers: () => ({
-						kubeconfig: kubeconfigEncoded,
+						kubeconfigEncoded,
 					}),
 				}),
 			],
@@ -46,7 +48,21 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 					url: "/api/trpc/instance",
 					maxURLLength: 6000,
 					headers: () => ({
-						kubeconfig: kubeconfigEncoded,
+						kubeconfigEncoded,
+					}),
+				}),
+			],
+		}),
+	);
+
+	const [devboxTrpcClient] = useState(() =>
+		createTRPCClient<DevboxRouter>({
+			links: [
+				httpBatchLink({
+					url: "/api/trpc/devbox",
+					maxURLLength: 6000,
+					headers: () => ({
+						kubeconfigEncoded,
 					}),
 				}),
 			],
@@ -76,12 +92,17 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 				trpcClient={instanceTrpcClient}
 				queryClient={queryClient}
 			>
-				<aiProxyClient.TRPCProvider
-					trpcClient={aiProxyTrpcClient}
+				<devboxClient.TRPCProvider
+					trpcClient={devboxTrpcClient}
 					queryClient={queryClient}
 				>
-					{children}
-				</aiProxyClient.TRPCProvider>
+					<aiProxyClient.TRPCProvider
+						trpcClient={aiProxyTrpcClient}
+						queryClient={queryClient}
+					>
+						{children}
+					</aiProxyClient.TRPCProvider>
+				</devboxClient.TRPCProvider>
 			</instanceClient.TRPCProvider>
 		</k8sClient.TRPCProvider>
 	);

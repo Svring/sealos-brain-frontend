@@ -22,7 +22,7 @@ export const DevboxPortCreateSchema = z.object({
 });
 
 // Main devbox create form schema
-export const devboxCreateFormSchema = z.object({
+export const devboxCreateSchema = z.object({
 	name: NameSchema.default(() => `devbox-${nanoid()}`),
 	runtime: DevboxRuntimeSchema,
 	resource: DevboxResourceSchema.default({
@@ -45,4 +45,4 @@ export const devboxCreateFormSchema = z.object({
 });
 
 // Export types
-export type DevboxCreateFormData = z.infer<typeof devboxCreateFormSchema>;
+export type DevboxCreateData = z.infer<typeof devboxCreateSchema>;
