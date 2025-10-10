@@ -2,8 +2,8 @@ import { convertK8sQuantityToUniversalUnit } from "@/lib/k8s/k8s.utils";
 import type {
 	QuotaObject,
 	ResourceValue,
-} from "@/mvvm/quota/models/quota-object.model";
-import type { ResourceQuota } from "@/mvvm/quota/models/quota-resource.model";
+} from "@/mvvm/sealos/quota/models/quota-object.model";
+import type { ResourceQuota } from "@/mvvm/sealos/quota/models/quota-resource.model";
 
 // Helper function to create ResourceValue from limit and used strings
 const createResourceValue = (

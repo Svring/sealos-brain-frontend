@@ -1,5 +1,5 @@
-import type { PodObject } from "@/mvvm/pod/models/pod-object.model";
-import type { PodResource } from "@/mvvm/pod/models/pod-resource.model";
+import type { PodObject } from "@/mvvm/sealos/pod/models/pod-object.model";
+import type { PodResource } from "@/mvvm/sealos/pod/models/pod-resource.model";
 
 // Convert PodResource to PodObject
 const toObject = (pod: PodResource): PodObject => {

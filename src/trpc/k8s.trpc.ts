@@ -21,7 +21,7 @@ import {
 	resourceTypeTargetSchema,
 } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
-import { ResourceQuotaSchema } from "@/mvvm/quota/models/quota-resource.model";
+import { QuotaSchema } from "@/mvvm/sealos/quota/models/quota-resource.model";
 
 // Context creation function
 export async function createK8sContext(opts: {
@@ -62,7 +62,7 @@ export const k8sRouter = t.router({
 			const rawQuota = quotaList.items[0];
 
 			// Validate and parse the quota using our schema
-			const validatedQuota = ResourceQuotaSchema.parse(rawQuota);
+			const validatedQuota = QuotaSchema.parse(rawQuota);
 
 			// Convert to quota object for easier consumption
 			return quotaParser.toObject(validatedQuota);

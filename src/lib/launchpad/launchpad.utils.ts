@@ -1,10 +1,10 @@
 import { formatIsoDateToReadable } from "@/lib/date/date-utils";
 import { convertK8sQuantityToUniversalUnit } from "@/lib/k8s/k8s.utils";
-import type { ConfigMapResource } from "@/mvvm/configmap/models/configmap-resource.model";
-import type { Container as DeploymentContainer } from "@/mvvm/launchpad/models/deployment-resource.model";
-import type { Container as StatefulSetContainer } from "@/mvvm/launchpad/models/statefulset-resource.model";
-import type { PodResource } from "@/mvvm/pod/models/pod-resource.model";
-import type { PVCResource } from "@/mvvm/pvc/models/pvc-resource.model";
+import type { ConfigMapResource } from "@/mvvm/sealos/configmap/models/configmap-resource.model";
+import type { Container as DeploymentContainer } from "@/mvvm/sealos/launchpad/models/deployment-resource.model";
+import type { Container as StatefulSetContainer } from "@/mvvm/sealos/launchpad/models/statefulset-resource.model";
+import type { PodResource } from "@/mvvm/sealos/pod/models/pod-resource.model";
+import type { PVCResource } from "@/mvvm/sealos/pvc/models/pvc-resource.model";
 
 // Common transformation functions for launchpad resources
 
