@@ -2,19 +2,16 @@
 
 import type { ReactNode } from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { cn } from "@/lib/utils";
 
 interface OverlayControlProps {
 	children: ReactNode;
-	className?: string;
 }
 
 export const OverlayControl = ({
 	children,
-	className,
 }: OverlayControlProps) => {
 	return (
-		<div className={cn("relative", className)}>
+		<div className="relative">
 			{children}
 
 			{/* Floating control buttons overlay */}

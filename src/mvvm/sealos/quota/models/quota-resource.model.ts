@@ -55,7 +55,7 @@ export const QuotaStatusSchema = z.object({
 });
 
 // Main resource quota schema
-export const QuotaSchema = z.object({
+export const QuotaResourceSchema = z.object({
 	apiVersion: z.literal("v1").optional().default("v1"),
 	kind: z.literal("ResourceQuota").optional().default("ResourceQuota"),
 	metadata: z.object({
@@ -78,4 +78,4 @@ export type QuotaLimits = z.infer<typeof QuotaLimitsSchema>;
 export type QuotaUsed = z.infer<typeof QuotaUsedSchema>;
 export type QuotaSpec = z.infer<typeof QuotaSpecSchema>;
 export type QuotaStatus = z.infer<typeof QuotaStatusSchema>;
-export type Quota = z.infer<typeof QuotaSchema>;
+export type QuotaResource = z.infer<typeof QuotaResourceSchema>;

@@ -4,21 +4,15 @@ import { Plus, Search } from "lucide-react";
 import type React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-interface Project {
-	name: string;
-	displayName: string;
-	createdAt: string;
-}
+import type { InstanceObject } from "@/mvvm/sealos/instance/models/instance-object.model";
 
 interface ProjectDashboardProps {
-	projects: Project[];
+	projects: InstanceObject[];
 	searchTerm: string;
 	onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 	onCreateProject: () => void;
 	ProjectCardComponent: React.ComponentType<{
-		project: Project;
-		variant?: "full" | "lite";
+		project: InstanceObject;
 	}>;
 	className?: string;
 }

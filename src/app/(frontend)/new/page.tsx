@@ -38,8 +38,9 @@ export default function NewPage() {
 	};
 
 	return (
-		<OverlayControl className="h-full w-full flex flex-col overflow-hidden">
-			<div className="flex-1 flex flex-col min-h-0">
+		<div className="h-full w-full flex flex-col overflow-hidden">
+			<OverlayControl>
+				<div className="flex-1 flex flex-col min-h-0">
 				{/* Hero overlays the content area and fades out when messages exist */}
 				{!showMessages && (
 					<motion.div
@@ -126,7 +127,8 @@ export default function NewPage() {
 						)}
 					</div>
 				</motion.div>
-			</div>
-		</OverlayControl>
+				</div>
+			</OverlayControl>
+		</div>
 	);
 }
