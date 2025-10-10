@@ -3,7 +3,7 @@ import {
 	formatDurationToReadable,
 	formatIsoDateToReadable,
 } from "@/lib/date/date-utils";
-import { convertK8sQuantityToUniversalUnit } from "@/lib/k8s/k8s.utils";
+import { convertK8sQuantityToUniversalUnit } from "@/lib/k8s/k8s-client.utils";
 import type { Env, K8sResource } from "@/mvvm/k8s/models/k8s-resource.model";
 
 export const SshSchema = z.object({

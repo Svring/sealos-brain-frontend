@@ -12,8 +12,8 @@ export const OwnerReferenceSchema = z.object({
 
 // Main configmap resource schema
 export const ConfigMapResourceSchema = z.object({
-	apiVersion: z.literal("v1"),
-	kind: z.literal("ConfigMap"),
+	apiVersion: z.literal("v1").optional().default("v1"),
+	kind: z.literal("ConfigMap").optional().default("ConfigMap"),
 	metadata: z.object({
 		creationTimestamp: z.string().optional(),
 		finalizers: z.array(z.string()).optional(),

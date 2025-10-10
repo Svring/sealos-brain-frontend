@@ -13,7 +13,7 @@ export const Users: CollectionConfig = {
   },
   fields: [
     {
-      name: "kubeconfig",
+      name: "kubeconfigEncoded",
       type: "text",
       required: true,
     },

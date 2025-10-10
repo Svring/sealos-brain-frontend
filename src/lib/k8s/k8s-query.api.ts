@@ -14,7 +14,7 @@ import {
 	getBuiltinApiClient,
 	getCurrentNamespace,
 	invokeApiMethod,
-} from "./k8s.utils";
+} from "./k8s-server.utils";
 
 // ============================================================================
 // Kubernetes API Query Functions

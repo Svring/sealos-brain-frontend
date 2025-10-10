@@ -10,13 +10,13 @@ import type {
 	ResourceTarget,
 } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
+import { escapeSlash } from "./k8s-client.utils";
 import {
-	escapeSlash,
 	getApiClients,
 	getBuiltinApiClient,
 	getCurrentNamespace,
 	invokeApiMethod,
-} from "./k8s.utils";
+} from "./k8s-server.utils";
 
 /**
  * Delete a custom resource by name in Kubernetes.
@@ -173,10 +173,10 @@ export const upsertBuiltinResource = async (
 /**
  * Upsert resource content for any resource type (generic version).
  * This function parses JSON or YAML content and creates or updates the resource.
- * 
+ *
  * @example
  * ```typescript
- * const result = await applyResource(context, 
+ * const result = await applyResource(context,
  *   { type: "custom", resourceType: "instance", name: "my-instance" },
  *   yamlContent
  * );

@@ -1,4 +1,4 @@
-import { convertK8sQuantityToUniversalUnit } from "@/lib/k8s/k8s.utils";
+import { convertK8sQuantityToUniversalUnit } from "@/lib/k8s/k8s-client.utils";
 import type {
 	QuotaObject,
 	ResourceValue,

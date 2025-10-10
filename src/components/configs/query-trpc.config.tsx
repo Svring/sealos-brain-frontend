@@ -20,7 +20,7 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 	const { auth } = useAuthState();
 
 	// Auth is guaranteed to exist by useAuthState
-	const kubeconfig = auth.kubeconfig;
+	const kubeconfigEncoded = auth.kubeconfigEncoded;
 	const appToken = auth.appToken;
 
 	const [k8sTrpcClient] = useState(() =>
@@ -30,7 +30,7 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 					url: "/api/trpc/k8s",
 					maxURLLength: 6000,
 					headers: () => ({
-						kubeconfig,
+						kubeconfig: kubeconfigEncoded,
 					}),
 				}),
 			],
@@ -44,7 +44,7 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 					url: "/api/trpc/ai-proxy",
 					maxURLLength: 6000,
 					headers: () => ({
-						kubeconfig,
+						kubeconfig: kubeconfigEncoded,
 						appToken,
 					}),
 				}),

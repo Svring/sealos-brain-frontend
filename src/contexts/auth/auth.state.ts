@@ -4,7 +4,7 @@ import { assign, createMachine } from "xstate";
 
 // Simplified Auth interface
 export interface Auth {
-	kubeconfig: string;
+	kubeconfigEncoded: string;
 	appToken: string;
 }
 

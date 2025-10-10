@@ -16,6 +16,7 @@ import {
 	upsertResource,
 } from "@/lib/k8s/k8s-service.api";
 import { quotaParser } from "@/lib/sealos/quota/quota.parser";
+import { createErrorFormatter } from "@/lib/trpc/trpc.utils";
 import {
 	resourceTargetSchema,
 	resourceTypeTargetSchema,
@@ -27,14 +28,17 @@ import { QuotaSchema } from "@/mvvm/sealos/quota/models/quota-resource.model";
 export async function createK8sContext(opts: {
 	req: Request;
 }): Promise<K8sContext> {
-	const kubeconfig = opts.req.headers.get("kubeconfig");
+	const kubeconfigEncoded = opts.req.headers.get("kubeconfig");
+	const kubeconfig = kubeconfigEncoded
+		? decodeURIComponent(kubeconfigEncoded)
+		: "";
 
 	return {
-		kubeconfig: kubeconfig as string,
+		kubeconfig,
 	};
 }
 
-const t = initTRPC.context<K8sContext>().create();
+const t = initTRPC.context<K8sContext>().create(createErrorFormatter());
 
 export const k8sRouter = t.router({
 	// ===== QUERY PROCEDURES =====
@@ -60,6 +64,8 @@ export const k8sRouter = t.router({
 		// Return the first resource quota if available
 		if (quotaList.items && quotaList.items.length > 0) {
 			const rawQuota = quotaList.items[0];
+
+			console.log("rawQuota", rawQuota);
 
 			// Validate and parse the quota using our schema
 			const validatedQuota = QuotaSchema.parse(rawQuota);

@@ -18,8 +18,8 @@ export const InstanceSpecSchema = z.object({
 
 // Main instance resource schema
 export const InstanceResourceSchema = z.object({
-	apiVersion: z.literal("app.sealos.io/v1"),
-	kind: z.literal("Instance"),
+	apiVersion: z.literal("app.sealos.io/v1").optional().default("app.sealos.io/v1"),
+	kind: z.literal("Instance").optional().default("Instance"),
 	metadata: z.object({
 		annotations: z.record(z.string(), z.string()).optional(),
 		creationTimestamp: z.string(),

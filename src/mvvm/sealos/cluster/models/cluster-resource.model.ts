@@ -118,8 +118,11 @@ export const ClusterStatusSchema = z.object({
 
 // Main cluster resource schema
 export const ClusterResourceSchema = z.object({
-	apiVersion: z.literal("apps.kubeblocks.io/v1alpha1"),
-	kind: z.literal("Cluster"),
+	apiVersion: z
+		.literal("apps.kubeblocks.io/v1alpha1")
+		.optional()
+		.default("apps.kubeblocks.io/v1alpha1"),
+	kind: z.literal("Cluster").optional().default("Cluster"),
 	metadata: z.object({
 		annotations: z.record(z.string(), z.string()).optional(),
 		creationTimestamp: z.string(),
@@ -142,7 +145,9 @@ export type Backup = z.infer<typeof BackupSchema>;
 export type ResourceLimits = z.infer<typeof ResourceLimitsSchema>;
 export type ResourceRequests = z.infer<typeof ResourceRequestsSchema>;
 export type Resources = z.infer<typeof ResourcesSchema>;
-export type VolumeClaimTemplateSpec = z.infer<typeof VolumeClaimTemplateSpecSchema>;
+export type VolumeClaimTemplateSpec = z.infer<
+	typeof VolumeClaimTemplateSpecSchema
+>;
 export type VolumeClaimTemplate = z.infer<typeof VolumeClaimTemplateSchema>;
 export type SwitchPolicy = z.infer<typeof SwitchPolicySchema>;
 export type ComponentSpec = z.infer<typeof ComponentSpecSchema>;

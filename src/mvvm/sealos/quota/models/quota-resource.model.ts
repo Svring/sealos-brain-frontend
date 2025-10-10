@@ -56,8 +56,8 @@ export const QuotaStatusSchema = z.object({
 
 // Main resource quota schema
 export const QuotaSchema = z.object({
-	apiVersion: z.literal("v1"),
-	kind: z.literal("ResourceQuota"),
+	apiVersion: z.literal("v1").optional().default("v1"),
+	kind: z.literal("ResourceQuota").optional().default("ResourceQuota"),
 	metadata: z.object({
 		annotations: z.record(z.string(), z.string()).optional(),
 		creationTimestamp: z.string(),

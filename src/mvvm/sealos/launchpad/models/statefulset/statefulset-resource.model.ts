@@ -11,10 +11,10 @@ export const RollingUpdateSchema = z.object({
 	maxUnavailable: z.union([z.number(), z.string()]),
 });
 
-// Deployment strategy schema
-export const DeploymentStrategySchema = z.object({
+// StatefulSet update strategy schema
+export const StatefulSetUpdateStrategySchema = z.object({
 	rollingUpdate: RollingUpdateSchema.optional(),
-	type: z.enum(["RollingUpdate", "Recreate"]),
+	type: z.enum(["RollingUpdate", "OnDelete"]),
 });
 
 // Environment variable schema
@@ -70,6 +70,23 @@ export const ContainerSchema = z.object({
 // Pod security context schema
 export const PodSecurityContextSchema = z.object({});
 
+// Persistent volume claim template schema
+export const PersistentVolumeClaimTemplateSchema = z.object({
+	metadata: z.object({
+		name: z.string(),
+		labels: z.record(z.string(), z.string()).optional(),
+		annotations: z.record(z.string(), z.string()).optional(),
+	}).optional(),
+	spec: z.object({
+		accessModes: z.array(z.string()),
+		resources: z.object({
+			requests: z.record(z.string(), z.string()),
+		}),
+		storageClassName: z.string().optional(),
+		volumeMode: z.enum(["Filesystem", "Block"]).optional(),
+	}),
+});
+
 // Pod template spec schema
 export const PodTemplateSpecSchema = z.object({
 	metadata: z.object({
@@ -88,8 +105,8 @@ export const PodTemplateSpecSchema = z.object({
 	}),
 });
 
-// Deployment condition schema
-export const DeploymentConditionSchema = z.object({
+// StatefulSet condition schema
+export const StatefulSetConditionSchema = z.object({
 	lastTransitionTime: z.string(),
 	lastUpdateTime: z.string().optional(),
 	message: z.string(),
@@ -98,30 +115,34 @@ export const DeploymentConditionSchema = z.object({
 	type: z.string(),
 });
 
-// Deployment status schema
-export const DeploymentStatusSchema = z.object({
+// StatefulSet status schema
+export const StatefulSetStatusSchema = z.object({
 	availableReplicas: z.number().optional(),
-	conditions: z.array(DeploymentConditionSchema).optional(),
+	conditions: z.array(StatefulSetConditionSchema).optional(),
 	observedGeneration: z.number().optional(),
 	readyReplicas: z.number().optional(),
 	replicas: z.number().optional(),
 	updatedReplicas: z.number().optional(),
+	currentReplicas: z.number().optional(),
+	currentRevision: z.string().optional(),
+	updateRevision: z.string().optional(),
 });
 
-// Deployment spec schema
-export const DeploymentSpecSchema = z.object({
-	progressDeadlineSeconds: z.number().optional(),
+// StatefulSet spec schema
+export const StatefulSetSpecSchema = z.object({
 	replicas: z.number().optional(),
-	revisionHistoryLimit: z.number().optional(),
 	selector: LabelSelectorSchema,
-	strategy: DeploymentStrategySchema.optional(),
 	template: PodTemplateSpecSchema,
+	updateStrategy: StatefulSetUpdateStrategySchema.optional(),
+	volumeClaimTemplates: z.array(PersistentVolumeClaimTemplateSchema).optional(),
+	serviceName: z.string().optional(),
+	podManagementPolicy: z.enum(["OrderedReady", "Parallel"]).optional(),
 });
 
-// Main deployment resource schema
-export const DeploymentResourceSchema = z.object({
-	apiVersion: z.literal("apps/v1"),
-	kind: z.literal("Deployment"),
+// Main statefulset resource schema
+export const StatefulSetResourceSchema = z.object({
+	apiVersion: z.literal("apps/v1").optional().default("apps/v1"),
+	kind: z.literal("StatefulSet").optional().default("StatefulSet"),
 	metadata: z.object({
 		name: z.string(),
 		namespace: z.string().optional(),
@@ -132,22 +153,23 @@ export const DeploymentResourceSchema = z.object({
 		labels: z.record(z.string(), z.string()).optional(),
 		annotations: z.record(z.string(), z.string()).optional(),
 	}),
-	spec: DeploymentSpecSchema,
-	status: DeploymentStatusSchema.optional(),
+	spec: StatefulSetSpecSchema,
+	status: StatefulSetStatusSchema.optional(),
 });
 
 // Type exports
 export type LabelSelector = z.infer<typeof LabelSelectorSchema>;
 export type RollingUpdate = z.infer<typeof RollingUpdateSchema>;
-export type DeploymentStrategy = z.infer<typeof DeploymentStrategySchema>;
+export type StatefulSetUpdateStrategy = z.infer<typeof StatefulSetUpdateStrategySchema>;
 export type EnvVar = z.infer<typeof EnvVarSchema>;
 export type ContainerPort = z.infer<typeof ContainerPortSchema>;
 export type ResourceRequirements = z.infer<typeof ResourceRequirementsSchema>;
 export type VolumeMount = z.infer<typeof VolumeMountSchema>;
 export type Container = z.infer<typeof ContainerSchema>;
 export type PodSecurityContext = z.infer<typeof PodSecurityContextSchema>;
+export type PersistentVolumeClaimTemplate = z.infer<typeof PersistentVolumeClaimTemplateSchema>;
 export type PodTemplateSpec = z.infer<typeof PodTemplateSpecSchema>;
-export type DeploymentCondition = z.infer<typeof DeploymentConditionSchema>;
-export type DeploymentStatus = z.infer<typeof DeploymentStatusSchema>;
-export type DeploymentSpec = z.infer<typeof DeploymentSpecSchema>;
-export type DeploymentResource = z.infer<typeof DeploymentResourceSchema>;
+export type StatefulSetCondition = z.infer<typeof StatefulSetConditionSchema>;
+export type StatefulSetStatus = z.infer<typeof StatefulSetStatusSchema>;
+export type StatefulSetSpec = z.infer<typeof StatefulSetSpecSchema>;
+export type StatefulSetResource = z.infer<typeof StatefulSetResourceSchema>;

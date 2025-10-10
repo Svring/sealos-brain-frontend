@@ -33,7 +33,7 @@ export function AuthPayloadAdapter({
 			send({
 				type: "SET_AUTH",
 				auth: {
-					kubeconfig: user.kubeconfig,
+					kubeconfigEncoded: user.kubeconfigEncoded,
 					appToken: user.appToken || "",
 				},
 			});
@@ -45,12 +45,11 @@ export function AuthPayloadAdapter({
 	const handleUserSelect = async (selectedUser: User) => {
 		try {
 			const result = await loginUser(selectedUser.username, "123");
-			console.log("result", result);
 			if (result.success && result.user) {
 				send({
 					type: "SET_AUTH",
 					auth: {
-						kubeconfig: result.user.kubeconfig,
+						kubeconfigEncoded: result.user.kubeconfigEncoded,
 						appToken: result.user.appToken || "",
 					},
 				});
@@ -125,7 +124,7 @@ export function AuthDesktopAdapter({ children }: { children: ReactNode }) {
 
 		if (sessionData?.kubeconfig) {
 			const auth: Auth = {
-				kubeconfig: sessionData.kubeconfig,
+				kubeconfigEncoded: sessionData.kubeconfig,
 				appToken: sessionData.token || "",
 			};
 			send({ type: "SET_AUTH", auth });

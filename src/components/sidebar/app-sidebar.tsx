@@ -1,5 +1,6 @@
 "use client";
 
+import { getHTTPStatusCodeFromError } from "@trpc/server/http";
 import { LayoutGrid, LogOut, MessageCirclePlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -15,6 +16,7 @@ import {
 	SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { useAuthEvents } from "@/contexts/auth/auth.context";
+import { useQuota } from "@/hooks/k8s/use-quota";
 import { logoutUser } from "@/payload/operations/users-operation";
 
 // Menu items.
@@ -34,6 +36,9 @@ const mainItems = [
 export function AppSidebar() {
 	const { fail } = useAuthEvents();
 	const router = useRouter();
+	const { data: quota, isLoading, isError } = useQuota();
+
+	// console.log(quota);
 
 	const handleLogout = async () => {
 		try {

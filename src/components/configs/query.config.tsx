@@ -13,8 +13,12 @@ function makeQueryClient() {
 	const queryClient = new QueryClient({
 		defaultOptions: {
 			queries: {
+				retry: 1,
 				staleTime: 20 * 1000, // Shorter stale time - 20 seconds
 				gcTime: 3 * 60 * 1000, // Keep in cache for 5 minutes
+			},
+			mutations: {
+				retry: 1,
 			},
 		},
 	});

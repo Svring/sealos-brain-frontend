@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { DeploymentBridgeSchema } from "./deployment-bridge.model";
-import { StatefulsetBridgeSchema } from "./statefulset-bridge.model";
+import { DeploymentBridgeSchema } from "./deployment/deployment-bridge.model";
+import { StatefulsetBridgeSchema } from "./statefulset/statefulset-bridge.model";
 
 // Unified launchpad object query schema (discriminated union)
 export const LaunchpadObjectQuerySchema = z.discriminatedUnion("resourceType", [
@@ -13,8 +13,8 @@ export const LaunchpadObjectQuerySchema = z.discriminatedUnion("resourceType", [
 ]);
 
 // Re-export schemas and types from individual bridge models
-export { DeploymentBridgeSchema as DeploymentObjectQuerySchema } from "./deployment-bridge.model";
-export { StatefulsetBridgeSchema as StatefulsetObjectQuerySchema } from "./statefulset-bridge.model";
+export { DeploymentBridgeSchema as DeploymentObjectQuerySchema } from "./deployment/deployment-bridge.model";
+export { StatefulsetBridgeSchema as StatefulsetObjectQuerySchema } from "./statefulset/statefulset-bridge.model";
 
 export type DeploymentObjectQuery = z.infer<typeof DeploymentBridgeSchema>;
 export type StatefulsetObjectQuery = z.infer<typeof StatefulsetBridgeSchema>;

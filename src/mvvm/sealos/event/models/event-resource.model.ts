@@ -28,8 +28,8 @@ export const EventMetadataSchema = z.object({
 
 // Main event resource schema
 export const EventResourceSchema = z.object({
-	apiVersion: z.literal("v1"),
-	kind: z.literal("Event"),
+	apiVersion: z.literal("v1").optional().default("v1"),
+	kind: z.literal("Event").optional().default("Event"),
 	metadata: EventMetadataSchema,
 	count: z.number().optional(),
 	eventTime: z.string().nullable().optional(),
@@ -46,8 +46,8 @@ export const EventResourceSchema = z.object({
 
 // Event list schema for the complete response
 export const EventListSchema = z.object({
-	apiVersion: z.literal("v1"),
-	kind: z.literal("List"),
+	apiVersion: z.literal("v1").optional().default("v1"),
+	kind: z.literal("List").optional().default("List"),
 	metadata: z.object({
 		resourceVersion: z.string().optional(),
 	}),

@@ -23,8 +23,11 @@ export const PVCStatusSchema = z.object({
 
 // Main PVC resource schema
 export const PVCResourceSchema = z.object({
-	apiVersion: z.literal("v1"),
-	kind: z.literal("PersistentVolumeClaim"),
+	apiVersion: z.literal("v1").optional().default("v1"),
+	kind: z
+		.literal("PersistentVolumeClaim")
+		.optional()
+		.default("PersistentVolumeClaim"),
 	metadata: z.object({
 		annotations: z.record(z.string(), z.string()).optional(),
 		creationTimestamp: z.string().optional(),

@@ -141,8 +141,8 @@ export const PodStatusSchema = z.object({
 
 // Main pod resource schema
 export const PodResourceSchema = z.object({
-	apiVersion: z.literal("v1"),
-	kind: z.literal("Pod"),
+	apiVersion: z.literal("v1").optional().default("v1"),
+	kind: z.literal("Pod").optional().default("Pod"),
 	metadata: z.object({
 		annotations: z.record(z.string(), z.string()).optional(),
 		creationTimestamp: z.string().optional(),
