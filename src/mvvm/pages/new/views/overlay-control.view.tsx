@@ -17,10 +17,8 @@ export const OverlayControl = ({
 			{children}
 
 			{/* Floating control buttons overlay */}
-			<div className="absolute top-2 left-2 z-50">
+			<div className="absolute top-2 left-2 z-50 flex">
 				<SidebarTrigger />
-			</div>
-			<div className="absolute top-2 right-2 z-50">
 				<Button variant="ghost" size="icon" className="h-8 w-8 [&_svg]:!size-4.5">
 					<SquarePen className="h-4 w-4" />
 				</Button>
