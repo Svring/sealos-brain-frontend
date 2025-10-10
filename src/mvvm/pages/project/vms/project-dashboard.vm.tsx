@@ -26,7 +26,7 @@ export const ProjectDashboard = () => {
 	};
 
 	if (isLoading) {
-		return <div>Loading projects...</div>;
+		return null;
 	}
 
 	if (isError) {
