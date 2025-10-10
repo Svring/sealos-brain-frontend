@@ -5,13 +5,7 @@ import { LayoutTemplate } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Hero } from "@/components/ui/hero";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { InputBoxVM } from "@/mvvm/copilot/vms/input-box.vm";
+import { InputBox } from "@/mvvm/copilot/vms/input-box.vm";
 import { OverlayControl } from "@/mvvm/pages/new/views/overlay-control.view";
 
 export default function NewPage() {
@@ -110,7 +104,7 @@ export default function NewPage() {
 					className={`flex-shrink-0 ${showMessages ? "pb-8" : "py-0"}`}
 				>
 					<div className="container mx-auto relative max-w-3xl">
-						<InputBoxVM
+						<InputBox
 							className={`max-w-3xl${!showMessages ? " min-h-[140px]" : ""}`}
 							exhibition={!showMessages}
 							onSend={handleSubmit}
@@ -119,23 +113,15 @@ export default function NewPage() {
 						/>
 						{!showMessages && (
 							<div className="absolute bottom-2 left-2 right-2 flex gap-2 pointer-events-none">
-								<TooltipProvider>
-									<Tooltip>
-										<TooltipTrigger asChild>
-											<Button
-												onClick={handleOpenTemplate}
-												variant="outline"
-												className="bg-background-tertiary! border-border-primary! pointer-events-auto"
-											>
-												<LayoutTemplate />
-												From Template
-											</Button>
-										</TooltipTrigger>
-										<TooltipContent>
-											<p>Deploy from app store templates</p>
-										</TooltipContent>
-									</Tooltip>
-								</TooltipProvider>
+								<Button
+									onClick={handleOpenTemplate}
+									variant="outline"
+									size="sm"
+									className="bg-background-tertiary! pointer-events-auto"
+								>
+									<LayoutTemplate />
+									From Template
+								</Button>
 							</div>
 						)}
 					</div>

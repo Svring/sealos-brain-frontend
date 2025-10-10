@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { InputBox } from "../views/input-box.view";
+import { InputBoxView } from "../views/input-box.view";
 
 interface InputBoxVMProps {
 	onSend?: (message: string) => void;
@@ -16,13 +16,12 @@ interface InputBoxVMProps {
 	exhibition?: boolean;
 }
 
-export const InputBoxVM = React.forwardRef<HTMLDivElement, InputBoxVMProps>(
+export const InputBox = React.forwardRef<HTMLDivElement, InputBoxVMProps>(
 	(props, ref) => {
 		const {
 			onSend = () => {},
 			onStop = () => {},
 			isLoading = false,
-			placeholder = "Type your message here...",
 			className,
 			textareaRef,
 			autoFocus = false,
@@ -150,10 +149,9 @@ export const InputBoxVM = React.forwardRef<HTMLDivElement, InputBoxVMProps>(
 		const hasContent = input.trim() !== "";
 
 		return (
-			<InputBox
+			<InputBoxView
 				ref={ref}
 				className={className}
-				placeholder={placeholder}
 				disabled={disableInput}
 				isLoading={isLoading}
 				showTypewriter={showTypewriter}
@@ -173,4 +171,4 @@ export const InputBoxVM = React.forwardRef<HTMLDivElement, InputBoxVMProps>(
 		);
 	}
 );
-InputBoxVM.displayName = "InputBoxVM";
+InputBoxView.displayName = "InputBoxVM";

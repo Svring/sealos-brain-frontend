@@ -27,7 +27,7 @@ interface InputBoxProps {
 	textareaRef: (node: HTMLTextAreaElement | null) => void;
 }
 
-export const InputBox = React.forwardRef<HTMLDivElement, InputBoxProps>(
+export const InputBoxView = React.forwardRef<HTMLDivElement, InputBoxProps>(
 	(props, ref) => {
 		const {
 			className,
@@ -108,4 +108,4 @@ export const InputBox = React.forwardRef<HTMLDivElement, InputBoxProps>(
 		);
 	},
 );
-InputBox.displayName = "InputBox";
+InputBoxView.displayName = "InputBox";
