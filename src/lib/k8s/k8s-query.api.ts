@@ -11,6 +11,7 @@ import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
 import {
 	getApiClients,
 	getBuiltinApiClient,
+	getCurrentNamespace,
 	invokeApiMethod,
 } from "./k8s.utils";
 
@@ -24,6 +25,7 @@ export const listCustomResources = async (
 ) => {
 	const { clients } = await getApiClients(context.kubeconfig);
 	const customResourceConfig = CUSTOM_RESOURCES[target.resourceType];
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
 	if (!customResourceConfig) {
 		throw new Error(`Unknown custom resource type: ${target.resourceType}`);
@@ -35,7 +37,7 @@ export const listCustomResources = async (
 		{
 			group: customResourceConfig.group,
 			version: customResourceConfig.version,
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			plural: customResourceConfig.plural,
 			labelSelector:
 				target.label && target.name
@@ -52,6 +54,7 @@ export const getCustomResource = async (
 ) => {
 	const { clients } = await getApiClients(context.kubeconfig);
 	const customResourceConfig = CUSTOM_RESOURCES[target.resourceType];
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
 	if (!customResourceConfig) {
 		throw new Error(`Unknown custom resource type: ${target.resourceType}`);
@@ -63,7 +66,7 @@ export const getCustomResource = async (
 		{
 			group: customResourceConfig.group,
 			version: customResourceConfig.version,
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			plural: customResourceConfig.plural,
 			name: target.name,
 		},
@@ -79,12 +82,13 @@ export const listBuiltinResources = async (
 		context.kubeconfig,
 		target.resourceType,
 	);
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
 	const builtinResourceListResponse = await invokeApiMethod(
 		client,
 		resourceConfig.listMethod,
 		{
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			labelSelector:
 				target.label && target.name
 					? `${target.label}=${target.name}`
@@ -103,12 +107,13 @@ export const getBuiltinResource = async (
 		context.kubeconfig,
 		target.resourceType,
 	);
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
 	const builtinResourceGetResponse = await invokeApiMethod(
 		client,
 		resourceConfig.getMethod,
 		{
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			name: target.name,
 		},
 	);
@@ -129,12 +134,13 @@ export const getLogsByPod = async (
 	target: BuiltinResourceTarget,
 ) => {
 	const { clients } = await getApiClients(context.kubeconfig);
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
 	const logResponse = await invokeApiMethod(
 		clients.coreApi,
 		"readNamespacedPodLog",
 		{
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			name: target.name,
 		},
 	);

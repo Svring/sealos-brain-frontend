@@ -7,12 +7,14 @@ import { CUSTOM_RESOURCES } from "@/constants/k8s/k8s-custom.constant";
 import type {
 	BuiltinResourceTarget,
 	CustomResourceTarget,
+	ResourceTarget,
 } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
 import {
 	escapeSlash,
 	getApiClients,
 	getBuiltinApiClient,
+	getCurrentNamespace,
 	invokeApiMethod,
 } from "./k8s.utils";
 
@@ -25,6 +27,7 @@ export const deleteCustomResource = async (
 ) => {
 	const { clients } = await getApiClients(context.kubeconfig);
 	const customResourceConfig = CUSTOM_RESOURCES[target.resourceType];
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
 	if (!customResourceConfig) {
 		throw new Error(`Unknown custom resource type: ${target.resourceType}`);
@@ -40,7 +43,7 @@ export const deleteCustomResource = async (
 		{
 			group: customResourceConfig.group,
 			version: customResourceConfig.version,
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			plural: customResourceConfig.plural,
 			name: target.name,
 		},
@@ -59,6 +62,7 @@ export const upsertCustomResource = async (
 ) => {
 	const { clients } = await getApiClients(context.kubeconfig);
 	const customResourceConfig = CUSTOM_RESOURCES[target.resourceType];
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
 	if (!customResourceConfig) {
 		throw new Error(`Unknown custom resource type: ${target.resourceType}`);
@@ -74,7 +78,7 @@ export const upsertCustomResource = async (
 		await invokeApiMethod<any>(clients.customApi, "getNamespacedCustomObject", {
 			group: customResourceConfig.group,
 			version: customResourceConfig.version,
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			plural: customResourceConfig.plural,
 			name: resourceName,
 		});
@@ -86,7 +90,7 @@ export const upsertCustomResource = async (
 			{
 				group: customResourceConfig.group,
 				version: customResourceConfig.version,
-				namespace: context.namespace,
+				namespace: namespace || "default",
 				plural: customResourceConfig.plural,
 				name: resourceName,
 				body: resourceBody,
@@ -102,7 +106,7 @@ export const upsertCustomResource = async (
 			{
 				group: customResourceConfig.group,
 				version: customResourceConfig.version,
-				namespace: context.namespace,
+				namespace: namespace || "default",
 				plural: customResourceConfig.plural,
 				body: resourceBody,
 			},
@@ -125,6 +129,7 @@ export const upsertBuiltinResource = async (
 		context.kubeconfig,
 		target.resourceType,
 	);
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
 	const resourceName = (resourceBody.metadata as any)?.name || target.name;
 	if (_.isNil(resourceName)) {
@@ -134,7 +139,7 @@ export const upsertBuiltinResource = async (
 	try {
 		// Try to get the existing resource
 		await invokeApiMethod<any>(client, resourceConfig.getMethod, {
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			name: resourceName,
 		});
 
@@ -143,7 +148,7 @@ export const upsertBuiltinResource = async (
 			client,
 			resourceConfig.replaceMethod,
 			{
-				namespace: context.namespace,
+				namespace: namespace || "default",
 				name: resourceName,
 				body: resourceBody,
 			},
@@ -156,7 +161,7 @@ export const upsertBuiltinResource = async (
 			client,
 			resourceConfig.createMethod,
 			{
-				namespace: context.namespace,
+				namespace: namespace || "default",
 				body: resourceBody,
 			},
 		);
@@ -168,11 +173,19 @@ export const upsertBuiltinResource = async (
 /**
  * Upsert resource content for any resource type (generic version).
  * This function parses JSON or YAML content and creates or updates the resource.
+ * 
+ * @example
+ * ```typescript
+ * const result = await applyResource(context, 
+ *   { type: "custom", resourceType: "instance", name: "my-instance" },
+ *   yamlContent
+ * );
+ * ```
  */
 export const applyResource = async (
 	context: K8sContext,
+	target: ResourceTarget,
 	resourceContent: string | Record<string, unknown>,
-	target?: CustomResourceTarget | BuiltinResourceTarget,
 ) => {
 	// Parse resource content
 	const resource =
@@ -186,63 +199,10 @@ export const applyResource = async (
 	if (_.isNil(name))
 		throw new Error("Resource name is required in YAML metadata");
 
-	// Handle target or infer resource type
-	if (target) {
-		return target.type === "custom"
-			? await upsertCustomResource(context, target, resource)
-			: await upsertBuiltinResource(context, target, resource);
-	}
-
-	const { apiVersion, kind } = resource as {
-		apiVersion: string;
-		kind: string;
-	};
-	if (!apiVersion || !kind) {
-		throw new Error(
-			"apiVersion and kind are required in YAML to infer resource type",
-		);
-	}
-
-	// Handle custom or builtin resource
-	if (apiVersion.includes("/")) {
-		const [group, version] = apiVersion.split("/");
-		const resourceType = kind.toLowerCase();
-
-		// Check if we have a config for this custom resource
-		const customResourceConfig = CUSTOM_RESOURCES[resourceType];
-		if (customResourceConfig) {
-			return await upsertCustomResource(
-				context,
-				{
-					type: "custom",
-					resourceType,
-					name,
-				},
-				resource,
-			);
-		} else {
-			// Fallback for unknown custom resources
-			return await upsertCustomResource(
-				context,
-				{
-					type: "custom",
-					resourceType,
-					name,
-				},
-				resource,
-			);
-		}
-	}
-
-	return await upsertBuiltinResource(
-		context,
-		{
-			type: "builtin",
-			resourceType: kind.toLowerCase(),
-			name,
-		},
-		resource,
-	);
+	// Use provided target
+	return target.type === "custom"
+		? await upsertCustomResource(context, target, resource)
+		: await upsertBuiltinResource(context, target, resource);
 };
 
 /**
@@ -256,6 +216,7 @@ export const deleteBuiltinResource = async (
 		context.kubeconfig,
 		target.resourceType,
 	);
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
 	if (_.isNil(target.name)) {
 		throw new Error("Resource name is required for deletion");
@@ -265,7 +226,7 @@ export const deleteBuiltinResource = async (
 		client,
 		resourceConfig.deleteMethod,
 		{
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			name: target.name,
 			propagationPolicy: "Foreground",
 		},
@@ -285,6 +246,7 @@ export const patchCustomResourceMetadata = async (
 ) => {
 	const { clients } = await getApiClients(context.kubeconfig);
 	const customResourceConfig = CUSTOM_RESOURCES[target.resourceType];
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
 	if (!customResourceConfig) {
 		throw new Error(`Unknown custom resource type: ${target.resourceType}`);
@@ -301,7 +263,7 @@ export const patchCustomResourceMetadata = async (
 		{
 			group: customResourceConfig.group,
 			version: customResourceConfig.version,
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			plural: customResourceConfig.plural,
 			name: target.name,
 		},
@@ -329,7 +291,7 @@ export const patchCustomResourceMetadata = async (
 		{
 			group: customResourceConfig.group,
 			version: customResourceConfig.version,
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			plural: customResourceConfig.plural,
 			name: target.name,
 			body: patchBody,
@@ -350,6 +312,7 @@ export const removeCustomResourceMetadata = async (
 ) => {
 	const { clients } = await getApiClients(context.kubeconfig);
 	const customResourceConfig = CUSTOM_RESOURCES[target.resourceType];
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
 	if (!customResourceConfig) {
 		throw new Error(`Unknown custom resource type: ${target.resourceType}`);
@@ -366,7 +329,7 @@ export const removeCustomResourceMetadata = async (
 		{
 			group: customResourceConfig.group,
 			version: customResourceConfig.version,
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			plural: customResourceConfig.plural,
 			name: target.name,
 		},
@@ -393,7 +356,7 @@ export const removeCustomResourceMetadata = async (
 		{
 			group: customResourceConfig.group,
 			version: customResourceConfig.version,
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			plural: customResourceConfig.plural,
 			name: target.name,
 			body: patchBody,
@@ -417,6 +380,7 @@ export const patchBuiltinResourceMetadata = async (
 		context.kubeconfig,
 		target.resourceType,
 	);
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
 	if (_.isNil(target.name)) {
 		throw new Error("Resource name is required for metadata patching");
@@ -427,7 +391,7 @@ export const patchBuiltinResourceMetadata = async (
 		client,
 		resourceConfig.getMethod,
 		{
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			name: target.name,
 		},
 	);
@@ -452,7 +416,7 @@ export const patchBuiltinResourceMetadata = async (
 		client,
 		resourceConfig.patchMethod,
 		{
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			name: target.name,
 			body: patchBody,
 		},
@@ -474,6 +438,7 @@ export const removeBuiltinResourceMetadata = async (
 		context.kubeconfig,
 		target.resourceType,
 	);
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
 	if (_.isNil(target.name)) {
 		throw new Error("Resource name is required for metadata removal");
@@ -484,7 +449,7 @@ export const removeBuiltinResourceMetadata = async (
 		client,
 		resourceConfig.getMethod,
 		{
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			name: target.name,
 		},
 	);
@@ -508,79 +473,13 @@ export const removeBuiltinResourceMetadata = async (
 		client,
 		resourceConfig.patchMethod,
 		{
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			name: target.name,
 			body: patchBody,
 		},
 	);
 
 	return JSON.parse(JSON.stringify(result));
-};
-
-/**
- * Apply YAML for instance kind custom resources.
- * This function parses YAML content and creates or updates the instance custom resource.
- */
-export const applyInstanceYaml = async (
-	context: K8sContext,
-	yamlContent: string,
-) => {
-	const { clients } = await getApiClients(context.kubeconfig);
-	const customResourceConfig = CUSTOM_RESOURCES.instance;
-
-	if (!customResourceConfig) {
-		throw new Error("Instance custom resource configuration not found");
-	}
-
-	// Parse YAML content
-	const resource = load(yamlContent) as Record<string, unknown>;
-	const { name } = resource.metadata as { name: string };
-
-	if (_.isNil(name)) {
-		throw new Error("Resource name is required in YAML metadata");
-	}
-
-	try {
-		// Try to get the existing resource
-		await invokeApiMethod<any>(clients.customApi, "getNamespacedCustomObject", {
-			group: customResourceConfig.group,
-			version: customResourceConfig.version,
-			namespace: context.namespace,
-			plural: customResourceConfig.plural,
-			name,
-		});
-
-		// If found, update it
-		const result = await invokeApiMethod<any>(
-			clients.customApi,
-			"replaceNamespacedCustomObject",
-			{
-				group: customResourceConfig.group,
-				version: customResourceConfig.version,
-				namespace: context.namespace,
-				plural: customResourceConfig.plural,
-				name,
-				body: resource,
-			},
-		);
-
-		return JSON.parse(JSON.stringify(result));
-	} catch (error: unknown) {
-		// Assume resource doesn't exist, create it
-		const result = await invokeApiMethod<any>(
-			clients.customApi,
-			"createNamespacedCustomObject",
-			{
-				group: customResourceConfig.group,
-				version: customResourceConfig.version,
-				namespace: context.namespace,
-				plural: customResourceConfig.plural,
-				body: resource,
-			},
-		);
-
-		return JSON.parse(JSON.stringify(result));
-	}
 };
 
 /**
@@ -593,6 +492,7 @@ export const patchCustomResource = async (
 ) => {
 	const { clients } = await getApiClients(context.kubeconfig);
 	const customResourceConfig = CUSTOM_RESOURCES[target.resourceType];
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
 	if (!customResourceConfig) {
 		throw new Error(`Unknown custom resource type: ${target.resourceType}`);
@@ -608,7 +508,7 @@ export const patchCustomResource = async (
 		{
 			group: customResourceConfig.group,
 			version: customResourceConfig.version,
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			plural: customResourceConfig.plural,
 			name: target.name,
 			body: patchBody,
@@ -630,6 +530,7 @@ export const patchBuiltinResource = async (
 		context.kubeconfig,
 		target.resourceType,
 	);
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
 	if (_.isNil(target.name)) {
 		throw new Error("Resource name is required for patching");
@@ -639,7 +540,7 @@ export const patchBuiltinResource = async (
 		client,
 		resourceConfig.patchMethod,
 		{
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			name: target.name,
 			body: patchBody,
 		},
@@ -659,6 +560,7 @@ export const strategicMergePatchCustomResource = async (
 ) => {
 	const { clients } = await getApiClients(context.kubeconfig);
 	const customResourceConfig = CUSTOM_RESOURCES[target.resourceType];
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
 	if (!customResourceConfig) {
 		throw new Error(`Unknown custom resource type: ${target.resourceType}`);
@@ -674,7 +576,7 @@ export const strategicMergePatchCustomResource = async (
 		{
 			group: customResourceConfig.group,
 			version: customResourceConfig.version,
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			plural: customResourceConfig.plural,
 			name: target.name,
 			body: patchBody,
@@ -702,6 +604,7 @@ export const strategicMergePatchBuiltinResource = async (
 		context.kubeconfig,
 		target.resourceType,
 	);
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
 	if (_.isNil(target.name)) {
 		throw new Error("Resource name is required for patching");
@@ -711,7 +614,7 @@ export const strategicMergePatchBuiltinResource = async (
 		client,
 		resourceConfig.patchMethod,
 		{
-			namespace: context.namespace,
+			namespace: namespace || "default",
 			name: target.name,
 			body: patchBody,
 			options: {

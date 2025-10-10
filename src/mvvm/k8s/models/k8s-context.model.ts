@@ -3,7 +3,6 @@ import { z } from "zod";
 // Context schema definition
 export const K8sContextSchema = z.object({
 	kubeconfig: z.string(),
-	namespace: z.string(),
 });
 
 // Derived type from schema
