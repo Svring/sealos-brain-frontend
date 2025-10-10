@@ -93,7 +93,7 @@ export function AppSidebar() {
 			<SidebarFooter>
 				<SidebarMenu>
 					<SidebarMenuItem>
-						<SidebarMenuButton onClick={handleLogout} tooltip="Logout">
+						<SidebarMenuButton onClick={handleLogout}>
 							<LogOut />
 							<span>Logout</span>
 						</SidebarMenuButton>

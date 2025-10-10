@@ -15,7 +15,7 @@ import {
 	strategicMergePatchResource,
 	upsertResource,
 } from "@/lib/k8s/k8s-service.api";
-import { quotaParser } from "@/lib/quota/quota.parser";
+import { quotaParser } from "@/lib/sealos/quota/quota.parser";
 import {
 	resourceTargetSchema,
 	resourceTypeTargetSchema,

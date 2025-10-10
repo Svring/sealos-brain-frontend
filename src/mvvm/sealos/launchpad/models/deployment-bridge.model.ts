@@ -8,7 +8,7 @@ import {
 	transformOperationalStatus,
 	transformPods,
 	transformStrategy,
-} from "@/lib/launchpad/launchpad.utils";
+} from "@/lib/sealos/launchpad/launchpad.utils";
 
 // Deployment object query schema
 export const DeploymentBridgeSchema = z.object({

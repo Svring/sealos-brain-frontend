@@ -41,6 +41,7 @@ const toObject = (pod: PodResource): PodObject => {
 
 	return {
 		name: metadata.name || "unknown",
+		resourceType: "pod",
 		createdAt: metadata.creationTimestamp || null,
 		ports,
 		resources,

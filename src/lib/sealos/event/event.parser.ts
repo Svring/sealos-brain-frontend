@@ -7,6 +7,7 @@ const toObject = (event: EventResource): EventObject => {
 
 	return {
 		name: metadata.name || "unknown",
+		resourceType: "event",
 		reason: reason || "",
 		type: type || "",
 		message: message || "",

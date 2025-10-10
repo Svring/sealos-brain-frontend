@@ -3,7 +3,7 @@ import type {
 	QuotaObject,
 	ResourceValue,
 } from "@/mvvm/sealos/quota/models/quota-object.model";
-import type { ResourceQuota } from "@/mvvm/sealos/quota/models/quota-resource.model";
+import type { Quota } from "@/mvvm/sealos/quota/models/quota-resource.model";
 
 // Helper function to create ResourceValue from limit and used strings
 const createResourceValue = (
@@ -22,7 +22,7 @@ const createResourceValue = (
 };
 
 // Convert ResourceQuota to QuotaObject
-const toObject = (resourceQuota: ResourceQuota): QuotaObject => {
+const toObject = (resourceQuota: Quota): QuotaObject => {
 	const { spec, status } = resourceQuota;
 
 	return {

@@ -2,8 +2,8 @@
 
 import type { Operation } from "fast-json-patch";
 import { POD_LABELS } from "@/constants/pod/pod-label.constant";
-import { eventParser } from "@/lib/event/event.parser";
-import { podParser } from "@/lib/pod/pod.parser";
+import { eventParser } from "@/lib/sealos/event/event.parser";
+import { podParser } from "@/lib/sealos/pod/pod.parser";
 import type {
 	BuiltinResourceTarget,
 	BuiltinResourceTypeTarget,

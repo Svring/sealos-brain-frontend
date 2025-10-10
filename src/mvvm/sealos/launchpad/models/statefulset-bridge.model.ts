@@ -9,7 +9,7 @@ import {
 	transformStatefulSetEnv,
 	transformStatefulSetResource,
 	transformStrategy,
-} from "@/lib/launchpad/launchpad.utils";
+} from "@/lib/sealos/launchpad/launchpad.utils";
 
 // StatefulSet object query schema
 export const StatefulsetBridgeSchema = z.object({
