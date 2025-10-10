@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { formatDurationToReadable, formatIsoDateToReadable } from "@/lib/date/date-utils";
-import { convertK8sQuantityToUniversalUnit } from "@/lib/k8s/k8s-client.utils";
+import { standardizeUnit } from "@/lib/k8s/k8s-client.utils";
 import type { K8sResource } from "@/mvvm/k8s/models/k8s-resource.model";
 import type { ClusterResource, ComponentSpec } from "./cluster-resource.model";
 
@@ -42,15 +42,15 @@ export const ClusterBridgeSchema = z.object({
 		)
 		.transform((data) => {
 			// Convert Kubernetes resource strings to universal units
-			const cpu = convertK8sQuantityToUniversalUnit(
+			const cpu = standardizeUnit(
 				data.cpu || "0",
 				"cpu",
 			);
-			const memory = convertK8sQuantityToUniversalUnit(
+			const memory = standardizeUnit(
 				data.memory || "0",
 				"memory",
 			);
-			const storage = convertK8sQuantityToUniversalUnit(
+			const storage = standardizeUnit(
 				data.storage || "0",
 				"storage",
 			);
@@ -92,17 +92,17 @@ export const ClusterBridgeSchema = z.object({
 			if (!Array.isArray(componentSpecs)) return [];
 
 			return componentSpecs.map((spec: ComponentSpec) => {
-				const cpu = convertK8sQuantityToUniversalUnit(
+				const cpu = standardizeUnit(
 					spec.resources?.limits?.cpu || spec.resources?.requests?.cpu || "0",
 					"cpu",
 				);
-				const memory = convertK8sQuantityToUniversalUnit(
+				const memory = standardizeUnit(
 					spec.resources?.limits?.memory ||
 						spec.resources?.requests?.memory ||
 						"0",
 					"memory",
 				);
-				const storage = convertK8sQuantityToUniversalUnit(
+				const storage = standardizeUnit(
 					spec.volumeClaimTemplates?.[0]?.spec?.resources?.requests?.storage ||
 						"0",
 					"storage",

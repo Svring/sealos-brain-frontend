@@ -1,6 +1,6 @@
 "use server";
 
-import type { z } from "zod";
+import _ from "lodash";
 import { INSTANCE_LABELS } from "@/constants/instance/instance-labels.constant";
 import { k8sParser } from "@/lib/k8s/k8s.parser";
 import {
@@ -8,10 +8,13 @@ import {
 	listResources,
 	selectResources,
 } from "@/lib/k8s/k8s-service.api";
+import { clusterParser } from "@/lib/sealos/cluster/cluster.parser";
+import { devboxParser } from "@/lib/sealos/devbox/devbox.parser";
 import { instanceParser } from "@/lib/sealos/instance/instance.parser";
+import { launchpadParser } from "@/lib/sealos/launchpad/launchpad.parser";
 import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
-import type { K8sResourceSchema } from "@/mvvm/k8s/models/k8s-resource.model";
+import type { K8sItem } from "@/mvvm/k8s/models/k8s-resource.model";
 import { K8sResourceListSchema } from "@/mvvm/k8s/models/k8s-resource.model";
 import type { InstanceObject } from "@/mvvm/sealos/instance/models/instance-object.model";
 import { InstanceResourceSchema } from "@/mvvm/sealos/instance/models/instance-resource.model";
@@ -65,8 +68,7 @@ export const getInstance = async (
 export const getInstanceResources = async (
 	context: K8sContext,
 	instanceName: string,
-): Promise<z.infer<typeof K8sResourceSchema>[]> => {
-	// Create a ResourceTypeTarget with the instance name and label
+): Promise<K8sItem[]> => {
 	const resourceTypeTarget = {
 		type: "custom" as const,
 		resourceType: "instance" as const,
@@ -74,25 +76,32 @@ export const getInstanceResources = async (
 		label: INSTANCE_LABELS.DEPLOY_ON_SEALOS,
 	};
 
-	// Use selectResources to get the specified resource types
 	const selectedResources = await selectResources(
 		context,
 		resourceTypeTarget,
-		["deployment", "statefulset"], // builtin resource types
-		["devbox", "cluster", "objectstoragebucket"], // custom resource types
+		["deployment", "statefulset"],
+		["devbox", "cluster", "objectstoragebucket"],
 	);
 
-	// Flatten and spread all resources
-	const resources: z.infer<typeof K8sResourceSchema>[] = [];
+	const parsers: Record<string, (resource: any) => K8sItem> = {
+		Devbox: devboxParser.toItem,
+		Cluster: clusterParser.toItem,
+		Deployment: launchpadParser.toItem,
+		StatefulSet: launchpadParser.toItem,
+	};
 
-	// Process each resource type
-	for (const [_, resourceList] of Object.entries(selectedResources)) {
-		if (resourceList) {
-			// Parse and validate the resource list
-			const parsedList = K8sResourceListSchema.parse(resourceList);
-			resources.push(...parsedList.items);
-		}
-	}
-
-	return resources;
+	return _.flatMap(_.pickBy(selectedResources, Boolean), (resourceList) =>
+		K8sResourceListSchema.parse(resourceList)
+			.items.map((resource) => {
+				const parser = parsers[resource.kind];
+				if (!parser) return null;
+				try {
+					return parser(resource);
+				} catch (error) {
+					console.warn(`Failed to parse resource ${resource.kind}:`, error);
+					return null;
+				}
+			})
+			.filter(Boolean),
+	) as K8sItem[];
 };

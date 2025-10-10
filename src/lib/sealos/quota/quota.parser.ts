@@ -1,4 +1,4 @@
-import { convertK8sQuantityToUniversalUnit } from "@/lib/k8s/k8s-client.utils";
+import { standardizeUnit } from "@/lib/k8s/k8s-client.utils";
 import type {
 	QuotaObject,
 	ResourceValue,
@@ -16,8 +16,8 @@ const createResourceValue = (
 	}
 
 	return {
-		used: convertK8sQuantityToUniversalUnit(used, resourceType),
-		limit: convertK8sQuantityToUniversalUnit(limit, resourceType),
+		used: standardizeUnit(used, resourceType),
+		limit: standardizeUnit(limit, resourceType),
 	};
 };
 

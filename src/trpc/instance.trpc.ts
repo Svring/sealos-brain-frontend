@@ -11,7 +11,7 @@ import {
 	resourceTargetSchema,
 } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
-import { K8sResourceSchema } from "@/mvvm/k8s/models/k8s-resource.model";
+import { K8sItemSchema } from "@/mvvm/k8s/models/k8s-resource.model";
 import { InstanceObjectSchema } from "@/mvvm/sealos/instance/models/instance-object.model";
 import { InstanceResourceSchema } from "@/mvvm/sealos/instance/models/instance-resource.model";
 
@@ -23,7 +23,7 @@ export async function createInstanceContext(opts: {
 	if (!kubeconfigEncoded) {
 		throw new Error("kubeconfigEncoded header is required");
 	}
-	
+
 	const kubeconfig = decodeURIComponent(kubeconfigEncoded);
 
 	return {
@@ -59,7 +59,7 @@ export const instanceRouter = t.router({
 
 	resources: t.procedure
 		.input(CustomResourceTargetSchema)
-		.output(z.array(K8sResourceSchema))
+		.output(z.array(K8sItemSchema))
 		.query(async ({ ctx, input }) => {
 			return await getInstanceResources(ctx, input.name);
 		}),

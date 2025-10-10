@@ -1,9 +1,34 @@
 /**
  * Client-side Kubernetes utilities
- * 
+ *
  * This file contains utility functions that can be used on the client side
  * for Kubernetes-related operations that don't require server-side execution.
  */
+
+/**
+ * Helper to add missing apiVersion and kind to builtin resource lists.
+ * This ensures all resources have the proper apiVersion and kind fields.
+ */
+export async function addMissingFields<T extends Record<string, unknown>>(
+	items: T[],
+	apiVersion: string,
+	kind: string,
+): Promise<{
+	apiVersion: string;
+	kind: string;
+	items: T[];
+}> {
+	await new Promise((resolve) => setTimeout(resolve, 0));
+	return {
+		apiVersion: `${apiVersion}List`,
+		kind: `${kind}List`,
+		items: items.map((item) => ({
+			apiVersion,
+			kind,
+			...item,
+		})),
+	};
+}
 
 /**
  * Helper function to escape slashes in keys for JSON Patch paths
@@ -18,9 +43,9 @@ export function escapeSlash(key: string): string {
  * @param resourceType - Type of resource ("cpu", "memory", "storage", or "other")
  * @returns Converted numeric value in universal units (cores for CPU, GB for memory/storage, raw number for others)
  */
-export function convertK8sQuantityToUniversalUnit(
+export function standardizeUnit(
 	quantity: string,
-	resourceType: "cpu" | "memory" | "storage" | "other" = "other"
+	resourceType: "cpu" | "memory" | "storage" | "other" = "other",
 ): number {
 	if (!quantity || typeof quantity !== "string") {
 		return 0;

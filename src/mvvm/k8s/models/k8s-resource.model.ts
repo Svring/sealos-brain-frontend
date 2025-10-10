@@ -41,7 +41,7 @@ export const K8sResourceSchema = z.object({
 					uid: z.string(),
 					controller: z.boolean().optional(),
 					blockOwnerDeletion: z.boolean().optional(),
-				})
+				}),
 			)
 			.optional(),
 		finalizers: z.array(z.string()).optional(),
@@ -74,7 +74,7 @@ export const K8sEventSchema = z.object({
 					uid: z.string(),
 					controller: z.boolean().optional(),
 					blockOwnerDeletion: z.boolean().optional(),
-				})
+				}),
 			)
 			.optional(),
 		finalizers: z.array(z.string()).optional(),
@@ -112,23 +112,32 @@ export const NameSchema = z
 	.max(63, "Name must be 63 characters or less")
 	.regex(
 		/^[a-z0-9]([-a-z0-9]*[a-z0-9])?$/,
-		"Name must be DNS compliant: lowercase, numbers, hyphens only"
+		"Name must be DNS compliant: lowercase, numbers, hyphens only",
 	);
 
 // Kubernetes resource list schema
 export const K8sResourceListSchema = z.object({
 	apiVersion: z.string(),
 	kind: z.string(),
-	metadata: z.object({
-		resourceVersion: z.string().optional(),
-		selfLink: z.string().optional(),
-	}).optional(),
+	metadata: z
+		.object({
+			resourceVersion: z.string().optional(),
+			selfLink: z.string().optional(),
+		})
+		.optional(),
 	items: z.array(K8sResourceSchema),
 });
+
+// K8s Item schema - mandates name and resourceType, allows other fields
+export const K8sItemSchema = z.object({
+	name: z.string(),
+	resourceType: z.string(),
+}).passthrough();
 
 // Type exports
 export type Env = z.infer<typeof EnvSchema>;
 export type K8sResource = z.infer<typeof K8sResourceSchema>;
 export type K8sEvent = z.infer<typeof K8sEventSchema>;
 export type K8sResourceList = z.infer<typeof K8sResourceListSchema>;
+export type K8sItem = z.infer<typeof K8sItemSchema>;
 export type Name = z.infer<typeof NameSchema>;

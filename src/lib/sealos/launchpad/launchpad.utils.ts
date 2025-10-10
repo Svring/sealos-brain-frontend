@@ -1,5 +1,5 @@
 import { formatIsoDateToReadable } from "@/lib/date/date-utils";
-import { convertK8sQuantityToUniversalUnit } from "@/lib/k8s/k8s-client.utils";
+import { standardizeUnit } from "@/lib/k8s/k8s-client.utils";
 import type { ConfigMapResource } from "@/mvvm/sealos/configmap/models/configmap-resource.model";
 import type { Container as DeploymentContainer } from "@/mvvm/sealos/launchpad/models/deployment/deployment-resource.model";
 import type { Container as StatefulSetContainer } from "@/mvvm/sealos/launchpad/models/statefulset/statefulset-resource.model";
@@ -88,8 +88,8 @@ export const transformDeploymentResource = (spec: unknown) => {
 
 		// Convert Kubernetes resource strings to numeric values
 		const convertedResource = {
-			cpu: convertK8sQuantityToUniversalUnit(k8sResource.cpu || "0", "cpu"),
-			memory: convertK8sQuantityToUniversalUnit(
+			cpu: standardizeUnit(k8sResource.cpu || "0", "cpu"),
+			memory: standardizeUnit(
 				k8sResource.memory || "0",
 				"memory",
 			),
@@ -134,8 +134,8 @@ export const transformStatefulSetResource = (spec: unknown) => {
 
 		// Convert Kubernetes resource strings to numeric values
 		const convertedResource = {
-			cpu: convertK8sQuantityToUniversalUnit(k8sResource.cpu || "0", "cpu"),
-			memory: convertK8sQuantityToUniversalUnit(
+			cpu: standardizeUnit(k8sResource.cpu || "0", "cpu"),
+			memory: standardizeUnit(
 				k8sResource.memory || "0",
 				"memory",
 			),
@@ -149,7 +149,7 @@ export const transformStatefulSetResource = (spec: unknown) => {
 
 		// Add storage for StatefulSet
 		if (k8sResource.storage) {
-			const storage = convertK8sQuantityToUniversalUnit(
+			const storage = standardizeUnit(
 				k8sResource.storage,
 				"storage",
 			);
@@ -165,7 +165,7 @@ export const transformStatefulSetResource = (spec: unknown) => {
 		Array.isArray(volumeClaimTemplates) && volumeClaimTemplates.length > 0
 			? volumeClaimTemplates[0].spec?.resources?.requests?.storage || ""
 			: "";
-	const convertedStorage = convertK8sQuantityToUniversalUnit(
+	const convertedStorage = standardizeUnit(
 		storage,
 		"storage",
 	);

@@ -3,14 +3,21 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { AvatarCircles } from "@/components/ui/avatar-circles";
+import type { K8sResource } from "@/mvvm/k8s/models/k8s-resource.model";
 import type { InstanceObject } from "@/mvvm/sealos/instance/models/instance-object.model";
 
 interface ProjectCardViewProps {
 	project: InstanceObject;
+	resources?: K8sResource[];
+	isLoading?: boolean;
+	isError?: boolean;
 }
 
 export const ProjectCardView = ({
 	project,
+	resources,
+	isLoading,
+	isError,
 }: ProjectCardViewProps) => {
 	// Mock avatar data for UI demonstration
 	const avatarData = {

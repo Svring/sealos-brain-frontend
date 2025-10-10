@@ -9,6 +9,7 @@ import type {
 	CustomResourceTypeTarget,
 } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
+import { addMissingFields } from "./k8s-client.utils";
 import {
 	getApiClients,
 	getBuiltinApiClient,
@@ -32,13 +33,17 @@ export const listCustomResources = async (
 		throw new Error(`Unknown custom resource type: ${target.resourceType}`);
 	}
 
+	if (!namespace) {
+		throw new Error("Namespace is required but not found in kubeconfig");
+	}
+
 	const customResourceListResponse = await invokeApiMethod(
 		clients.customApi,
 		"listNamespacedCustomObject",
 		{
 			group: customResourceConfig.group,
 			version: customResourceConfig.version,
-			namespace: namespace || "default",
+			namespace,
 			plural: customResourceConfig.plural,
 			labelSelector:
 				target.label && target.name
@@ -61,13 +66,17 @@ export const getCustomResource = async (
 		throw new Error(`Unknown custom resource type: ${target.resourceType}`);
 	}
 
+	if (!namespace) {
+		throw new Error("Namespace is required but not found in kubeconfig");
+	}
+
 	const customResourceGetResponse = await invokeApiMethod(
 		clients.customApi,
 		"getNamespacedCustomObject",
 		{
 			group: customResourceConfig.group,
 			version: customResourceConfig.version,
-			namespace: namespace || "default",
+			namespace,
 			plural: customResourceConfig.plural,
 			name: target.name,
 		},
@@ -85,11 +94,17 @@ export const listBuiltinResources = async (
 	);
 	const namespace = await getCurrentNamespace(context.kubeconfig);
 
-	const builtinResourceListResponse = await invokeApiMethod(
+	if (!namespace) {
+		throw new Error("Namespace is required but not found in kubeconfig");
+	}
+
+	const builtinResourceListResponse = await invokeApiMethod<{
+		items: any[];
+	}>(
 		client,
 		resourceConfig.listMethod,
 		{
-			namespace: namespace || "default",
+			namespace,
 			labelSelector:
 				target.label && target.name
 					? `${target.label}=${target.name}`
@@ -97,7 +112,15 @@ export const listBuiltinResources = async (
 		},
 	);
 
-	return JSON.parse(JSON.stringify(builtinResourceListResponse));
+	return JSON.parse(
+		JSON.stringify(
+			await addMissingFields(
+				builtinResourceListResponse.items,
+				resourceConfig.apiVersion,
+				resourceConfig.kind,
+			),
+		),
+	);
 };
 
 export const getBuiltinResource = async (
@@ -110,11 +133,15 @@ export const getBuiltinResource = async (
 	);
 	const namespace = await getCurrentNamespace(context.kubeconfig);
 
+	if (!namespace) {
+		throw new Error("Namespace is required but not found in kubeconfig");
+	}
+
 	const builtinResourceGetResponse = await invokeApiMethod(
 		client,
 		resourceConfig.getMethod,
 		{
-			namespace: namespace || "default",
+			namespace,
 			name: target.name,
 		},
 	);
@@ -137,11 +164,15 @@ export const getLogsByPod = async (
 	const { clients } = await getApiClients(context.kubeconfig);
 	const namespace = await getCurrentNamespace(context.kubeconfig);
 
+	if (!namespace) {
+		throw new Error("Namespace is required but not found in kubeconfig");
+	}
+
 	const logResponse = await invokeApiMethod(
 		clients.coreApi,
 		"readNamespacedPodLog",
 		{
-			namespace: namespace || "default",
+			namespace,
 			name: target.name,
 		},
 	);
@@ -164,14 +195,28 @@ export const getEventsByPod = async (context: K8sContext, podName: string) => {
 	);
 	const namespace = await getCurrentNamespace(context.kubeconfig);
 
-	const eventListResponse = await invokeApiMethod(
+	if (!namespace) {
+		throw new Error("Namespace is required but not found in kubeconfig");
+	}
+
+	const eventListResponse = await invokeApiMethod<{
+		items: any[];
+	}>(
 		client,
 		resourceConfig.listMethod,
 		{
-			namespace: namespace || "default",
+			namespace,
 			fieldSelector: `${EVENT_FIELDS.INVOLVED_OBJECT_NAME}=${podName}`,
 		},
 	);
 
-	return JSON.parse(JSON.stringify(eventListResponse));
+	return JSON.parse(
+		JSON.stringify(
+			await addMissingFields(
+				eventListResponse.items,
+				resourceConfig.apiVersion,
+				resourceConfig.kind,
+			),
+		),
+	);
 };
