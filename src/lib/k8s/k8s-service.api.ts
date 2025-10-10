@@ -1,6 +1,8 @@
 "use server";
 
 import type { Operation } from "fast-json-patch";
+import { BUILTIN_RESOURCES } from "@/constants/k8s/k8s-builtin.constant";
+import { CUSTOM_RESOURCES } from "@/constants/k8s/k8s-custom.constant";
 import { POD_LABELS } from "@/constants/pod/pod-label.constant";
 import { eventParser } from "@/lib/sealos/event/event.parser";
 import { podParser } from "@/lib/sealos/pod/pod.parser";
@@ -12,7 +14,9 @@ import type {
 	ResourceTarget,
 	ResourceTypeTarget,
 } from "@/mvvm/k8s/models/k8s.model";
+import { BuiltinResourceTypeTargetSchema } from "@/mvvm/k8s/models/k8s-builtin.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
+import { CustomResourceTypeTargetSchema } from "@/mvvm/k8s/models/k8s-custom.model";
 import { k8sParser } from "./k8s.parser";
 import {
 	applyResource as applyResourceMutation,
@@ -37,6 +41,130 @@ import {
 	listBuiltinResources,
 	listCustomResources,
 } from "./k8s-query.api";
+
+// ============================================================================
+// Resource Selection Functions
+// ============================================================================
+
+/**
+ * Select specific resources based on provided resource types.
+ * This function allows selecting only the resources specified in the parameters,
+ * unlike listAllResources which fetches all available resources.
+ *
+ * @example
+ * ```typescript
+ * // Select only specific builtin and custom resources
+ * const selectedResources = await selectResources(context, {
+ *   type: "custom",
+ *   resourceType: "devbox",
+ *   label: "app",
+ *   name: "my-app"
+ * }, ["pod", "service"], ["devbox", "instance"]);
+ * ```
+ */
+export const selectResources = async (
+	context: K8sContext,
+	target: ResourceTypeTarget,
+	builtinResourceTypes?: string[],
+	customResourceTypes?: string[],
+) => {
+	// Filter builtin resources based on provided list
+	const builtinResourcesToFetch = builtinResourceTypes
+		? builtinResourceTypes.reduce(
+				(acc, resourceType) => {
+					const config = BUILTIN_RESOURCES[resourceType];
+					if (config) {
+						acc[resourceType] = config;
+					} else {
+						console.warn(`Unknown builtin resource type: ${resourceType}`);
+					}
+					return acc;
+				},
+				{} as Record<string, (typeof BUILTIN_RESOURCES)[string]>,
+			)
+		: {};
+
+	// Filter custom resources based on provided list
+	const customResourcesToFetch = customResourceTypes
+		? customResourceTypes.reduce(
+				(acc, resourceType) => {
+					const config = CUSTOM_RESOURCES[resourceType];
+					if (config) {
+						acc[resourceType] = config;
+					} else {
+						console.warn(`Unknown custom resource type: ${resourceType}`);
+					}
+					return acc;
+				},
+				{} as Record<string, (typeof CUSTOM_RESOURCES)[string]>,
+			)
+		: {};
+
+	// Prepare builtin resource promises only if there are resources to fetch
+	const builtinPromises = Object.entries(builtinResourcesToFetch).map(
+		async ([name, config]) => {
+			try {
+				const builtinTarget = BuiltinResourceTypeTargetSchema.parse({
+					type: "builtin",
+					resourceType: config.resourceType,
+					label: target.label,
+					name: target.name,
+				});
+				const result = await listBuiltinResources(context, builtinTarget);
+				return [name, result];
+			} catch (error) {
+				console.warn(
+					`Failed to fetch builtin resources of type ${config.resourceType}:`,
+					error,
+				);
+				return [name, { items: [] }];
+			}
+		},
+	);
+
+	// Prepare custom resource promises only if there are resources to fetch
+	const customPromises = Object.entries(customResourcesToFetch).map(
+		async ([name, config]) => {
+			try {
+				const customTarget = CustomResourceTypeTargetSchema.parse({
+					type: "custom",
+					resourceType: config.resourceType,
+					label: target.label,
+					name: target.name,
+				});
+				const result = await listCustomResources(context, customTarget);
+				return [name, result];
+			} catch (error) {
+				console.warn(
+					`Failed to fetch custom resources of type ${config.resourceType}:`,
+					error,
+				);
+				return [name, { items: [] }];
+			}
+		},
+	);
+
+	// Execute all promises in parallel
+	const [builtinResults, customResults] = await Promise.all([
+		Promise.all(builtinPromises),
+		Promise.all(customPromises),
+	]);
+
+	// Merge all results into a single object
+	const mergedResults: Record<string, unknown> = {};
+
+	// Add builtin results
+	for (const [name, result] of builtinResults) {
+		mergedResults[name] = result;
+	}
+
+	// Add custom results
+	for (const [name, result] of customResults) {
+		mergedResults[name] = result;
+	}
+
+	return mergedResults;
+};
 
 // ============================================================================
 // Unified Kubernetes Service API Functions

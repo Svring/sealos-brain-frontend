@@ -1,5 +1,7 @@
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
+import { INSTANCE_LABELS } from "@/constants/instance/instance-labels.constant";
+import { selectResources } from "@/lib/k8s/k8s-service.api";
 import { getInstance, listInstances } from "@/lib/sealos/instance/instance.api";
 import { createErrorFormatter } from "@/lib/trpc/trpc.utils";
 import {
@@ -7,6 +9,10 @@ import {
 	resourceTargetSchema,
 } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
+import {
+	K8sResourceListSchema,
+	K8sResourceSchema,
+} from "@/mvvm/k8s/models/k8s-resource.model";
 import { InstanceObjectSchema } from "@/mvvm/sealos/instance/models/instance-object.model";
 import { InstanceResourceSchema } from "@/mvvm/sealos/instance/models/instance-resource.model";
 
@@ -50,20 +56,39 @@ export const instanceRouter = t.router({
 			return await getInstance(ctx, input);
 		}),
 
-	getResources: t.procedure
-		.input(z.string())
-		.output(
-			z.object({
-				targets: z.array(resourceTargetSchema),
-				resources: z.array(z.any()),
-			}),
-		)
+	resources: t.procedure
+		.input(CustomResourceTargetSchema)
+		.output(z.array(K8sResourceSchema))
 		.query(async ({ ctx, input }) => {
-			// TODO: Implement get instance resources
-			return {
-				targets: [],
-				resources: [],
+			// Create a ResourceTypeTarget with the instance name and label
+			const resourceTypeTarget = {
+				type: "custom" as const,
+				resourceType: "instance" as const,
+				name: input.name,
+				label: INSTANCE_LABELS.DEPLOY_ON_SEALOS,
 			};
+
+			// Use selectResources to get the specified resource types
+			const selectedResources = await selectResources(
+				ctx,
+				resourceTypeTarget,
+				["deployment", "statefulset"], // builtin resource types
+				["devbox", "cluster", "objectstoragebucket"], // custom resource types
+			);
+
+			// Flatten and spread all resources
+			const resources: z.infer<typeof K8sResourceSchema>[] = [];
+
+			// Process each resource type
+			for (const [_, resourceList] of Object.entries(selectedResources)) {
+				if (resourceList) {
+					// Parse and validate the resource list
+					const parsedList = K8sResourceListSchema.parse(resourceList);
+					resources.push(...parsedList.items);
+				}
+			}
+
+			return resources;
 		}),
 
 	// ===== MUTATION PROCEDURES =====
@@ -85,22 +110,24 @@ export const instanceRouter = t.router({
 			throw new Error("Not implemented");
 		}),
 
-	delete: t.procedure.input(z.string()).mutation(async ({ ctx, input }) => {
-		// TODO: Implement delete instance
-		throw new Error("Not implemented");
-	}),
+	delete: t.procedure
+		.input(CustomResourceTargetSchema)
+		.mutation(async ({ ctx, input }) => {
+			// TODO: Implement delete instance
+			throw new Error("Not implemented");
+		}),
 
 	// Instance Configuration
-	updateName: t.procedure
+	update: t.procedure
 		.input(
 			z.object({
-				name: z.string(),
+				target: CustomResourceTargetSchema,
 				newDisplayName: z.string(),
 			}),
 		)
 		.output(
 			z.object({
-				name: z.string(),
+				target: CustomResourceTargetSchema,
 				newDisplayName: z.string(),
 			}),
 		)
@@ -130,32 +157,6 @@ export const instanceRouter = t.router({
 		)
 		.mutation(async ({ ctx, input }) => {
 			// TODO: Implement remove resources from instance
-			throw new Error("Not implemented");
-		}),
-
-	// Resource Patching
-	patch: t.procedure
-		.input(
-			z.object({
-				target: resourceTargetSchema,
-				patchBody: z.array(z.record(z.unknown())),
-			}),
-		)
-		.mutation(async ({ ctx, input }) => {
-			// TODO: Implement patch instance
-			throw new Error("Not implemented");
-		}),
-
-	// Strategic Merge Patch
-	merge: t.procedure
-		.input(
-			z.object({
-				target: resourceTargetSchema,
-				patchBody: z.record(z.unknown()),
-			}),
-		)
-		.mutation(async ({ ctx, input }) => {
-			// TODO: Implement strategic merge patch instance
 			throw new Error("Not implemented");
 		}),
 });

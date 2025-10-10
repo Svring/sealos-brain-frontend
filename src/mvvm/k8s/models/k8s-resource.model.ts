@@ -115,8 +115,20 @@ export const NameSchema = z
 		"Name must be DNS compliant: lowercase, numbers, hyphens only"
 	);
 
+// Kubernetes resource list schema
+export const K8sResourceListSchema = z.object({
+	apiVersion: z.string(),
+	kind: z.string(),
+	metadata: z.object({
+		resourceVersion: z.string().optional(),
+		selfLink: z.string().optional(),
+	}).optional(),
+	items: z.array(K8sResourceSchema),
+});
+
 // Type exports
 export type Env = z.infer<typeof EnvSchema>;
 export type K8sResource = z.infer<typeof K8sResourceSchema>;
 export type K8sEvent = z.infer<typeof K8sEventSchema>;
+export type K8sResourceList = z.infer<typeof K8sResourceListSchema>;
 export type Name = z.infer<typeof NameSchema>;
