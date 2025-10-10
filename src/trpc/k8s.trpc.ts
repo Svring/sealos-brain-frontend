@@ -1,9 +1,13 @@
 import { initTRPC } from "@trpc/server";
 import type { Operation } from "fast-json-patch";
 import { z } from "zod";
+import { k8sParser } from "@/lib/k8s/k8s.parser";
 import {
 	deleteResource,
 	getResource,
+	getResourceEvents,
+	getResourceLogs,
+	getResourcePods,
 	listResources,
 	patchResource,
 	patchResourceMetadata,
@@ -11,6 +15,7 @@ import {
 	strategicMergePatchResource,
 	upsertResource,
 } from "@/lib/k8s/k8s-service.api";
+import { quotaParser } from "@/lib/quota/quota.parser";
 import {
 	resourceTargetSchema,
 	resourceTypeTargetSchema,
@@ -48,10 +53,7 @@ export const k8sRouter = t.router({
 	// Quota Management
 	quota: t.procedure.query(async ({ ctx }) => {
 		// List resource quotas using the builtin resource type
-		const quotaTarget = {
-			type: "builtin" as const,
-			resourceType: "resourcequota" as const,
-		};
+		const quotaTarget = k8sParser.fromTypeToTarget("resourcequota");
 
 		const quotaList = await listResources(ctx, quotaTarget);
 
@@ -60,36 +62,35 @@ export const k8sRouter = t.router({
 			const rawQuota = quotaList.items[0];
 
 			// Validate and parse the quota using our schema
-			return ResourceQuotaSchema.parse(rawQuota);
+			const validatedQuota = ResourceQuotaSchema.parse(rawQuota);
+
+			// Convert to quota object for easier consumption
+			return quotaParser.toObject(validatedQuota);
 		}
 
 		throw new Error("No resource quotas found");
-	}),
-
-	// Events Management
-	events: t.procedure.input(resourceTargetSchema).query(async () => {
-		// TODO: Implement events fetching - placeholder for now
-		throw new Error("Events fetching not implemented yet");
 	}),
 
 	// Pod Management
 	pods: t.procedure
 		.input(resourceTargetSchema)
 		.query(async ({ ctx, input }) => {
-			// List pods by filtering for pod resource type
-			const podTarget = {
-				...input,
-				type: "builtin" as const,
-				resourceType: "pod" as const,
-			};
-			return await listResources(ctx, podTarget);
+			return await getResourcePods(ctx, input);
+		}),
+
+	// Events Management
+	events: t.procedure
+		.input(resourceTargetSchema)
+		.query(async ({ ctx, input }) => {
+			return await getResourceEvents(ctx, input);
 		}),
 
 	// Logs Management
-	logs: t.procedure.input(resourceTargetSchema).query(async () => {
-		// TODO: Implement logs fetching - placeholder for now
-		throw new Error("Logs fetching not implemented yet");
-	}),
+	logs: t.procedure
+		.input(resourceTargetSchema)
+		.query(async ({ ctx, input }) => {
+			return await getResourceLogs(ctx, input);
+		}),
 
 	// ===== MUTATION PROCEDURES =====
 

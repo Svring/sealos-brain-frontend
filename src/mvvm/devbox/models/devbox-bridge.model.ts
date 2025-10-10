@@ -61,12 +61,6 @@ export const DevboxBridgeSchema = z.object({
 			path: ["metadata.uid"],
 		}),
 	),
-	kind: z.string().describe(
-		JSON.stringify({
-			resourceType: "devbox",
-			path: ["kind"],
-		}),
-	),
 	runtime: z
 		.any()
 		.describe(

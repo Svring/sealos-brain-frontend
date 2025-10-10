@@ -73,7 +73,7 @@ export const LocalStorageSchema = z.object({
 // Deployment object schema
 export const DeploymentObjectSchema = z.object({
 	name: z.string(),
-	kind: z.string(),
+	resourceType: z.string().default("deployment"),
 	image: ImageSchema,
 	resource: ResourceSchema,
 	status: z.string().nullable().optional(),
@@ -94,7 +94,7 @@ export const DeploymentObjectSchema = z.object({
 // StatefulSet object schema
 export const StatefulsetObjectSchema = z.object({
 	name: z.string(),
-	kind: z.string(),
+	resourceType: z.string().default("statefulset"),
 	image: ImageSchema,
 	resource: StatefulsetResourceSchema,
 	status: z.string().nullable(),
@@ -114,12 +114,12 @@ export const StatefulsetObjectSchema = z.object({
 });
 
 // Unified launchpad object schema (discriminated union)
-export const LaunchpadObjectSchema = z.discriminatedUnion("kind", [
+export const LaunchpadObjectSchema = z.discriminatedUnion("resourceType", [
 	DeploymentObjectSchema.extend({
-		kind: z.literal("Deployment"),
+		resourceType: z.literal("deployment"),
 	}),
 	StatefulsetObjectSchema.extend({
-		kind: z.literal("StatefulSet"),
+		resourceType: z.literal("statefulset"),
 	}),
 ]);
 

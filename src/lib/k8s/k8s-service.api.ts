@@ -1,6 +1,9 @@
 "use server";
 
 import type { Operation } from "fast-json-patch";
+import { POD_LABELS } from "@/constants/pod/pod-label.constant";
+import { eventParser } from "@/lib/event/event.parser";
+import { podParser } from "@/lib/pod/pod.parser";
 import type {
 	BuiltinResourceTarget,
 	BuiltinResourceTypeTarget,
@@ -10,6 +13,7 @@ import type {
 	ResourceTypeTarget,
 } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
+import { k8sParser } from "./k8s.parser";
 import {
 	applyResource as applyResourceMutation,
 	deleteBuiltinResource,
@@ -28,6 +32,8 @@ import {
 import {
 	getBuiltinResource,
 	getCustomResource,
+	getEventsByPod,
+	getLogsByPod,
 	listBuiltinResources,
 	listCustomResources,
 } from "./k8s-query.api";
@@ -347,7 +353,7 @@ export const strategicMergePatchResource = async (
  * @example
  * ```typescript
  * // Apply YAML content with target
- * const result = await applyResource(context, 
+ * const result = await applyResource(context,
  *   { type: "custom", resourceType: "instance", name: "my-instance" },
  *   yamlContent
  * );
@@ -360,3 +366,172 @@ export const applyResource = async (
 ) => {
 	return await applyResourceMutation(context, target, resourceContent);
 };
+
+/**
+ * Get pods associated with a resource.
+ * This function encapsulates the logic from the pods tRPC procedure.
+ *
+ * @example
+ * ```typescript
+ * const pods = await getResourcePods(context, {
+ *   type: "custom",
+ *   resourceType: "devbox",
+ *   name: "my-devbox"
+ * });
+ * ```
+ */
+export const getResourcePods = async (
+	context: K8sContext,
+	target: ResourceTarget,
+) => {
+	// Determine the appropriate label key based on resource type
+	const labelKey = POD_LABELS[target.resourceType as keyof typeof POD_LABELS];
+	if (!labelKey) {
+		throw new Error(`Unknown resource type: ${target.resourceType}`);
+	}
+
+	// Get pods using the resource name and label key
+	const podTarget = k8sParser.fromTypeToTarget("pod", target.name, labelKey);
+
+	const podList = await listResources(context, podTarget);
+
+	// Convert raw pod resources to pod objects
+	return podParser.toObjects(podList.items || []);
+};
+
+/**
+ * Get events for all pods associated with a resource.
+ * This function encapsulates the logic from the events tRPC procedure.
+ *
+ * @example
+ * ```typescript
+ * const events = await getResourceEvents(context, {
+ *   type: "custom",
+ *   resourceType: "devbox",
+ *   name: "my-devbox"
+ * });
+ * ```
+ */
+export const getResourceEvents = async (
+	context: K8sContext,
+	target: ResourceTarget,
+) => {
+	// Get pods associated with the resource
+	const pods = await getResourcePods(context, target);
+
+	if (pods.length === 0) {
+		return {};
+	}
+
+	// Get events for each pod in parallel
+	const eventsPromises = pods.map(async (pod) => {
+		try {
+			// Get events for this specific pod using fieldSelector
+			const eventList = await getEventsByPod(context, pod.name);
+
+			return {
+				podName: pod.name,
+				events: eventList.items || [],
+				success: true,
+			};
+		} catch (error) {
+			console.warn(`Failed to fetch events for pod ${pod.name}:`, error);
+			return {
+				podName: pod.name,
+				events: [],
+				success: false,
+				error: error instanceof Error ? error.message : "Unknown error",
+			};
+		}
+	});
+
+	const results = await Promise.all(eventsPromises);
+
+	// Convert array to record format
+	const eventsRecord: Record<
+		string,
+		{ events: unknown[]; success: boolean; error?: string }
+	> = {};
+	for (const result of results) {
+		eventsRecord[result.podName] = {
+			events: result.events,
+			success: result.success,
+			error: result.error,
+		};
+	}
+
+	// Process events using the event parser
+	return eventParser.processEventsRecord(eventsRecord);
+};
+
+/**
+ * Get logs for all pods associated with a resource.
+ * This function uses getResourcePods to get pods and then fetches logs for each pod.
+ *
+ * @example
+ * ```typescript
+ * const logs = await getResourceLogs(context, {
+ *   type: "custom",
+ *   resourceType: "devbox",
+ *   name: "my-devbox"
+ * });
+ * ```
+ */
+export const getResourceLogs = async (
+	context: K8sContext,
+	target: ResourceTarget,
+) => {
+	// Get pods associated with the resource
+	const pods = await getResourcePods(context, target);
+
+	if (pods.length === 0) {
+		return {};
+	}
+
+	// Get logs for each pod in parallel
+	const logsPromises = pods.map(async (pod) => {
+		try {
+			const podTarget = {
+				type: "builtin" as const,
+				resourceType: "pod" as const,
+				name: pod.name,
+			};
+
+			const logs = await getLogsByPod(context, podTarget);
+
+			return {
+				podName: pod.name,
+				logs: logs as string,
+				success: true,
+			};
+		} catch (error) {
+			console.warn(`Failed to fetch logs for pod ${pod.name}:`, error);
+			return {
+				podName: pod.name,
+				logs: "",
+				success: false,
+				error: error instanceof Error ? error.message : "Unknown error",
+			};
+		}
+	});
+
+	const results = await Promise.all(logsPromises);
+
+	// Convert array to record format
+	const logsRecord: Record<
+		string,
+		{ logs: string; success: boolean; error?: string }
+	> = {};
+	for (const result of results) {
+		logsRecord[result.podName] = {
+			logs: result.logs,
+			success: result.success,
+			error: result.error,
+		};
+	}
+
+	return logsRecord;
+};
+
+// Re-export specialized functions
+export { getEventsByPod, getLogsByPod };

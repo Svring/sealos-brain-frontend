@@ -1,5 +1,6 @@
 "use server";
 
+import { EVENT_FIELDS } from "@/constants/event/event.constant";
 import { CUSTOM_RESOURCES } from "@/constants/k8s/k8s-custom.constant";
 import type {
 	BuiltinResourceTarget,
@@ -156,20 +157,21 @@ export const getLogsByPod = async (
  * const podEvents = await getEventsByPod(context, "my-pod-name");
  * ```
  */
-// export const getEventsByPod = async (context: K8sContext, podName: string) => {
-// 	const { client, resourceConfig } = await getBuiltinApiClient(
-// 		context.kubeconfig,
-// 		"event",
-// 	);
+export const getEventsByPod = async (context: K8sContext, podName: string) => {
+	const { client, resourceConfig } = await getBuiltinApiClient(
+		context.kubeconfig,
+		"event",
+	);
+	const namespace = await getCurrentNamespace(context.kubeconfig);
 
-// 	const eventListResponse = await invokeApiMethod(
-// 		client,
-// 		resourceConfig.listMethod,
-// 		{
-// 			namespace: context.namespace,
-// 			fieldSelector: `${EVENT_FIELD_SELECTORS.INVOLVED_OBJECT_NAME}=${podName}`,
-// 		},
-// 	);
+	const eventListResponse = await invokeApiMethod(
+		client,
+		resourceConfig.listMethod,
+		{
+			namespace: namespace || "default",
+			fieldSelector: `${EVENT_FIELDS.INVOLVED_OBJECT_NAME}=${podName}`,
+		},
+	);
 
-// 	return JSON.parse(JSON.stringify(eventListResponse));
-// };
+	return JSON.parse(JSON.stringify(eventListResponse));
+};

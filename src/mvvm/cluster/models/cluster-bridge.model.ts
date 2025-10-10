@@ -11,12 +11,6 @@ export const ClusterBridgeSchema = z.object({
 			path: ["metadata.name"],
 		}),
 	),
-	kind: z.string().describe(
-		JSON.stringify({
-			resourceType: "cluster",
-			path: ["kind"],
-		}),
-	),
 	type: z.any().describe(
 		JSON.stringify({
 			resourceType: "cluster",

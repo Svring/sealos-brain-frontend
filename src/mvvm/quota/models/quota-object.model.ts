@@ -12,7 +12,6 @@ export const QuotaObjectSchema = z.object({
 	memory: ResourceValueSchema.nullable(),
 	storage: ResourceValueSchema.nullable(),
 	ports: ResourceValueSchema.nullable(),
-	balance: ResourceValueSchema.nullable(),
 });
 
 // Type exports
