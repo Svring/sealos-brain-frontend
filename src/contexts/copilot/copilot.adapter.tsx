@@ -1,20 +1,18 @@
 "use client";
 
 import type { Thread } from "@langchain/langgraph-sdk";
-import { useStream } from "@langchain/langgraph-sdk/react";
 import { useQueryState } from "nuqs";
 import type { ReactNode } from "react";
 import { createContext, use, useState } from "react";
-import { useAuthState } from "@/contexts/auth/auth.context";
 import { useLangGraphState } from "@/contexts/langgraph/langgraph.context";
-import { useProjectState } from "@/contexts/project/project.context";
+import { useSearchThreads } from "@/hooks/langgraph/use-search-threads";
 
 interface CopilotAdapterContextValue {
 	threads: Thread[];
-	activeThreadId: string;
+	threadId: string;
 	metadata?: Record<string, string>;
 	setThreads: (threads: Thread[]) => void;
-	setActiveThreadId: (activeThreadId: string) => void;
+	setThreadId: (threadId: string) => void;
 }
 
 export const copilotAdapterContext = createContext<
@@ -23,26 +21,23 @@ export const copilotAdapterContext = createContext<
 
 interface CopilotAdapterProps {
 	children: ReactNode;
-	metadata?: Record<string, string>;
+	metadata: Record<string, string>;
 }
 
 export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
-	const [threads, setThreads] = useState<Thread[]>([]);
 	const [threadId, setThreadId] = useQueryState("threadId");
-	const {
-		auth: { kubeconfigEncoded },
-	} = useAuthState();
 	const { graphState } = useLangGraphState();
-	const { project } = useProjectState();
+
+	// Search threads based on metadata
+	const { data: threads, isLoading } = useSearchThreads(metadata);
 
 	return (
 		<copilotAdapterContext.Provider
 			value={{
-				threads,
-				activeThreadId: threadId || "",
+				threads: threads || [],
+				threadId: threadId || "",
 				metadata,
-				setThreads,
-				setActiveThreadId: setThreadId,
+				setThreadId,
 			}}
 		>
 			{children}

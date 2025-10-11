@@ -51,8 +51,8 @@ export function useProjectEvents() {
 		addResource: (resource: any) => send({ type: "ADD_RESOURCE", resource }),
 		updateResource: (resource: any) =>
 			send({ type: "UPDATE_RESOURCE", resource }),
-		removeResource: (resourceId: string) =>
-			send({ type: "REMOVE_RESOURCE", resourceId }),
+		removeResource: (resourceUid: string) =>
+			send({ type: "REMOVE_RESOURCE", resourceUid }),
 		setActiveResource: (resource: any) =>
 			send({ type: "SET_ACTIVE_RESOURCE", resource }),
 		clearActiveResource: () => send({ type: "CLEAR_ACTIVE_RESOURCE" }),

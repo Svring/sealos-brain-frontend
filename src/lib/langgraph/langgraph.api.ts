@@ -1,6 +1,6 @@
 "use server";
 
-import { Client, type Metadata } from "@langchain/langgraph-sdk";
+import { Client, type Metadata, type Thread } from "@langchain/langgraph-sdk";
 
 const createClient = () => {
 	const apiUrl = process.env.LANGGRAPH_DEPLOYMENT_URL;
@@ -89,7 +89,9 @@ export const patchThread = async (threadId: string, metadata: Metadata) => {
 	}
 };
 
-export const searchThreads = async (metadata: Record<string, any>) => {
+export const searchThreads = async (
+	metadata: Record<string, any>,
+): Promise<Thread[]> => {
 	const client = createClient();
 
 	const res = await client.threads
@@ -110,4 +112,3 @@ export const getThreadState = async (threadId: string) => {
 	const client = createClient();
 	return await client.threads.getState(threadId);
 };
-
