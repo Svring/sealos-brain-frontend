@@ -2,6 +2,8 @@
 
 import { useMachine } from "@xstate/react";
 import type { ReactNode } from "react";
+import { useAuthState } from "../auth/auth.context";
+import { useLangGraphState } from "../langgraph/langgraph.context";
 import { copilotMachineContext } from "./copilot.context";
 import { copilotMachine } from "./copilot.state";
 

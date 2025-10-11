@@ -6,7 +6,7 @@ import { useTRPCClients } from "../trpc/use-trpc-clients";
 export const useProxyToken = () => {
 	const { aiProxy } = useTRPCClients();
 
-	const query = useQuery(aiProxy.list.queryOptions());
+	const query = useQuery(aiProxy.list.queryOptions("tokens"));
 
 	return {
 		data: query.data,

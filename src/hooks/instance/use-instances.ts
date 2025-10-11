@@ -6,7 +6,9 @@ import { useTRPCClients } from "../trpc/use-trpc-clients";
 export const useInstances = () => {
 	const { instance } = useTRPCClients();
 
-	const query = useQuery(instance.list.queryOptions());
+	const query = useQuery(instance.list.queryOptions("instances"));
+
+	console.log("query.data", query.data);
 
 	return {
 		data: query.data,

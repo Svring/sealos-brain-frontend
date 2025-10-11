@@ -11,11 +11,16 @@ export const ProjectDashboard = () => {
 
 	// Filter instances based on search term
 	const filteredProjects =
-		instances?.filter(
-			(instance) =>
-				instance.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-				instance.name.toLowerCase().includes(searchTerm.toLowerCase()),
-		) || [];
+		instances?.filter((instance) => {
+			if (instance.displayName) {
+				return instance.displayName
+					.toLowerCase()
+					.includes(searchTerm.toLowerCase());
+			}
+			return instance.name
+				.toLowerCase()
+				.includes(searchTerm.toLowerCase());
+		}) || [];
 
 	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setSearchTerm(e.target.value);

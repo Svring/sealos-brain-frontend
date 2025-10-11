@@ -13,6 +13,7 @@ const toObject = (instance: InstanceResource): InstanceObject => {
 
 	return {
 		name: metadata.name || "unknown",
+		uid: metadata.uid || "",
 		resourceType: "instance",
 		displayName,
 		createdAt: metadata.creationTimestamp || "",
