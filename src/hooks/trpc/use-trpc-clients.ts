@@ -1,4 +1,4 @@
-import { aiProxyClient, clusterClient, devboxClient, instanceClient, k8sClient, launchpadClient } from "@/components/configs/query-trpc.config";
+import { aiProxyClient, clusterClient, devboxClient, instanceClient, k8sClient, langgraphClient, launchpadClient } from "@/components/configs/query-trpc.config";
 
 export const useTRPCClients = () => {
 	const k8sTrpcClient = k8sClient.useTRPC();
@@ -6,6 +6,7 @@ export const useTRPCClients = () => {
 	const devboxTrpcClient = devboxClient.useTRPC();
 	const clusterTrpcClient = clusterClient.useTRPC();
 	const launchpadTrpcClient = launchpadClient.useTRPC();
+	const langgraphTrpcClient = langgraphClient.useTRPC();
 	const aiProxyTrpcClient = aiProxyClient.useTRPC();
 
 	return {
@@ -14,6 +15,7 @@ export const useTRPCClients = () => {
 		devbox: devboxTrpcClient,
 		cluster: clusterTrpcClient,
 		launchpad: launchpadTrpcClient,
+		langgraph: langgraphTrpcClient,
 		aiProxy: aiProxyTrpcClient,
 	};
 };

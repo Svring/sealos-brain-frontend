@@ -1,8 +1,12 @@
 "use client";
 
-import { getHTTPStatusCodeFromError } from "@trpc/server/http";
-import { LayoutGrid, LogOut, MessageCirclePlus } from "lucide-react";
+import { LayoutGrid, LogOut, MessageCirclePlus, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import {
 	Sidebar,
 	SidebarContent,
@@ -15,7 +19,9 @@ import {
 	SidebarMenuItem,
 	SidebarSeparator,
 } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthEvents } from "@/contexts/auth/auth.context";
+import { useEnvState } from "@/contexts/env/env.context";
 import { useQuota } from "@/hooks/k8s/use-quota";
 import { logoutUser } from "@/payload/operations/users-operation";
 
@@ -36,26 +42,8 @@ const mainItems = [
 export function AppSidebar() {
 	const { fail } = useAuthEvents();
 	const router = useRouter();
-	const { data: quota, isLoading, isError } = useQuota();
-
-	// console.log(quota);
-
-	const handleLogout = async () => {
-		try {
-			const result = await logoutUser();
-			if (result.success) {
-				// Clear auth state
-				fail();
-				// Navigate to home and refresh without full reload to avoid input stream errors
-				router.replace("/");
-				router.refresh();
-			} else {
-				console.error("Logout failed:", result.error);
-			}
-		} catch (error) {
-			console.error("Logout error:", error);
-		}
-	};
+	const { data: quotaObject, isLoading } = useQuota();
+	const { mode } = useEnvState();
 
 	return (
 		<Sidebar variant="inset" collapsible="icon">
@@ -98,11 +86,87 @@ export function AppSidebar() {
 			<SidebarFooter>
 				<SidebarMenu>
 					<SidebarMenuItem>
-						<SidebarMenuButton onClick={handleLogout}>
-							<LogOut />
-							<span>Logout</span>
-						</SidebarMenuButton>
+						<Popover>
+							<PopoverTrigger asChild>
+								<SidebarMenuButton>
+									<Sparkles className="h-4 w-4" />
+									<span>Quota</span>
+								</SidebarMenuButton>
+							</PopoverTrigger>
+							<PopoverContent
+								align="end"
+								side="right"
+								sideOffset={16}
+								className="w-80"
+							>
+								<div className="space-y-4">
+									{isLoading ? (
+										<div className="space-y-2">
+											<Skeleton className="h-4 w-full" />
+											<Skeleton className="h-2 w-full" />
+											<Skeleton className="h-4 w-3/4" />
+										</div>
+									) : quotaObject ? (
+										<div className="space-y-4">
+											{/* Resource Quotas - 2x2 Grid */}
+											<div className="grid grid-cols-2 gap-3">
+												<div className="flex justify-between text-xs">
+													<span className="text-muted-foreground">CPU</span>
+													<span className="text-primary">
+														{quotaObject.cpu?.used.toFixed(1)}/
+														{quotaObject.cpu?.limit}
+													</span>
+												</div>
+												<div className="flex justify-between text-xs">
+													<span className="text-muted-foreground">Memory</span>
+													<span className="text-primary">
+														{quotaObject.memory?.used.toFixed(1)}/
+														{quotaObject.memory?.limit}
+													</span>
+												</div>
+												<div className="flex justify-between text-xs">
+													<span className="text-muted-foreground">Storage</span>
+													<span className="text-primary">
+														{quotaObject.storage?.used}/
+														{quotaObject.storage?.limit}
+													</span>
+												</div>
+												<div className="flex justify-between text-xs">
+													<span className="text-muted-foreground">Ports</span>
+													<span className="text-primary">
+														{quotaObject.ports?.used}/{quotaObject.ports?.limit}
+													</span>
+												</div>
+											</div>
+										</div>
+									) : (
+										<div className="space-y-2">
+											<p className="text-sm text-muted-foreground">
+												Resource information is temporarily unavailable.
+											</p>
+										</div>
+									)}
+								</div>
+							</PopoverContent>
+						</Popover>
 					</SidebarMenuItem>
+					{mode === "development" && (
+						<SidebarMenuItem>
+							<SidebarMenuButton
+								onClick={async () => {
+									const result = await logoutUser();
+									if (result.success) {
+										fail();
+										router.replace("/");
+										router.refresh();
+									}
+								}}
+							>
+								<LogOut />
+								<span>Logout</span>
+							</SidebarMenuButton>
+						</SidebarMenuItem>
+					)}
 				</SidebarMenu>
 			</SidebarFooter>
 		</Sidebar>

@@ -16,8 +16,8 @@ const createResourceValue = (
 	}
 
 	return {
-		used: standardizeUnit(used, resourceType),
-		limit: standardizeUnit(limit, resourceType),
+		used: Number(standardizeUnit(used, resourceType).toFixed(2)),
+		limit: Number(standardizeUnit(limit, resourceType).toFixed(2)),
 	};
 };
 

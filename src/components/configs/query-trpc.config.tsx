@@ -10,6 +10,7 @@ import type { ClusterRouter } from "@/trpc/cluster.trpc";
 import type { DevboxRouter } from "@/trpc/devbox.trpc";
 import type { InstanceRouter } from "@/trpc/instance.trpc";
 import type { K8sRouter } from "@/trpc/k8s.trpc";
+import type { LanggraphRouter } from "@/trpc/langgraph.trpc";
 import type { LaunchpadRouter } from "@/trpc/launchpad.trpc";
 
 export const k8sClient = createTRPCContext<K8sRouter>();
@@ -17,6 +18,7 @@ export const instanceClient = createTRPCContext<InstanceRouter>();
 export const devboxClient = createTRPCContext<DevboxRouter>();
 export const clusterClient = createTRPCContext<ClusterRouter>();
 export const launchpadClient = createTRPCContext<LaunchpadRouter>();
+export const langgraphClient = createTRPCContext<LanggraphRouter>();
 export const aiProxyClient = createTRPCContext<AiProxyRouter>();
 
 interface TRPCConfigProps {
@@ -101,6 +103,20 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 		}),
 	);
 
+	const [langgraphTrpcClient] = useState(() =>
+		createTRPCClient<LanggraphRouter>({
+			links: [
+				httpBatchLink({
+					url: "/api/trpc/langgraph",
+					maxURLLength: 6000,
+					headers: () => ({
+						kubeconfigEncoded,
+					}),
+				}),
+			],
+		}),
+	);
+
 	const [aiProxyTrpcClient] = useState(() =>
 		createTRPCClient<AiProxyRouter>({
 			links: [
@@ -136,12 +152,17 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 							trpcClient={launchpadTrpcClient}
 							queryClient={queryClient}
 						>
-							<aiProxyClient.TRPCProvider
-								trpcClient={aiProxyTrpcClient}
+							<langgraphClient.TRPCProvider
+								trpcClient={langgraphTrpcClient}
 								queryClient={queryClient}
 							>
-								{children}
-							</aiProxyClient.TRPCProvider>
+								<aiProxyClient.TRPCProvider
+									trpcClient={aiProxyTrpcClient}
+									queryClient={queryClient}
+								>
+									{children}
+								</aiProxyClient.TRPCProvider>
+							</langgraphClient.TRPCProvider>
 						</launchpadClient.TRPCProvider>
 					</clusterClient.TRPCProvider>
 				</devboxClient.TRPCProvider>
