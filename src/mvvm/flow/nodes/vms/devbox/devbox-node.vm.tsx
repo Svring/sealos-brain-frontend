@@ -1,7 +1,6 @@
 "use client";
 
 import { Package } from "lucide-react";
-import React from "react";
 import { BaseNode } from "@/components/flow/nodes/base-node";
 import type { DevboxObject } from "@/mvvm/sealos/devbox/models/devbox-object.model";
 

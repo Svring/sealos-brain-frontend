@@ -1,8 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
 import * as React from "react";
-import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -18,9 +16,9 @@ const TextReveal = ({ text, className, delay = 0 }: TextRevealProps) => {
 
 	return (
 		<div className={cn("overflow-hidden", className)}>
-			{words.map((word, wordIndex) => (
-				<span key={word} className="inline-block whitespace-nowrap mr-1">
-					{word.split("").map((char, index) => {
+			{words.map((word, _) => (
+				<span key={word} className="inline-block whitespace-nowrap mr-4">
+					{word.split("").map((char, _) => {
 						const currentDelay = delay + charIndex * 0.03;
 						charIndex++;
 						return (

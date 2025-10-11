@@ -36,7 +36,7 @@ export default function RootLayout({
 									<SidebarProvider defaultOpen={false}>
 										<AppSidebar />
 										<SidebarInset>
-											<main>{children}</main>
+											<main className="h-full w-full">{children}</main>
 										</SidebarInset>
 									</SidebarProvider>
 								</QueryConfig>
