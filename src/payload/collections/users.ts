@@ -22,14 +22,6 @@ export const Users: CollectionConfig = {
       type: "text",
     },
     {
-      name: "baseUrl",
-      type: "text",
-    },
-    {
-      name: "apiKey",
-      type: "text",
-    },
-    {
       name: "avatar",
       type: "upload",
       relationTo: "media",

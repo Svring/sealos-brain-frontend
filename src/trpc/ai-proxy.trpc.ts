@@ -1,41 +1,28 @@
-import { KubeConfig } from "@kubernetes/client-node";
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
+import { getRegionUrlFromKubeconfig } from "@/lib/k8s/k8s-server.utils";
 import {
 	createAiProxyToken,
 	deleteAiProxyToken,
-	getAiProxyFreeUsage,
 	getAiProxyTokens,
 } from "@/lib/sealos/ai-proxy/ai-proxy.api";
 import { createErrorFormatter } from "@/lib/trpc/trpc.utils";
+import { AiProxyTokenSchema } from "@/mvvm/sealos/ai-proxy/models/ai-proxy-resource.model";
 
 // ===== CONTEXT =====
 export async function createAiProxyContext(opts: { req: Request }) {
-	const kubeconfig = opts.req.headers.get("kubeconfig");
+	const kubeconfigEncoded = opts.req.headers.get("kubeconfigEncoded");
 	const appToken = opts.req.headers.get("appToken");
 
-	// Decode kubeconfig if it was percent-encoded when sent via headers
-	const decodedKubeconfig = decodeURIComponent(kubeconfig as string);
+	if (!kubeconfigEncoded) {
+		throw new Error("kubeconfigEncoded header is required");
+	}
 
-	// Extract regionUrl from kubeconfig
-	let regionUrl = "";
-	try {
-		const kc = new KubeConfig();
-		kc.loadFromString(decodedKubeconfig);
+	const kubeconfig = decodeURIComponent(kubeconfigEncoded);
+	const regionUrl = await getRegionUrlFromKubeconfig(kubeconfig);
 
-		const currentContext = kc.getCurrentContext();
-		const contextObj = kc.getContextObject(currentContext);
-
-		if (contextObj?.cluster) {
-			const clusterObj = kc.getCluster(contextObj.cluster);
-			if (clusterObj?.server) {
-				// Parse the server URL to extract hostname
-				const url = new URL(clusterObj.server);
-				regionUrl = url.hostname;
-			}
-		}
-	} catch (error) {
-		console.error("Failed to extract region URL from kubeconfig:", error);
+	if (!regionUrl) {
+		throw new Error("Failed to extract region URL from kubeconfig");
 	}
 
 	return {
@@ -56,22 +43,12 @@ export const aiProxyRouter = t.router({
 	// ===== QUERY PROCEDURES =====
 
 	// Token Listing
-	list: t.procedure.query(async ({ ctx }) => {
-		return await getAiProxyTokens(ctx.regionUrl, ctx.authorization);
-	}),
-
-	// Free Usage Information
-	freeUsage: t.procedure
-		.output(
-			z.object({
-				total_limit: z.number(),
-				used_today: z.number(),
-				remaining_today: z.number(),
-				next_reset_time: z.number(),
-			}),
-		)
-		.query(async ({ ctx }) => {
-			return await getAiProxyFreeUsage(ctx.authorization);
+	list: t.procedure
+		.input(z.string().optional().default("tokens"))
+		.output(z.array(AiProxyTokenSchema))
+		.query(async ({ ctx, input: _input }) => {
+			const result = await getAiProxyTokens(ctx);
+			return result;
 		}),
 
 	// ===== MUTATION PROCEDURES =====
@@ -80,13 +57,13 @@ export const aiProxyRouter = t.router({
 	create: t.procedure
 		.input(z.object({ name: z.string() }))
 		.mutation(async ({ input, ctx }) => {
-			return await createAiProxyToken(input, ctx.regionUrl, ctx.authorization);
+			return await createAiProxyToken(ctx, input);
 		}),
 
 	delete: t.procedure
 		.input(z.object({ id: z.number() }))
 		.mutation(async ({ input, ctx }) => {
-			return await deleteAiProxyToken(input, ctx.regionUrl, ctx.authorization);
+			return await deleteAiProxyToken(ctx, input);
 		}),
 });
 

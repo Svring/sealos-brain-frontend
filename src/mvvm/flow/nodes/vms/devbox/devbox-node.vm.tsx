@@ -4,11 +4,11 @@ import { Package } from "lucide-react";
 import { BaseNode } from "@/components/flow/nodes/base-node";
 import type { DevboxObject } from "@/mvvm/sealos/devbox/models/devbox-object.model";
 
-interface DevboxNodeViewProps {
+interface DevboxNodeProps {
 	data: DevboxObject;
 }
 
-export function DevboxNodeView({ data }: DevboxNodeViewProps) {
+export function DevboxNode({ data }: DevboxNodeProps) {
 	const { name, image } = data;
 	return (
 		<BaseNode width="fixed">

@@ -32,7 +32,7 @@ export const OverlayControlView = ({
 	onReset,
 }: OverlayControlProps) => {
 	return (
-		<div className="relative">
+		<div className="relative h-full w-full">
 			{children}
 
 			{/* Floating control buttons overlay */}
@@ -45,7 +45,7 @@ export const OverlayControlView = ({
 				<TooltipProvider>
 					<div className="flex items-center gap-1">
 						{/* Zoom In Button */}
-						<Tooltip>
+						{/* <Tooltip>
 							<TooltipTrigger asChild>
 								<Button
 									variant="ghost"
@@ -59,10 +59,10 @@ export const OverlayControlView = ({
 							<TooltipContent>
 								<p>Zoom In</p>
 							</TooltipContent>
-						</Tooltip>
+						</Tooltip> */}
 
 						{/* Zoom Out Button */}
-						<Tooltip>
+						{/* <Tooltip>
 							<TooltipTrigger asChild>
 								<Button
 									variant="ghost"
@@ -76,7 +76,7 @@ export const OverlayControlView = ({
 							<TooltipContent>
 								<p>Zoom Out</p>
 							</TooltipContent>
-						</Tooltip>
+						</Tooltip> */}
 
 						{/* Reset Button */}
 						<Tooltip>

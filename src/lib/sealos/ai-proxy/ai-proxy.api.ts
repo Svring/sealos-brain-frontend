@@ -17,35 +17,6 @@ const AiProxyCreateTokenResponseSchema = z.object({
 	message: z.string(),
 });
 
-// Token List Schemas
-const AiProxyTokenListResponseSchema = z.object({
-	code: z.literal(200),
-	data: z.object({
-		tokens: z.array(
-			z.object({
-				key: z.string(),
-				name: z.string(),
-				group: z.string(),
-				subnets: z.any().nullable(),
-				models: z.any().nullable(),
-				status: z.number(),
-				id: z.number(),
-				used_amount: z.number(),
-				request_count: z.number(),
-				quota: z.number(),
-				period_quota: z.number(),
-				period_type: z.string(),
-				period_last_update_amount: z.number(),
-				created_at: z.number(),
-				period_last_update_time: z.number(),
-				expired_at: z.number().optional(),
-				accessed_at: z.number(),
-			}),
-		),
-		total: z.number(),
-	}),
-});
-
 // Free Usage Schemas
 const AiProxyFreeUsageResponseSchema = z.object({
 	total_limit: z.number(),
@@ -71,9 +42,6 @@ export type AiProxyCreateTokenRequest = z.infer<
 >;
 export type AiProxyCreateTokenResponse = z.infer<
 	typeof AiProxyCreateTokenResponseSchema
->;
-export type AiProxyTokenListResponse = z.infer<
-	typeof AiProxyTokenListResponseSchema
 >;
 export type AiProxyFreeUsageResponse = z.infer<
 	typeof AiProxyFreeUsageResponseSchema
@@ -108,13 +76,12 @@ export async function createAiProxyApi(
 
 // Token Management
 export async function createAiProxyToken(
+	ctx: { regionUrl: string; authorization: string },
 	request: AiProxyCreateTokenRequest,
-	baseUrl: string,
-	authorization?: string,
 ): Promise<AiProxyCreateTokenResponse> {
 	try {
 		const validatedRequest = AiProxyCreateTokenRequestSchema.parse(request);
-		const api = await createAiProxyApi(baseUrl, authorization);
+		const api = await createAiProxyApi(ctx.regionUrl, ctx.authorization);
 		const response = await api.post("/user/token", validatedRequest);
 
 		// Check if the response indicates success
@@ -144,12 +111,11 @@ export async function createAiProxyToken(
 }
 
 export async function deleteAiProxyToken(
+	ctx: { regionUrl: string; authorization: string },
 	request: AiProxyDeleteTokenRequest,
-	baseUrl: string,
-	authorization?: string,
 ): Promise<AiProxyDeleteTokenResponse> {
 	const validatedRequest = AiProxyDeleteTokenRequestSchema.parse(request);
-	const api = await createAiProxyApi(baseUrl, authorization);
+	const api = await createAiProxyApi(ctx.regionUrl, ctx.authorization);
 	const response = await api.delete(`/user/token/${validatedRequest.id}`);
 	return AiProxyDeleteTokenResponseSchema.parse(response.data);
 }
@@ -157,26 +123,27 @@ export async function deleteAiProxyToken(
 // ===== QUERY OPERATIONS =====
 
 // Token Listing
-export async function getAiProxyTokens(
-	baseUrl: string,
-	authorization?: string,
-): Promise<AiProxyTokenListResponse["data"]> {
-	const api = await createAiProxyApi(baseUrl, authorization);
+export async function getAiProxyTokens(ctx: {
+	regionUrl: string;
+	authorization: string;
+}) {
+	const api = await createAiProxyApi(ctx.regionUrl, ctx.authorization);
 	const response = await api.get("/user/token", {
 		params: { page: 1, perPage: 10 },
 	});
-	return response.data.data;
+	return response.data.data.tokens;
 }
 
 // Free Usage Information
-export async function getAiProxyFreeUsage(
-	authorization?: string,
-): Promise<AiProxyFreeUsageResponse> {
+export async function getAiProxyFreeUsage(ctx: {
+	regionUrl: string;
+	authorization: string;
+}): Promise<AiProxyFreeUsageResponse> {
 	const response = await fetch("/api/ai-proxy/free-usage", {
 		method: "GET",
 		headers: {
 			"Content-Type": "application/json",
-			...(authorization ? { Authorization: authorization } : {}),
+			...(ctx.authorization ? { Authorization: ctx.authorization } : {}),
 		},
 	});
 
@@ -189,4 +156,3 @@ export async function getAiProxyFreeUsage(
 	const data = await response.json();
 	return AiProxyFreeUsageResponseSchema.parse(data);
 }
-

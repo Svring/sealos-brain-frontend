@@ -31,16 +31,16 @@ export default function RootLayout({
 				>
 					<EnvProvider>
 						<AuthProvider>
-							<ProxyProvider>
-								<QueryConfig>
+							<QueryConfig>
+								<ProxyProvider>
 									<SidebarProvider defaultOpen={false}>
 										<AppSidebar />
 										<SidebarInset>
 											<main className="h-full w-full">{children}</main>
 										</SidebarInset>
 									</SidebarProvider>
-								</QueryConfig>
-							</ProxyProvider>
+								</ProxyProvider>
+							</QueryConfig>
 						</AuthProvider>
 					</EnvProvider>
 				</ThemeProvider>

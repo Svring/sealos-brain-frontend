@@ -29,10 +29,6 @@ interface TRPCConfigProps {
 export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 	const { auth } = useAuthState();
 
-	// Auth is guaranteed to exist by useAuthState
-	const kubeconfigEncoded = auth.kubeconfigEncoded;
-	const appToken = auth.appToken;
-
 	const [k8sTrpcClient] = useState(() =>
 		createTRPCClient<K8sRouter>({
 			links: [
@@ -40,7 +36,7 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 					url: "/api/trpc/k8s",
 					maxURLLength: 6000,
 					headers: () => ({
-						kubeconfigEncoded,
+						kubeconfigEncoded: auth.kubeconfigEncoded,
 					}),
 				}),
 			],
@@ -54,7 +50,7 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 					url: "/api/trpc/instance",
 					maxURLLength: 6000,
 					headers: () => ({
-						kubeconfigEncoded,
+						kubeconfigEncoded: auth.kubeconfigEncoded,
 					}),
 				}),
 			],
@@ -68,7 +64,7 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 					url: "/api/trpc/devbox",
 					maxURLLength: 6000,
 					headers: () => ({
-						kubeconfigEncoded,
+						kubeconfigEncoded: auth.kubeconfigEncoded,
 					}),
 				}),
 			],
@@ -82,7 +78,7 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 					url: "/api/trpc/cluster",
 					maxURLLength: 6000,
 					headers: () => ({
-						kubeconfigEncoded,
+						kubeconfigEncoded: auth.kubeconfigEncoded,
 					}),
 				}),
 			],
@@ -96,7 +92,7 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 					url: "/api/trpc/launchpad",
 					maxURLLength: 6000,
 					headers: () => ({
-						kubeconfigEncoded,
+						kubeconfigEncoded: auth.kubeconfigEncoded,
 					}),
 				}),
 			],
@@ -110,7 +106,7 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 					url: "/api/trpc/langgraph",
 					maxURLLength: 6000,
 					headers: () => ({
-						kubeconfigEncoded,
+						kubeconfigEncoded: auth.kubeconfigEncoded,
 					}),
 				}),
 			],
@@ -124,7 +120,8 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 					url: "/api/trpc/ai-proxy",
 					maxURLLength: 6000,
 					headers: () => ({
-						appToken,
+						kubeconfigEncoded: auth.kubeconfigEncoded,
+						appToken: auth.appToken,
 					}),
 				}),
 			],

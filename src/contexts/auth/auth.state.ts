@@ -6,6 +6,7 @@ import { assign, createMachine } from "xstate";
 export interface Auth {
 	kubeconfigEncoded: string;
 	appToken: string;
+	regionUrl: string;
 }
 
 export interface AuthContext {

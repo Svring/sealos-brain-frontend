@@ -1,19 +1,19 @@
 "use client";
 
 import { Globe, HardDrive } from "lucide-react";
-import React from "react";
 import { BaseNode } from "@/components/flow/nodes/base-node";
 import type { ClusterObject } from "@/mvvm/sealos/cluster/models/cluster-object.model";
 
-interface ClusterNodeViewProps {
+interface ClusterNodeProps {
 	data: ClusterObject;
 }
 
-export function ClusterNodeView({ data }: ClusterNodeViewProps) {
+export function ClusterNode({ data }: ClusterNodeProps) {
 	const { name, type, resource } = data;
 	const storage = resource?.storage || 50;
-	const hasPublicAccess = data.connection?.publicConnection && 
-		typeof data.connection.publicConnection === 'object' && 
+	const hasPublicAccess =
+		data.connection?.publicConnection &&
+		typeof data.connection.publicConnection === "object" &&
 		!Array.isArray(data.connection.publicConnection);
 	return (
 		<BaseNode width="fixed">
@@ -79,8 +79,8 @@ export function ClusterNodeView({ data }: ClusterNodeViewProps) {
 							storage > 90
 								? "bg-status-error/20"
 								: storage > 75
-								? "bg-theme-yellow/10"
-								: "bg-muted"
+									? "bg-theme-yellow/10"
+									: "bg-muted"
 						}`}
 						style={{ width: `${storage}%` }}
 					/>

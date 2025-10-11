@@ -1,11 +1,10 @@
 "use client";
 
 import { HardDrive, Package } from "lucide-react";
-import React from "react";
 import { BaseNode } from "@/components/flow/nodes/base-node";
 import type { ResourceTarget } from "@/mvvm/k8s/models/k8s.model";
 
-interface LaunchpadNodeViewProps {
+interface LaunchpadNodeProps {
 	target?: ResourceTarget;
 	name?: string;
 	image?: string;
@@ -14,14 +13,14 @@ interface LaunchpadNodeViewProps {
 	nodeType?: "deployment" | "statefulset";
 }
 
-export function LaunchpadNodeView({
+export function LaunchpadNode({
 	target,
 	name = "sample-app",
 	image = "nginx:latest",
 	replicas = 1,
 	storage = 20,
 	nodeType = "deployment",
-}: LaunchpadNodeViewProps) {
+}: LaunchpadNodeProps) {
 	return (
 		<BaseNode target={target} width="fixed">
 			<div className="flex h-full flex-col gap-2 justify-between">

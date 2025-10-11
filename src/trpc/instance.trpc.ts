@@ -38,13 +38,7 @@ export const instanceRouter = t.router({
 
 	// Instance Information
 	list: t.procedure
-		.input(
-			z
-				.object({
-					resourceType: z.literal("instance"),
-				})
-				.default({ resourceType: "instance" }),
-		)
+		.input(z.string().optional().default("instances"))
 		.output(z.array(InstanceObjectSchema))
 		.query(async ({ ctx }) => {
 			return await listInstances(ctx);
