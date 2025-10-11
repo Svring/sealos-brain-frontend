@@ -3,7 +3,7 @@
 import https from "node:https";
 import axios from "axios";
 import { getRegionUrlFromKubeconfig } from "@/lib/k8s/k8s-server.utils";
-import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s.model";
+import type { BuiltinResourceTarget } from "@/mvvm/k8s/models/k8s-builtin.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
 import type { LaunchpadCreateData } from "@/mvvm/sealos/launchpad/models/launchpad-create.model";
 import type { LaunchpadUpdateData } from "@/mvvm/sealos/launchpad/models/launchpad-update.model";
@@ -55,7 +55,7 @@ export const listLaunchpads = async (context: K8sContext) => {
  */
 export const getLaunchpad = async (
 	context: K8sContext,
-	target: CustomResourceTarget,
+	target: BuiltinResourceTarget,
 ) => {
 	// TODO: Implement get launchpad
 	throw new Error("Not implemented");
@@ -89,7 +89,7 @@ export const checkLaunchpadReady = async (
  */
 export const getLaunchpadLogs = async (
 	context: K8sContext,
-	target: CustomResourceTarget,
+	target: BuiltinResourceTarget,
 ) => {
 	// TODO: Implement get launchpad logs
 	throw new Error("Not implemented");

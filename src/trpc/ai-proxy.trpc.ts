@@ -1,6 +1,13 @@
 import { KubeConfig } from "@kubernetes/client-node";
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
+import {
+	createAiProxyToken,
+	deleteAiProxyToken,
+	getAiProxyFreeUsage,
+	getAiProxyTokens,
+} from "@/lib/sealos/ai-proxy/ai-proxy.api";
+import { createErrorFormatter } from "@/lib/trpc/trpc.utils";
 
 // ===== CONTEXT =====
 export async function createAiProxyContext(opts: { req: Request }) {
@@ -43,35 +50,28 @@ export type AiProxyContext = Awaited<ReturnType<typeof createAiProxyContext>>;
 
 // ===== ROUTER =====
 
-const t = initTRPC.context<AiProxyContext>().create();
+const t = initTRPC.context<AiProxyContext>().create(createErrorFormatter());
 
 export const aiProxyRouter = t.router({
 	// ===== QUERY PROCEDURES =====
 
 	// Token Listing
-	list: t.procedure.query(async ({ ctx: _ctx }) => {
-		// TODO: Implement getAiProxyTokensService
-		// return await getAiProxyTokensService(ctx);
-		return [];
+	list: t.procedure.query(async ({ ctx }) => {
+		return await getAiProxyTokens(ctx.regionUrl, ctx.authorization);
 	}),
 
 	// Free Usage Information
 	freeUsage: t.procedure
-		.output(z.object({
-			total_limit: z.number(),
-			used_today: z.number(),
-			remaining_today: z.number(),
-			next_reset_time: z.number(),
-		}))
-		.query(async ({ ctx: _ctx }) => {
-			// TODO: Implement getAiProxyFreeUsageService
-			// return await getAiProxyFreeUsageService(ctx);
-			return {
-				total_limit: 1000,
-				used_today: 0,
-				remaining_today: 1000,
-				next_reset_time: Date.now() + 24 * 60 * 60 * 1000,
-			};
+		.output(
+			z.object({
+				total_limit: z.number(),
+				used_today: z.number(),
+				remaining_today: z.number(),
+				next_reset_time: z.number(),
+			}),
+		)
+		.query(async ({ ctx }) => {
+			return await getAiProxyFreeUsage(ctx.authorization);
 		}),
 
 	// ===== MUTATION PROCEDURES =====
@@ -79,10 +79,14 @@ export const aiProxyRouter = t.router({
 	// Token Management
 	create: t.procedure
 		.input(z.object({ name: z.string() }))
-		.mutation(async ({ input, ctx: _ctx }) => {
-			// TODO: Implement createAiProxyTokenService
-			// return await createAiProxyTokenService(input, ctx);
-			return { id: Math.random(), name: input.name, created_at: new Date() };
+		.mutation(async ({ input, ctx }) => {
+			return await createAiProxyToken(input, ctx.regionUrl, ctx.authorization);
+		}),
+
+	delete: t.procedure
+		.input(z.object({ id: z.number() }))
+		.mutation(async ({ input, ctx }) => {
+			return await deleteAiProxyToken(input, ctx.regionUrl, ctx.authorization);
 		}),
 });
 
