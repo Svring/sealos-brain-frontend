@@ -3,6 +3,7 @@
 import https from "node:https";
 import axios, { type AxiosInstance } from "axios";
 import { z } from "zod";
+import { composeAiProxyBaseUrl } from "./ai-proxy-utils";
 
 // ===== SCHEMAS =====
 
@@ -61,7 +62,7 @@ export async function createAiProxyApi(
 ): Promise<AxiosInstance> {
 	const isDevelopment = process.env.MODE === "development";
 	return axios.create({
-		baseURL: `http://aiproxy-web.${baseUrl}/api`,
+		baseURL: composeAiProxyBaseUrl(baseUrl),
 		headers: {
 			"Content-Type": "application/json",
 			...(authorization ? { Authorization: authorization } : {}),

@@ -3,6 +3,7 @@
 import { useMachine } from "@xstate/react";
 import { type ReactNode, useEffect } from "react";
 import { useProxyToken } from "@/hooks/ai-proxy/use-proxy-token";
+import { composeAiProxyChatUrl } from "@/lib/sealos/ai-proxy/ai-proxy-utils";
 import { useAuthState } from "../auth/auth.context";
 import { proxyMachineContext } from "./proxy.context";
 import { proxyMachine } from "./proxy.state";
@@ -16,16 +17,16 @@ export function ProxyAdapter({ children }: { children: ReactNode }) {
 	useEffect(() => {
 		if (data && data.length > 0) {
 			const firstToken = data[0];
-			if (firstToken) {
+			if (firstToken && auth?.regionUrl) {
 				send({
 					type: "SET_CONFIG",
-					base_url: "dummy", // Dummy base_url for now
+					base_url: composeAiProxyChatUrl(auth.regionUrl),
 					api_key: firstToken.key,
 					model_name: "gpt-4.1",
 				});
 			}
 		}
-	}, [data, send]);
+	}, [data, send, auth?.regionUrl]);
 
 	return (
 		<proxyMachineContext.Provider
