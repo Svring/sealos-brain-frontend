@@ -1,13 +1,10 @@
 "use client";
 
-import type { Thread } from "@langchain/langgraph-sdk";
 import { assign, createMachine } from "xstate";
 
 // Chat object interface
 export interface Chat {
 	metadata: Record<string, string>;
-	threads: Thread[];
-	activeThreadId: string;
 }
 
 // Copilot context interface

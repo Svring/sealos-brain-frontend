@@ -28,6 +28,10 @@ export function ProxyAdapter({ children }: { children: ReactNode }) {
 		}
 	}, [data, send, auth?.regionUrl]);
 
+	if (state.matches("initializing") || !state.matches("ready")) {
+		return null;
+	}
+
 	return (
 		<proxyMachineContext.Provider
 			value={{

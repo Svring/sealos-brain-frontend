@@ -13,5 +13,5 @@ export function composeAiProxyBaseUrl(baseUrl: string): string {
  * @returns The complete Chat API base URL
  */
 export function composeAiProxyChatUrl(baseUrl: string): string {
-	return `http://aiproxy-web.${baseUrl}/v1`;
+	return `http://aiproxy.${baseUrl}/v1`;
 }

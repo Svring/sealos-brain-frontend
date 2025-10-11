@@ -51,6 +51,10 @@ export function LangGraphAdapter({
 		auth?.kubeconfigEncoded,
 	]);
 
+	if (state.matches("initializing") || !state.matches("ready")) {
+		return null;
+	}
+
 	return (
 		<langgraphMachineContext.Provider
 			value={{

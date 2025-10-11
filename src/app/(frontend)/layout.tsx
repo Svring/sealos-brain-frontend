@@ -7,6 +7,8 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AuthProvider } from "@/contexts/auth/auth.provider";
 import { CopilotProvider } from "@/contexts/copilot/copilot.provider";
 import { EnvProvider } from "@/contexts/env/env.provider";
+import { LangGraphProvider } from "@/contexts/langgraph/langgraph.provider";
+import { ProjectProvider } from "@/contexts/project/project.provider";
 import { ProxyProvider } from "@/contexts/proxy/proxy.provider";
 
 import "@/styles/globals.css";
@@ -34,14 +36,18 @@ export default function RootLayout({
 						<AuthProvider>
 							<QueryConfig>
 								<ProxyProvider>
-									<CopilotProvider>
-										<SidebarProvider defaultOpen={false}>
-											<AppSidebar />
-											<SidebarInset>
-												<main className="h-full w-full">{children}</main>
-											</SidebarInset>
-										</SidebarProvider>
-									</CopilotProvider>
+									<LangGraphProvider>
+										<CopilotProvider>
+											<ProjectProvider>
+												<SidebarProvider defaultOpen={false}>
+													<AppSidebar />
+													<SidebarInset>
+														<main className="h-full w-full">{children}</main>
+													</SidebarInset>
+												</SidebarProvider>
+											</ProjectProvider>
+										</CopilotProvider>
+									</LangGraphProvider>
 								</ProxyProvider>
 							</QueryConfig>
 						</AuthProvider>
