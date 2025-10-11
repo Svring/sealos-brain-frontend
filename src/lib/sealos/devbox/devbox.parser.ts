@@ -2,6 +2,7 @@ import type { DevboxResource } from "@/mvvm/sealos/devbox/models/devbox-resource
 
 export interface DevboxItem extends Record<string, unknown> {
 	name: string;
+	uid: string;
 	runtime: string;
 	resourceType: "devbox";
 }
@@ -15,6 +16,7 @@ export const devboxParser = {
 
 		return {
 			name: resource.metadata.name,
+			uid: resource.metadata.uid,
 			runtime,
 			resourceType: "devbox" as const,
 		};

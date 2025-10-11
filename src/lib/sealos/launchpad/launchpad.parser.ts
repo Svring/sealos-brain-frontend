@@ -3,16 +3,19 @@ import type { StatefulSetResource } from "@/mvvm/sealos/launchpad/models/statefu
 
 export interface LaunchpadItem extends Record<string, unknown> {
 	name: string;
+	uid: string;
 	image: string;
 	resourceType: "deployment" | "statefulset";
 }
 
 export const launchpadParser = {
-	toItem: (resource: DeploymentResource | StatefulSetResource): LaunchpadItem => {
+	toItem: (
+		resource: DeploymentResource | StatefulSetResource,
+	): LaunchpadItem => {
 		// Determine resource type and extract image
 		const isDeployment = resource.kind === "Deployment";
 		const resourceType = isDeployment ? "deployment" : "statefulset";
-		
+
 		// Extract image from containers
 		let image = "";
 		if (isDeployment) {
@@ -25,6 +28,7 @@ export const launchpadParser = {
 
 		return {
 			name: resource.metadata.name,
+			uid: resource.metadata.uid,
 			image,
 			resourceType: resourceType as "deployment" | "statefulset",
 		};

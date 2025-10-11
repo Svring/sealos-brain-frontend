@@ -129,10 +129,13 @@ export const K8sResourceListSchema = z.object({
 });
 
 // K8s Item schema - mandates name and resourceType, allows other fields
-export const K8sItemSchema = z.object({
-	name: z.string(),
-	resourceType: z.string(),
-}).passthrough();
+export const K8sItemSchema = z
+	.object({
+		name: z.string(),
+		uid: z.string(),
+		resourceType: z.string(),
+	})
+	.passthrough();
 
 // Type exports
 export type Env = z.infer<typeof EnvSchema>;

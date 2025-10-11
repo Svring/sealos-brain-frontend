@@ -201,7 +201,7 @@ export const DevboxResourceSchema = z.object({
 		name: z.string(),
 		namespace: z.string().optional(),
 		resourceVersion: z.string().optional(),
-		uid: z.string().optional(),
+		uid: z.string(),
 	}),
 	spec: DevboxSpecSchema,
 	status: DevboxStatusSchema.optional(),

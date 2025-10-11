@@ -8,8 +8,6 @@ export const useInstances = () => {
 
 	const query = useQuery(instance.list.queryOptions("instances"));
 
-	console.log("query.data", query.data);
-
 	return {
 		data: query.data,
 		isLoading: query.isLoading,

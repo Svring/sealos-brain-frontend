@@ -1,6 +1,8 @@
 "use client";
 
 import type { Thread } from "@langchain/langgraph-sdk";
+import { useStream } from "@langchain/langgraph-sdk/react";
+import { useQueryState } from "nuqs";
 import type { ReactNode } from "react";
 import { createContext, use, useState } from "react";
 import { useAuthState } from "@/contexts/auth/auth.context";
@@ -26,8 +28,10 @@ interface CopilotAdapterProps {
 
 export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 	const [threads, setThreads] = useState<Thread[]>([]);
-	const [activeThreadId, setActiveThreadId] = useState<string>("");
-	const { auth } = useAuthState();
+	const [threadId, setThreadId] = useQueryState("threadId");
+	const {
+		auth: { kubeconfigEncoded },
+	} = useAuthState();
 	const { graphState } = useLangGraphState();
 	const { project } = useProjectState();
 
@@ -35,10 +39,10 @@ export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 		<copilotAdapterContext.Provider
 			value={{
 				threads,
-				activeThreadId,
+				activeThreadId: threadId || "",
 				metadata,
 				setThreads,
-				setActiveThreadId,
+				setActiveThreadId: setThreadId,
 			}}
 		>
 			{children}

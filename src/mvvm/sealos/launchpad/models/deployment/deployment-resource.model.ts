@@ -131,7 +131,7 @@ export const DeploymentResourceSchema = z.object({
 	metadata: z.object({
 		name: z.string(),
 		namespace: z.string().optional(),
-		uid: z.string().optional(),
+		uid: z.string(),
 		resourceVersion: z.string().optional(),
 		generation: z.number().optional(),
 		creationTimestamp: z.string().optional(),

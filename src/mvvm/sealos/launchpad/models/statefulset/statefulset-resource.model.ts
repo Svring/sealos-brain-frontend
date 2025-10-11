@@ -64,7 +64,9 @@ export const ContainerSchema = z.object({
 	resources: ResourceRequirementsSchema.optional(),
 	volumeMounts: z.array(VolumeMountSchema).optional(),
 	terminationMessagePath: z.string().optional(),
-	terminationMessagePolicy: z.enum(["File", "FallbackToLogsOnError"]).optional(),
+	terminationMessagePolicy: z
+		.enum(["File", "FallbackToLogsOnError"])
+		.optional(),
 });
 
 // Pod security context schema
@@ -72,11 +74,13 @@ export const PodSecurityContextSchema = z.object({});
 
 // Persistent volume claim template schema
 export const PersistentVolumeClaimTemplateSchema = z.object({
-	metadata: z.object({
-		name: z.string(),
-		labels: z.record(z.string(), z.string()).optional(),
-		annotations: z.record(z.string(), z.string()).optional(),
-	}).optional(),
+	metadata: z
+		.object({
+			name: z.string(),
+			labels: z.record(z.string(), z.string()).optional(),
+			annotations: z.record(z.string(), z.string()).optional(),
+		})
+		.optional(),
 	spec: z.object({
 		accessModes: z.array(z.string()),
 		resources: z.object({
@@ -89,14 +93,18 @@ export const PersistentVolumeClaimTemplateSchema = z.object({
 
 // Pod template spec schema
 export const PodTemplateSpecSchema = z.object({
-	metadata: z.object({
-		labels: z.record(z.string(), z.string()).optional(),
-		annotations: z.record(z.string(), z.string()).optional(),
-	}).optional(),
+	metadata: z
+		.object({
+			labels: z.record(z.string(), z.string()).optional(),
+			annotations: z.record(z.string(), z.string()).optional(),
+		})
+		.optional(),
 	spec: z.object({
 		automountServiceAccountToken: z.boolean().optional(),
 		containers: z.array(ContainerSchema),
-		dnsPolicy: z.enum(["ClusterFirst", "ClusterFirstWithHostNet", "Default", "None"]).optional(),
+		dnsPolicy: z
+			.enum(["ClusterFirst", "ClusterFirstWithHostNet", "Default", "None"])
+			.optional(),
 		restartPolicy: z.enum(["Always", "OnFailure", "Never"]).optional(),
 		schedulerName: z.string().optional(),
 		securityContext: PodSecurityContextSchema.optional(),
@@ -146,7 +154,7 @@ export const StatefulSetResourceSchema = z.object({
 	metadata: z.object({
 		name: z.string(),
 		namespace: z.string().optional(),
-		uid: z.string().optional(),
+		uid: z.string(),
 		resourceVersion: z.string().optional(),
 		generation: z.number().optional(),
 		creationTimestamp: z.string().optional(),
@@ -160,14 +168,18 @@ export const StatefulSetResourceSchema = z.object({
 // Type exports
 export type LabelSelector = z.infer<typeof LabelSelectorSchema>;
 export type RollingUpdate = z.infer<typeof RollingUpdateSchema>;
-export type StatefulSetUpdateStrategy = z.infer<typeof StatefulSetUpdateStrategySchema>;
+export type StatefulSetUpdateStrategy = z.infer<
+	typeof StatefulSetUpdateStrategySchema
+>;
 export type EnvVar = z.infer<typeof EnvVarSchema>;
 export type ContainerPort = z.infer<typeof ContainerPortSchema>;
 export type ResourceRequirements = z.infer<typeof ResourceRequirementsSchema>;
 export type VolumeMount = z.infer<typeof VolumeMountSchema>;
 export type Container = z.infer<typeof ContainerSchema>;
 export type PodSecurityContext = z.infer<typeof PodSecurityContextSchema>;
-export type PersistentVolumeClaimTemplate = z.infer<typeof PersistentVolumeClaimTemplateSchema>;
+export type PersistentVolumeClaimTemplate = z.infer<
+	typeof PersistentVolumeClaimTemplateSchema
+>;
 export type PodTemplateSpec = z.infer<typeof PodTemplateSpecSchema>;
 export type StatefulSetCondition = z.infer<typeof StatefulSetConditionSchema>;
 export type StatefulSetStatus = z.infer<typeof StatefulSetStatusSchema>;

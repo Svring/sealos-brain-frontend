@@ -1,10 +1,23 @@
+"use client";
+
+import { useMount } from "@reactuses/core";
+import { useParams } from "next/navigation";
 import type React from "react";
-import { CopilotAdapter } from "@/contexts/copilot/copilot.adapter";
+import { useProjectEvents } from "@/contexts/project/project.context";
 
 interface LayoutProps {
 	children: React.ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
-	return <CopilotAdapter>{children}</CopilotAdapter>;
+	const { name } = useParams();
+	const { setProject } = useProjectEvents();
+
+	useMount(() => {
+		setProject({
+			name,
+		});
+	});
+
+	return <>{children}</>;
 }

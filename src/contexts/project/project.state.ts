@@ -1,35 +1,24 @@
 "use client";
 
 import { assign, createMachine } from "xstate";
-
-// Project interface
-export interface Project {
-	id: string;
-	name: string;
-	namespace: string;
-	createdAt: string;
-	updatedAt: string;
-}
+import type { ResourceTarget } from "@/mvvm/k8s/models/k8s.model";
+import type { K8sItem } from "@/mvvm/k8s/models/k8s-resource.model";
+import type { InstanceObject } from "@/mvvm/sealos/instance/models/instance-object.model";
 
 // Resource interface
 export interface Resource {
-	id: string;
-	name: string;
-	type: string;
-	namespace: string;
-	status: string;
-	createdAt: string;
-	updatedAt: string;
+	item: K8sItem;
+	target: ResourceTarget;
 }
 
 export interface ProjectContext {
-	project: Project | null;
+	project: InstanceObject | null;
 	allResources: Resource[];
 	activeResource: Resource | null;
 }
 
 export type ProjectEvent =
-	| { type: "SET_PROJECT"; project: Project }
+	| { type: "SET_PROJECT"; project: InstanceObject }
 	| { type: "CLEAR_PROJECT" }
 	| { type: "SET_ALL_RESOURCES"; resources: Resource[] }
 	| { type: "ADD_RESOURCE"; resource: Resource }
@@ -92,7 +81,9 @@ export const projectMachine = createMachine({
 					actions: assign({
 						allResources: ({ context, event }) =>
 							context.allResources.map((resource) =>
-								resource.id === event.resource.id ? event.resource : resource
+								resource.item.name === event.resource.item.name
+									? event.resource
+									: resource,
 							),
 					}),
 				},
@@ -100,10 +91,10 @@ export const projectMachine = createMachine({
 					actions: assign({
 						allResources: ({ context, event }) =>
 							context.allResources.filter(
-								(resource) => resource.id !== event.resourceId
+								(resource) => resource.item.name !== event.resourceId,
 							),
 						activeResource: ({ context, event }) =>
-							context.activeResource?.id === event.resourceId
+							context.activeResource?.item.name === event.resourceId
 								? null
 								: context.activeResource,
 					}),

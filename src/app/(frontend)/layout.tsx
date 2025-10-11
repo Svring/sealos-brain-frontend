@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type React from "react";
 import QueryConfig from "@/components/configs/query.config";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
@@ -32,26 +33,28 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					<EnvProvider>
-						<AuthProvider>
-							<QueryConfig>
-								<ProxyProvider>
-									<LangGraphProvider>
-										<CopilotProvider>
-											<ProjectProvider>
-												<SidebarProvider defaultOpen={false}>
-													<AppSidebar />
-													<SidebarInset>
-														<main className="h-full w-full">{children}</main>
-													</SidebarInset>
-												</SidebarProvider>
-											</ProjectProvider>
-										</CopilotProvider>
-									</LangGraphProvider>
-								</ProxyProvider>
-							</QueryConfig>
-						</AuthProvider>
-					</EnvProvider>
+					<NuqsAdapter>
+						<EnvProvider>
+							<AuthProvider>
+								<QueryConfig>
+									<ProxyProvider>
+										<LangGraphProvider>
+											<CopilotProvider>
+												<ProjectProvider>
+													<SidebarProvider defaultOpen={false}>
+														<AppSidebar />
+														<SidebarInset>
+															<main className="h-full w-full">{children}</main>
+														</SidebarInset>
+													</SidebarProvider>
+												</ProjectProvider>
+											</CopilotProvider>
+										</LangGraphProvider>
+									</ProxyProvider>
+								</QueryConfig>
+							</AuthProvider>
+						</EnvProvider>
+					</NuqsAdapter>
 				</ThemeProvider>
 			</body>
 		</html>
