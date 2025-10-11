@@ -55,28 +55,20 @@ export function useLangGraphEvents() {
 	const { send } = useLangGraphContext();
 
 	return {
-		setConfig: (
-			base_url: string,
-			api_key: string,
-			model_name: string,
-			region_url: string,
-			kubeconfig: string,
-		) =>
+		setGraphState: (graphState: Partial<GraphState>) =>
 			send({
-				type: "SET_CONFIG",
-				base_url,
-				api_key,
-				model_name,
-				region_url,
-				kubeconfig,
+				type: "SET_GRAPH_STATE",
+				graphState,
 			}),
 		setDeploymentUrl: (deploymentUrl: string) =>
 			send({ type: "SET_DEPLOYMENT_URL", deploymentUrl }),
 		setGraphId: (graphId: string) => send({ type: "SET_GRAPH_ID", graphId }),
+		setDeployment: (deploymentUrl: string, graphId: string) =>
+			send({ type: "SET_DEPLOYMENT", deploymentUrl, graphId }),
 		updateGraphState: (graphState: Partial<GraphState>) =>
 			send({ type: "UPDATE_GRAPH_STATE", graphState }),
-		setStage: (stage: GraphState["stage"]) =>
-			send({ type: "SET_STAGE", stage }),
+		setRoute: (route: GraphState["route"]) =>
+			send({ type: "SET_ROUTE", route }),
 		addMessage: (message: Message) => send({ type: "ADD_MESSAGE", message }),
 		setProjectContext: (project_context: any) =>
 			send({ type: "SET_PROJECT_CONTEXT", project_context }),

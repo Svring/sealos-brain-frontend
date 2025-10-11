@@ -15,13 +15,12 @@ export interface GraphState {
 	base_url?: string | null;
 	api_key?: string | null;
 	model_name?: string | null;
-	region_url?: string | null;
-	kubeconfig?: string | null;
+	kubeconfig_encoded?: string | null;
 	messages: Message[];
-	stage?:
-		| "manage_project"
-		| "manage_resource"
-		| "deploy_project"
+	route?:
+		| "propose"
+		| "resource"
+		| "project"
 		| null;
 	project_context?: ProjectContext | null;
 	resource_context?: ResourceContext | null;
@@ -36,17 +35,14 @@ export interface LangGraphContext {
 
 export type LangGraphEvent =
 	| {
-			type: "SET_CONFIG";
-			base_url: string;
-			api_key: string;
-			model_name: string;
-			region_url: string;
-			kubeconfig: string;
+			type: "SET_GRAPH_STATE";
+			graphState: Partial<GraphState>;
 	  }
 	| { type: "SET_DEPLOYMENT_URL"; deploymentUrl: string }
 	| { type: "SET_GRAPH_ID"; graphId: string }
+	| { type: "SET_DEPLOYMENT"; deploymentUrl: string; graphId: string }
 	| { type: "UPDATE_GRAPH_STATE"; graphState: Partial<GraphState> }
-	| { type: "SET_STAGE"; stage: GraphState["stage"] }
+	| { type: "SET_ROUTE"; route: GraphState["route"] }
 	| { type: "ADD_MESSAGE"; message: Message }
 	| { type: "SET_PROJECT_CONTEXT"; project_context: any }
 	| { type: "SET_RESOURCE_CONTEXT"; resource_context: any }
@@ -65,10 +61,9 @@ export const langgraphMachine = createMachine({
 			base_url: null,
 			api_key: null,
 			model_name: null,
-			region_url: null,
-			kubeconfig: null,
+			kubeconfig_encoded: null,
 			messages: [],
-			stage: null,
+			route: null,
 			project_context: null,
 			resource_context: null,
 		},
@@ -78,16 +73,12 @@ export const langgraphMachine = createMachine({
 	states: {
 		initializing: {
 			on: {
-				SET_CONFIG: {
+				SET_GRAPH_STATE: {
 					target: "ready",
 					actions: assign({
 						graphState: ({ context, event }) => ({
 							...context.graphState,
-							base_url: event.base_url,
-							api_key: event.api_key,
-							model_name: event.model_name,
-							region_url: event.region_url,
-							kubeconfig: event.kubeconfig,
+							...event.graphState,
 						}),
 					}),
 				},
@@ -98,6 +89,14 @@ export const langgraphMachine = createMachine({
 		},
 		ready: {
 			on: {
+				SET_GRAPH_STATE: {
+					actions: assign({
+						graphState: ({ context, event }) => ({
+							...context.graphState,
+							...event.graphState,
+						}),
+					}),
+				},
 				SET_DEPLOYMENT_URL: {
 					actions: assign({
 						deploymentUrl: ({ event }) => event.deploymentUrl,
@@ -105,6 +104,12 @@ export const langgraphMachine = createMachine({
 				},
 				SET_GRAPH_ID: {
 					actions: assign({
+						graphId: ({ event }) => event.graphId,
+					}),
+				},
+				SET_DEPLOYMENT: {
+					actions: assign({
+						deploymentUrl: ({ event }) => event.deploymentUrl,
 						graphId: ({ event }) => event.graphId,
 					}),
 				},
@@ -116,11 +121,11 @@ export const langgraphMachine = createMachine({
 						}),
 					}),
 				},
-				SET_STAGE: {
+				SET_ROUTE: {
 					actions: assign({
 						graphState: ({ context, event }) => ({
 							...context.graphState,
-							stage: event.stage,
+							route: event.route,
 						}),
 					}),
 				},

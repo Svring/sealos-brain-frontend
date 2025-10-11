@@ -2,6 +2,7 @@
 
 import { useMachine } from "@xstate/react";
 import { type ReactNode, useEffect } from "react";
+import { useAuthState } from "@/contexts/auth/auth.context";
 import { useProxyState } from "@/contexts/proxy/proxy.context";
 import { langgraphMachineContext } from "./langgraph.context";
 import { langgraphMachine } from "./langgraph.state";
@@ -20,39 +21,44 @@ export function LangGraphAdapter({
 }) {
 	const [state, send] = useMachine(langgraphMachine);
 	const { base_url, api_key, model_name } = useProxyState();
+	const { auth } = useAuthState();
 
 	// Handle langgraph config updates in useEffect to avoid setState during render
 	useEffect(() => {
-		// Set deployment URL and graph ID from environment
+		// Set deployment URL and graph ID from environment in one event
 		send({
-			type: "SET_DEPLOYMENT_URL",
+			type: "SET_DEPLOYMENT",
 			deploymentUrl: langgraphContext.deploymentUrl,
-		});
-
-		send({
-			type: "SET_GRAPH_ID",
 			graphId: langgraphContext.graphId,
 		});
 
 		// Set config from proxy state
 		send({
-			type: "SET_CONFIG",
-			base_url,
-			api_key,
-			model_name,
-			region_url: "",
-			kubeconfig: "",
+			type: "SET_GRAPH_STATE",
+			graphState: {
+				base_url,
+				api_key,
+				model_name,
+				kubeconfig_encoded: auth?.kubeconfigEncoded || "",
+			},
 		});
-	}, [langgraphContext, base_url, api_key, model_name, send]);
+	}, [
+		langgraphContext,
+		base_url,
+		api_key,
+		model_name,
+		send,
+		auth?.kubeconfigEncoded,
+	]);
 
 	return (
 		<langgraphMachineContext.Provider
-			value={{ 
+			value={{
 				graphState: state.context.graphState,
 				deploymentUrl: state.context.deploymentUrl,
 				graphId: state.context.graphId,
-				state, 
-				send 
+				state,
+				send,
 			}}
 		>
 			{children}
