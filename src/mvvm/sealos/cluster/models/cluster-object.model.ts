@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 export const ClusterResourceSchema = z.object({
-	cpu: z.number().nullable().optional(),
-	memory: z.number().nullable().optional(),
-	storage: z.number().nullable().optional(),
-	replicas: z.number().nullable().optional(),
+	cpu: z.number(),
+	memory: z.number(),
+	storage: z.number(),
+	replicas: z.number(),
 });
 
 export const ClusterComponentSchema = z.object({
@@ -70,18 +70,15 @@ export const ClusterObjectSchema = z.object({
 		])
 		.nullable()
 		.optional(),
-	version: z.string().nullable().optional(),
-	operationalStatus: z.any().optional().nullable(),
-	status: z.string().nullable().optional(),
-	resource: z
-		.union([ClusterResourceSchema, z.array(z.any())])
-		.nullable()
-		.optional(),
+	version: z.string(),
+	operationalStatus: z.any(),
+	status: z.string(),
+	resource: ClusterResourceSchema,
 	components: z
 		.union([z.array(ClusterComponentSchema), z.object({}).passthrough()])
 		.optional()
 		.nullable(),
-	connection: ClusterConnectionSchema.nullable().optional(),
+	connection: ClusterConnectionSchema,
 	backup: ClusterBackupSchema.optional().nullable(),
 	pods: z.array(PodSchema).optional().nullable(),
 });

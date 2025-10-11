@@ -1,25 +1,7 @@
 "use client";
 
+import type { Edge, Node } from "@xyflow/react";
 import { assign, createMachine } from "xstate";
-
-// Node interface
-export interface Node {
-	id: string;
-	type: string;
-	position: { x: number; y: number };
-	data: Record<string, unknown>;
-	selected?: boolean;
-}
-
-// Edge interface
-export interface Edge {
-	id: string;
-	source: string;
-	target: string;
-	type?: string;
-	data?: Record<string, unknown>;
-	selected?: boolean;
-}
 
 export interface FlowContext {
 	nodes: Node[];
@@ -82,7 +64,7 @@ export const flowMachine = createMachine({
 					actions: assign({
 						nodes: ({ context, event }) =>
 							context.nodes.map((node) =>
-								node.id === event.node.id ? event.node : node
+								node.id === event.node.id ? event.node : node,
 							),
 					}),
 				},
@@ -92,7 +74,8 @@ export const flowMachine = createMachine({
 							context.nodes.filter((node) => node.id !== event.nodeId),
 						edges: ({ context, event }) =>
 							context.edges.filter(
-								(edge) => edge.source !== event.nodeId && edge.target !== event.nodeId
+								(edge) =>
+									edge.source !== event.nodeId && edge.target !== event.nodeId,
 							),
 					}),
 				},
@@ -108,7 +91,7 @@ export const flowMachine = createMachine({
 					actions: assign({
 						edges: ({ context, event }) =>
 							context.edges.map((edge) =>
-								edge.id === event.edge.id ? event.edge : edge
+								edge.id === event.edge.id ? event.edge : edge,
 							),
 					}),
 				},
