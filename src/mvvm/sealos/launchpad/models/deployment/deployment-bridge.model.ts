@@ -18,6 +18,12 @@ export const DeploymentBridgeSchema = z.object({
 			path: ["metadata.name"],
 		}),
 	),
+	uid: z.any().describe(
+		JSON.stringify({
+			resourceType: "deployment",
+			path: ["metadata.uid"],
+		}),
+	),
 	image: z
 		.any()
 		.describe(

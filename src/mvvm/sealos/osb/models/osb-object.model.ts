@@ -19,6 +19,7 @@ export const OsbPolicySchema = z.enum([
 // Main Osb Object Schema
 export const OsbObjectSchema = z.object({
 	name: z.string(),
+	uid: z.string(),
 	displayName: z.string(),
 	kind: z.string(),
 	policy: OsbPolicySchema,

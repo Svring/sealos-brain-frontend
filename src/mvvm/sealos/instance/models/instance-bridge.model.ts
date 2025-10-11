@@ -8,6 +8,12 @@ export const InstanceBridgeSchema = z.object({
 			path: ["metadata.name"],
 		}),
 	),
+	uid: z.any().describe(
+		JSON.stringify({
+			resourceType: "instance",
+			path: ["metadata.uid"],
+		}),
+	),
 	displayName: z
 		.any()
 		.describe(

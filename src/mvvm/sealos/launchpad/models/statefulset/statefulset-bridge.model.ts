@@ -19,6 +19,12 @@ export const StatefulsetBridgeSchema = z.object({
 			path: ["metadata.name"],
 		}),
 	),
+	uid: z.any().describe(
+		JSON.stringify({
+			resourceType: "statefulset",
+			path: ["metadata.uid"],
+		}),
+	),
 	image: z
 		.any()
 		.describe(

@@ -34,7 +34,7 @@ const PodSchema = z.object({
 
 export const DevboxObjectSchema = z.object({
 	name: z.string(),
-	id: z.string(),
+	uid: z.string(),
 	resourceType: z.string().default("devbox"),
 	runtime: z.string(),
 	image: z.string(),

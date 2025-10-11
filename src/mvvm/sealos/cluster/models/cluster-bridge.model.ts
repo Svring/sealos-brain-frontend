@@ -1,5 +1,8 @@
 import { z } from "zod";
-import { formatDurationToReadable, formatIsoDateToReadable } from "@/lib/date/date-utils";
+import {
+	formatDurationToReadable,
+	formatIsoDateToReadable,
+} from "@/lib/date/date-utils";
 import { standardizeUnit } from "@/lib/k8s/k8s-client.utils";
 import type { K8sResource } from "@/mvvm/k8s/models/k8s-resource.model";
 import type { ClusterResource, ComponentSpec } from "./cluster-resource.model";
@@ -9,6 +12,12 @@ export const ClusterBridgeSchema = z.object({
 		JSON.stringify({
 			resourceType: "cluster",
 			path: ["metadata.name"],
+		}),
+	),
+	uid: z.any().describe(
+		JSON.stringify({
+			resourceType: "cluster",
+			path: ["metadata.uid"],
 		}),
 	),
 	type: z.any().describe(
@@ -42,18 +51,9 @@ export const ClusterBridgeSchema = z.object({
 		)
 		.transform((data) => {
 			// Convert Kubernetes resource strings to universal units
-			const cpu = standardizeUnit(
-				data.cpu || "0",
-				"cpu",
-			);
-			const memory = standardizeUnit(
-				data.memory || "0",
-				"memory",
-			);
-			const storage = standardizeUnit(
-				data.storage || "0",
-				"storage",
-			);
+			const cpu = standardizeUnit(data.cpu || "0", "cpu");
+			const memory = standardizeUnit(data.memory || "0", "memory");
+			const storage = standardizeUnit(data.storage || "0", "storage");
 
 			return {
 				cpu,
@@ -244,8 +244,7 @@ export const ClusterBridgeSchema = z.object({
 					name: pod.metadata?.name,
 					status: pod.status?.phase,
 					upTime,
-					containers:
-						pod.status?.containerStatuses || [],
+					containers: pod.status?.containerStatuses || [],
 				};
 			});
 		})

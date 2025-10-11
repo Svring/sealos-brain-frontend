@@ -61,6 +61,7 @@ export const ConfigMapSchema = z.object({
 // Deployment object schema
 export const DeploymentObjectSchema = z.object({
 	name: z.string(),
+	uid: z.string(),
 	resourceType: z.literal("deployment"),
 	image: ImageSchema,
 	resource: ResourceSchema,

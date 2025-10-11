@@ -7,6 +7,12 @@ export const OsbBridgeSchema = z.object({
 			path: ["metadata.name"],
 		}),
 	),
+	uid: z.string().describe(
+		JSON.stringify({
+			resourceType: "objectstoragebucket",
+			path: ["metadata.uid"],
+		}),
+	),
 	displayName: z.string().describe(
 		JSON.stringify({
 			resourceType: "objectstoragebucket",

@@ -5,6 +5,7 @@ import QueryConfig from "@/components/configs/query.config";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AuthProvider } from "@/contexts/auth/auth.provider";
+import { CopilotProvider } from "@/contexts/copilot/copilot.provider";
 import { EnvProvider } from "@/contexts/env/env.provider";
 import { ProxyProvider } from "@/contexts/proxy/proxy.provider";
 
@@ -33,12 +34,14 @@ export default function RootLayout({
 						<AuthProvider>
 							<QueryConfig>
 								<ProxyProvider>
-									<SidebarProvider defaultOpen={false}>
-										<AppSidebar />
-										<SidebarInset>
-											<main className="h-full w-full">{children}</main>
-										</SidebarInset>
-									</SidebarProvider>
+									<CopilotProvider>
+										<SidebarProvider defaultOpen={false}>
+											<AppSidebar />
+											<SidebarInset>
+												<main className="h-full w-full">{children}</main>
+											</SidebarInset>
+										</SidebarProvider>
+									</CopilotProvider>
 								</ProxyProvider>
 							</QueryConfig>
 						</AuthProvider>
