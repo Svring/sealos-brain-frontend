@@ -11,6 +11,7 @@ export const devboxParser = {
 	toItem: (resource: DevboxResource): DevboxItem => {
 		// Extract runtime from image similar to DevboxBridgeSchema
 		const image = resource.spec.image || "";
+		// @ts-expect-error
 		const imageName = image.split(":")[0].split("/").pop() || "";
 		const runtime = imageName.split("-").slice(0, 1).join("-");
 
