@@ -12,6 +12,7 @@ import {
 	patchResource,
 	patchResourceMetadata,
 	removeResourceMetadata,
+	selectResources,
 	strategicMergePatchResource,
 	upsertResource,
 } from "@/lib/k8s/k8s-service.api";
@@ -55,6 +56,13 @@ export const k8sRouter = t.router({
 	get: t.procedure.input(resourceTargetSchema).query(async ({ ctx, input }) => {
 		return await getResource(ctx, input);
 	}),
+
+	select: t.procedure
+		.input(z.array(resourceTypeTargetSchema))
+		.output(z.array(z.any())) // K8sResource array
+		.query(async ({ ctx, input }) => {
+			return await selectResources(ctx, input);
+		}),
 
 	// Quota Management
 	quota: t.procedure.query(async ({ ctx }) => {

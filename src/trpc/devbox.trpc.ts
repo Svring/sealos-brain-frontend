@@ -65,7 +65,7 @@ export const devboxRouter = t.router({
 			return await getDevboxMonitor(ctx, input);
 		}),
 
-	networkStatus: t.procedure
+	network: t.procedure
 		.input(z.string())
 		.query(async ({ input: _input, ctx: _ctx }) => {
 			// TODO: Implement check devbox ready

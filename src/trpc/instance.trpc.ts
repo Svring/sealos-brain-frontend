@@ -1,6 +1,7 @@
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
 import {
+	deleteInstance,
 	getInstance,
 	getInstanceResources,
 	listInstances,
@@ -55,7 +56,7 @@ export const instanceRouter = t.router({
 		.input(CustomResourceTargetSchema)
 		.output(z.array(K8sItemSchema))
 		.query(async ({ ctx, input }) => {
-			return await getInstanceResources(ctx, input.name);
+			return await getInstanceResources(ctx, input);
 		}),
 
 	// ===== MUTATION PROCEDURES =====
@@ -80,8 +81,7 @@ export const instanceRouter = t.router({
 	delete: t.procedure
 		.input(CustomResourceTargetSchema)
 		.mutation(async ({ ctx, input }) => {
-			// TODO: Implement delete instance
-			throw new Error("Not implemented");
+			return await deleteInstance(ctx, input.name);
 		}),
 
 	// Instance Configuration

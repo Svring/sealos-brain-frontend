@@ -1,23 +1,53 @@
 "use server";
 
+import https from "node:https";
+import axios from "axios";
 import _ from "lodash";
 import { INSTANCE_LABELS } from "@/constants/instance/instance-labels.constant";
 import { k8sParser } from "@/lib/k8s/k8s.parser";
+import { getRegionUrlFromKubeconfig } from "@/lib/k8s/k8s-server.utils";
 import {
 	getResource,
 	listResources,
 	selectResources,
 } from "@/lib/k8s/k8s-service.api";
-import { clusterParser } from "@/lib/sealos/cluster/cluster.parser";
-import { devboxParser } from "@/lib/sealos/devbox/devbox.parser";
+import { resourceParser } from "@/lib/resource/resource.parser";
 import { instanceParser } from "@/lib/sealos/instance/instance.parser";
-import { launchpadParser } from "@/lib/sealos/launchpad/launchpad.parser";
 import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
 import type { K8sItem } from "@/mvvm/k8s/models/k8s-resource.model";
-import { K8sResourceListSchema } from "@/mvvm/k8s/models/k8s-resource.model";
 import type { InstanceObject } from "@/mvvm/sealos/instance/models/instance-object.model";
 import { InstanceResourceSchema } from "@/mvvm/sealos/instance/models/instance-resource.model";
+
+/**
+ * Creates axios instance for instance API calls
+ */
+async function createInstanceAxios(context: K8sContext, apiVersion?: string) {
+	const regionUrl = await getRegionUrlFromKubeconfig(context.kubeconfig);
+	if (!regionUrl) {
+		throw new Error("Failed to extract region URL from kubeconfig");
+	}
+
+	const serviceSubdomain = "template";
+	const baseURL = `https://${serviceSubdomain}.${regionUrl}/api${
+		apiVersion ? `/${apiVersion}` : ""
+	}`;
+
+	const isDevelopment = process.env.MODE === "development";
+	const httpsAgent = new https.Agent({
+		keepAlive: true,
+		rejectUnauthorized: !isDevelopment,
+	});
+
+	return axios.create({
+		baseURL,
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: encodeURIComponent(context.kubeconfig),
+		},
+		httpsAgent,
+	});
+}
 
 // ============================================================================
 // Instance API Functions
@@ -70,41 +100,55 @@ export const getInstance = async (
  */
 export const getInstanceResources = async (
 	context: K8sContext,
-	instanceName: string,
+	target: CustomResourceTarget,
 ): Promise<K8sItem[]> => {
-	const resourceTypeTarget = {
-		type: "custom" as const,
-		resourceType: "instance" as const,
-		name: instanceName,
-		label: INSTANCE_LABELS.DEPLOY_ON_SEALOS,
-	};
+	const targets = [
+		{
+			type: "builtin" as const,
+			resourceType: "deployment" as const,
+			name: target.name,
+			label: INSTANCE_LABELS.DEPLOY_ON_SEALOS,
+		},
+		{
+			type: "builtin" as const,
+			resourceType: "statefulset" as const,
+			name: target.name,
+			label: INSTANCE_LABELS.DEPLOY_ON_SEALOS,
+		},
+		{
+			type: "custom" as const,
+			resourceType: "devbox" as const,
+			name: target.name,
+			label: INSTANCE_LABELS.DEPLOY_ON_SEALOS,
+		},
+		{
+			type: "custom" as const,
+			resourceType: "cluster" as const,
+			name: target.name,
+			label: INSTANCE_LABELS.DEPLOY_ON_SEALOS,
+		},
+		{
+			type: "custom" as const,
+			resourceType: "objectstoragebucket" as const,
+			name: target.name,
+			label: INSTANCE_LABELS.DEPLOY_ON_SEALOS,
+		},
+	];
 
-	const selectedResources = await selectResources(
-		context,
-		resourceTypeTarget,
-		["deployment", "statefulset"],
-		["devbox", "cluster", "objectstoragebucket"],
-	);
+	const selectedResources = await selectResources(context, targets);
 
-	const parsers: Record<string, (resource: any) => K8sItem> = {
-		Devbox: devboxParser.toItem,
-		Cluster: clusterParser.toItem,
-		Deployment: launchpadParser.toItem,
-		StatefulSet: launchpadParser.toItem,
-	};
+	// Convert resources to items using resourceParser
+	return resourceParser.toItems(selectedResources);
+};
 
-	return _.flatMap(_.pickBy(selectedResources, Boolean), (resourceList) =>
-		K8sResourceListSchema.parse(resourceList)
-			.items.map((resource) => {
-				const parser = parsers[resource.kind];
-				if (!parser) return null;
-				try {
-					return parser(resource);
-				} catch (error) {
-					console.warn(`Failed to parse resource ${resource.kind}:`, error);
-					return null;
-				}
-			})
-			.filter(Boolean),
-	) as K8sItem[];
+/**
+ * Delete instance
+ */
+export const deleteInstance = async (
+	context: K8sContext,
+	instanceName: string,
+) => {
+	const api = await createInstanceAxios(context, "v1/instance");
+	const response = await api.delete(`/${instanceName}`, {});
+	return response.data;
 };
