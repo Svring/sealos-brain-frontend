@@ -45,7 +45,7 @@ async function createClusterAxios(context: K8sContext, apiVersion?: string) {
 /**
  * List all clusters
  */
-export const listClusters = async (context: K8sContext) => {
+export const listClusters = async (_context: K8sContext) => {
 	// TODO: Implement list clusters
 	throw new Error("Not implemented");
 };
@@ -54,20 +54,40 @@ export const listClusters = async (context: K8sContext) => {
  * Get a specific cluster by CustomResourceTarget
  */
 export const getCluster = async (
-	context: K8sContext,
-	target: CustomResourceTarget,
+	_context: K8sContext,
+	_target: CustomResourceTarget,
 ) => {
 	// TODO: Implement get cluster
 	throw new Error("Not implemented");
 };
 
 /**
- * Get cluster combined monitor
+ * Get cluster monitor data
  */
-export const getClusterCombinedMonitor = async (
+export const getClusterMonitorData = async (
 	context: K8sContext,
 	dbName: string,
 	dbType: string,
+	queryKey: string,
+) => {
+	const api = await createClusterAxios(context);
+	const response = await api.get("/monitor/getMonitorData", {
+		params: {
+			dbName,
+			dbType,
+			queryKey,
+		},
+	});
+	return response.data.data;
+};
+
+/**
+ * Get cluster combined monitor
+ */
+export const getClusterCombinedMonitor = async (
+	_context: K8sContext,
+	_dbName: string,
+	_dbType: string,
 ) => {
 	// TODO: Implement get cluster combined monitor
 	throw new Error("Not implemented");
@@ -80,16 +100,21 @@ export const getClusterBackupList = async (
 	context: K8sContext,
 	target: CustomResourceTarget,
 ) => {
-	// TODO: Implement get cluster backup list
-	throw new Error("Not implemented");
+	const api = await createClusterAxios(context);
+	const response = await api.get("/backup/getBackupList", {
+		params: {
+			dbName: target.name,
+		},
+	});
+	return response.data.data;
 };
 
 /**
  * Get cluster logs
  */
 export const getClusterLogs = async (
-	context: K8sContext,
-	target: CustomResourceTarget,
+	_context: K8sContext,
+	_target: CustomResourceTarget,
 ) => {
 	// TODO: Implement get cluster logs
 	throw new Error("Not implemented");
@@ -99,8 +124,9 @@ export const getClusterLogs = async (
  * Get cluster versions
  */
 export const getClusterVersions = async (context: K8sContext) => {
-	// TODO: Implement get cluster versions
-	throw new Error("Not implemented");
+	const api = await createClusterAxios(context, "v1/database");
+	const response = await api.get("/version/list");
+	return response.data;
 };
 
 /**

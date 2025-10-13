@@ -2,12 +2,19 @@
 
 import { useQuery } from "@tanstack/react-query";
 import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s.model";
+import { useDevboxMonitor } from "../devbox/use-devbox-monitor";
 import { useTRPCClients } from "../trpc/use-trpc-clients";
 
 export const useInstanceResources = (target: CustomResourceTarget) => {
 	const { instance } = useTRPCClients();
 
 	const query = useQuery(instance.resources.queryOptions(target));
+
+	useDevboxMonitor({
+		type: "custom",
+		name: "frontend-dev-pji581",
+		resourceType: "devbox",
+	});
 
 	return {
 		data: query.data,

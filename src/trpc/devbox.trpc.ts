@@ -1,11 +1,14 @@
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
 import {
+	authCname,
 	autostartDevbox,
 	createDevbox,
 	deleteDevbox,
 	deleteDevboxRelease,
 	deployDevbox,
+	getDevboxReleases,
+	getDevboxTemplates,
 	pauseDevbox,
 	releaseDevbox,
 	restartDevbox,
@@ -13,6 +16,7 @@ import {
 	startDevbox,
 	updateDevbox,
 } from "@/lib/sealos/devbox/devbox.api";
+import { getDevboxMonitor } from "@/lib/sealos/devbox/devbox-service.api";
 import { createErrorFormatter } from "@/lib/trpc/trpc.utils";
 import { CustomResourceTargetSchema } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
@@ -27,7 +31,7 @@ export async function createDevboxContext(opts: {
 	if (!kubeconfigEncoded) {
 		throw new Error("kubeconfigEncoded header is required");
 	}
-	
+
 	const kubeconfig = decodeURIComponent(kubeconfigEncoded);
 
 	return {
@@ -43,45 +47,39 @@ export const devboxRouter = t.router({
 	// DevBox Listing & Information
 	list: t.procedure
 		.input(z.string().optional().default("devbox"))
-		.query(async ({ ctx, input }) => {
+		.query(async ({ ctx: _ctx, input: _input }) => {
 			// TODO: Implement list devboxes
 			throw new Error("Not implemented");
 		}),
 
 	get: t.procedure
 		.input(CustomResourceTargetSchema)
-		.query(async ({ input, ctx }) => {
+		.query(async ({ input: _input, ctx: _ctx }) => {
 			// TODO: Implement get devbox
 			throw new Error("Not implemented");
 		}),
 
 	monitor: t.procedure
-		.input(
-			z.object({
-				devboxName: z.string(),
-				step: z.string().optional().default("2m"),
-			}),
-		)
+		.input(CustomResourceTargetSchema)
 		.query(async ({ input, ctx }) => {
-			// TODO: Implement get devbox combined monitor
+			return await getDevboxMonitor(ctx, input);
+		}),
+
+	networkStatus: t.procedure
+		.input(z.string())
+		.query(async ({ input: _input, ctx: _ctx }) => {
+			// TODO: Implement check devbox ready
 			throw new Error("Not implemented");
 		}),
 
-	networkStatus: t.procedure.input(z.string()).query(async ({ input, ctx }) => {
-		// TODO: Implement check devbox ready
-		throw new Error("Not implemented");
-	}),
-
 	// Release Information
 	releases: t.procedure.input(z.string()).query(async ({ ctx, input }) => {
-		// TODO: Implement get devbox releases
-		throw new Error("Not implemented");
+		return await getDevboxReleases(ctx, input);
 	}),
 
 	// Templates
 	templates: t.procedure.query(async ({ ctx }) => {
-		// TODO: Implement get devbox templates
-		throw new Error("Not implemented");
+		return await getDevboxTemplates(ctx);
 	}),
 
 	// Domain Authentication
@@ -93,8 +91,7 @@ export const devboxRouter = t.router({
 			}),
 		)
 		.query(async ({ ctx, input }) => {
-			// TODO: Implement auth cname
-			throw new Error("Not implemented");
+			return await authCname(ctx, input.publicDomain, input.customDomain);
 		}),
 
 	// ===== MUTATION PROCEDURES =====

@@ -45,7 +45,7 @@ async function createDevboxAxios(context: K8sContext, apiVersion?: string) {
 /**
  * List all devboxes
  */
-export const listDevboxes = async (context: K8sContext) => {
+export const listDevboxes = async (_context: K8sContext) => {
 	// TODO: Implement list devboxes
 	throw new Error("Not implemented");
 };
@@ -54,23 +54,31 @@ export const listDevboxes = async (context: K8sContext) => {
  * Get a specific devbox by CustomResourceTarget
  */
 export const getDevbox = async (
-	context: K8sContext,
-	target: CustomResourceTarget,
+	_context: K8sContext,
+	_target: CustomResourceTarget,
 ) => {
 	// TODO: Implement get devbox
 	throw new Error("Not implemented");
 };
 
 /**
- * Get devbox combined monitor
+ * Get devbox monitor data
  */
-export const getDevboxCombinedMonitor = async (
+export const getDevboxMonitorData = async (
 	context: K8sContext,
-	devboxName: string,
+	queryKey: string,
+	queryName: string,
 	step: string = "2m",
 ) => {
-	// TODO: Implement get devbox combined monitor
-	throw new Error("Not implemented");
+	const api = await createDevboxAxios(context);
+	const response = await api.get("/monitor/getMonitorData", {
+		params: {
+			queryKey,
+			queryName,
+			step,
+		},
+	});
+	return response.data.data;
 };
 
 /**
@@ -80,8 +88,13 @@ export const checkDevboxReady = async (
 	context: K8sContext,
 	devboxName: string,
 ) => {
-	// TODO: Implement check devbox ready
-	throw new Error("Not implemented");
+	const api = await createDevboxAxios(context);
+	const response = await api.get("/checkReady", {
+		params: {
+			devboxName,
+		},
+	});
+	return response.data.data;
 };
 
 /**
@@ -91,16 +104,18 @@ export const getDevboxReleases = async (
 	context: K8sContext,
 	devboxName: string,
 ) => {
-	// TODO: Implement get devbox releases
-	throw new Error("Not implemented");
+	const api = await createDevboxAxios(context, "v1/devbox");
+	const response = await api.get(`/${devboxName}/release`);
+	return response.data.data;
 };
 
 /**
  * Get devbox templates
  */
 export const getDevboxTemplates = async (context: K8sContext) => {
-	// TODO: Implement get devbox templates
-	throw new Error("Not implemented");
+	const api = await createDevboxAxios(context, "v1/devbox");
+	const response = await api.get("/templates");
+	return response.data.data;
 };
 
 /**
@@ -111,8 +126,13 @@ export const authCname = async (
 	publicDomain: string,
 	customDomain: string,
 ) => {
-	// TODO: Implement auth cname
-	throw new Error("Not implemented");
+	const api = await createDevboxAxios(context);
+	const cleanPublicDomain = publicDomain?.replace(/^https?:\/\//, "") || "";
+	const response = await api.post("/platform/authCname", {
+		publicDomain: cleanPublicDomain,
+		customDomain,
+	});
+	return response.data;
 };
 
 /**

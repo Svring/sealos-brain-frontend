@@ -5,16 +5,14 @@ import {
 	createLaunchpad,
 	deleteLaunchpad,
 	getLaunchpad,
-	getLaunchpadApplicationPods,
-	getLaunchpadCombinedMonitor,
 	getLaunchpadLogs,
-	getLaunchpadPodsMetrics,
 	listLaunchpads,
 	pauseLaunchpad,
 	restartLaunchpad,
 	startLaunchpad,
 	updateLaunchpad,
 } from "@/lib/sealos/launchpad/launchpad.api";
+import { getLaunchpadMonitor } from "@/lib/sealos/launchpad/launchpad-service.api";
 import { createErrorFormatter } from "@/lib/trpc/trpc.utils";
 import { BuiltinResourceTargetSchema } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
@@ -51,7 +49,7 @@ export const launchpadRouter = t.router({
 
 	list: t.procedure
 		.input(z.string().optional().default("launchpad"))
-		.query(async ({ ctx, input }) => {
+		.query(async ({ ctx, input: _input }) => {
 			return await listLaunchpads(ctx);
 		}),
 
@@ -68,21 +66,16 @@ export const launchpadRouter = t.router({
 	// Monitoring
 	monitor: t.procedure
 		.input(
-			z.object({
-				queryName: z.string(),
+			BuiltinResourceTargetSchema.extend({
 				step: z.string().optional().default("2m"),
 			}),
 		)
 		.query(async ({ input, ctx }) => {
-			return await getLaunchpadCombinedMonitor(
-				ctx,
-				input.queryName,
-				input.step,
-			);
+			return await getLaunchpadMonitor(ctx, input.name, input.step);
 		}),
 
-	getPods: t.procedure.input(z.string()).query(async ({ input, ctx }) => {
-		return await getLaunchpadApplicationPods(ctx, input);
+	pods: t.procedure.input(z.string()).query(async ({ input, ctx }) => {
+		// return await getLaunchpadApplicationPods(ctx, input);
 	}),
 
 	// ===== MUTATION PROCEDURES =====

@@ -45,7 +45,7 @@ async function createLaunchpadAxios(context: K8sContext, apiVersion?: string) {
 /**
  * List all launchpads
  */
-export const listLaunchpads = async (context: K8sContext) => {
+export const listLaunchpads = async (_context: K8sContext) => {
 	// TODO: Implement list launchpads
 	throw new Error("Not implemented");
 };
@@ -54,20 +54,40 @@ export const listLaunchpads = async (context: K8sContext) => {
  * Get a specific launchpad by CustomResourceTarget
  */
 export const getLaunchpad = async (
-	context: K8sContext,
-	target: BuiltinResourceTarget,
+	_context: K8sContext,
+	_target: BuiltinResourceTarget,
 ) => {
 	// TODO: Implement get launchpad
 	throw new Error("Not implemented");
 };
 
 /**
+ * Get launchpad monitor data
+ */
+export const getLaunchpadMonitorData = async (
+	context: K8sContext,
+	queryKey: string,
+	queryName: string,
+	step: string = "2m",
+) => {
+	const api = await createLaunchpadAxios(context);
+	const response = await api.get("/monitor/getMonitorData", {
+		params: {
+			queryKey,
+			queryName,
+			step,
+		},
+	});
+	return response.data.data;
+};
+
+/**
  * Get launchpad combined monitor
  */
 export const getLaunchpadCombinedMonitor = async (
-	context: K8sContext,
-	queryName: string,
-	step: string = "2m",
+	_context: K8sContext,
+	_queryName: string,
+	_step: string = "2m",
 ) => {
 	// TODO: Implement get launchpad combined monitor
 	throw new Error("Not implemented");
@@ -77,8 +97,8 @@ export const getLaunchpadCombinedMonitor = async (
  * Check launchpad ready status
  */
 export const checkLaunchpadReady = async (
-	context: K8sContext,
-	queryName: string,
+	_context: K8sContext,
+	_queryName: string,
 ) => {
 	// TODO: Implement check launchpad ready
 	throw new Error("Not implemented");
@@ -88,8 +108,8 @@ export const checkLaunchpadReady = async (
  * Get launchpad logs
  */
 export const getLaunchpadLogs = async (
-	context: K8sContext,
-	target: BuiltinResourceTarget,
+	_context: K8sContext,
+	_target: BuiltinResourceTarget,
 ) => {
 	// TODO: Implement get launchpad logs
 	throw new Error("Not implemented");
@@ -99,8 +119,8 @@ export const getLaunchpadLogs = async (
  * Get launchpad application pods
  */
 export const getLaunchpadApplicationPods = async (
-	context: K8sContext,
-	name: string,
+	_context: K8sContext,
+	_name: string,
 ) => {
 	// TODO: Implement get launchpad application pods
 	throw new Error("Not implemented");
@@ -110,8 +130,8 @@ export const getLaunchpadApplicationPods = async (
  * Get launchpad pods metrics
  */
 export const getLaunchpadPodsMetrics = async (
-	context: K8sContext,
-	name: string,
+	_context: K8sContext,
+	_name: string,
 ) => {
 	// TODO: Implement get launchpad pods metrics
 	throw new Error("Not implemented");
