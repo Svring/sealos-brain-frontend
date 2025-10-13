@@ -13,7 +13,7 @@ export const createThread = async ({
 	metadata,
 	supersteps,
 }: {
-	metadata: Record<string, any>;
+	metadata: Metadata;
 	supersteps?: Array<{
 		updates: Array<{
 			values: Record<string, any>;
@@ -49,7 +49,6 @@ export const getThread = async (threadId: string) => {
 export const updateThreadState = async (
 	threadId: string,
 	values: any,
-	asNode: string,
 ) => {
 	const client = createClient();
 	return await client.threads.updateState(threadId, { values });

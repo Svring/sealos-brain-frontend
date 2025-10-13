@@ -40,7 +40,7 @@ export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 
 	// Search threads based on metadata
 	const { data: threads, isSuccess } = useSearchThreads(metadata);
-	const { mutate: createThread } = useCreateThread(metadata);
+	const { mutate: createThread } = useCreateThread();
 
 	// Auto-select first thread or create new thread when search is successful
 	useEffectOnCondition(() => {
@@ -48,23 +48,28 @@ export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 			threads,
 			isSuccess,
 			threadId,
-			metadata
+			metadata,
 		});
 		if (threads && threads.length > 0 && threads[0]?.thread_id) {
 			console.log("[CopilotAdapter] Selecting existing thread", {
-				selectedThreadId: threads[0].thread_id
+				selectedThreadId: threads[0].thread_id,
 			});
 			setThreadId(threads[0].thread_id);
 		} else {
 			console.log("[CopilotAdapter] No threads found. Creating new thread.", {
-				metadata
+				metadata,
 			});
-			createThread(metadata, {
-				onSuccess: (data) => {
-					console.log("[CopilotAdapter] New thread created", { newThreadId: data.thread_id });
-					setThreadId(data.thread_id);
+			createThread(
+				{ metadata },
+				{
+					onSuccess: (data) => {
+						console.log("[CopilotAdapter] New thread created", {
+							newThreadId: data.thread_id,
+						});
+						setThreadId(data.thread_id);
+					},
 				},
-			});
+			);
 		}
 	}, isSuccess && !threadId);
 
@@ -80,9 +85,9 @@ export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 	const submitWithContext = (data: { messages: Message[] }) => {
 		return submit(
 			{
-				api_key: graphState.api_key,
-				base_url: graphState.base_url,
-				model_name: graphState.model_name,
+				api_key: graphState.apiKey,
+				base_url: graphState.baseURL,
+				model_name: graphState.modelName,
 				region_url: auth?.regionUrl,
 				kubeconfigEncoded: auth?.kubeconfigEncoded,
 				messages: data.messages,

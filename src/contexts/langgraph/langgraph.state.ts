@@ -12,18 +12,14 @@ export type ResourceContext = any;
 
 // Graph State interface based on the Python TypedDict
 export interface GraphState {
-	base_url?: string | null;
-	api_key?: string | null;
-	model_name?: string | null;
-	kubeconfig_encoded?: string | null;
+	baseURL?: string | null;
+	apiKey?: string | null;
+	modelName?: string | null;
+	kubeconfigEncoded?: string | null;
 	messages: Message[];
-	route?:
-		| "propose"
-		| "resource"
-		| "project"
-		| null;
-	project_context?: ProjectContext | null;
-	resource_context?: ResourceContext | null;
+	route?: "proposeNode" | "resourceNode" | "projectNode" | null;
+	projectContext?: ProjectContext | null;
+	resourceContext?: ResourceContext | null;
 }
 
 // LangGraph context interface
@@ -44,8 +40,8 @@ export type LangGraphEvent =
 	| { type: "UPDATE_GRAPH_STATE"; graphState: Partial<GraphState> }
 	| { type: "SET_ROUTE"; route: GraphState["route"] }
 	| { type: "ADD_MESSAGE"; message: Message }
-	| { type: "SET_PROJECT_CONTEXT"; project_context: any }
-	| { type: "SET_RESOURCE_CONTEXT"; resource_context: any }
+	| { type: "SET_PROJECT_CONTEXT"; projectContext: any }
+	| { type: "SET_RESOURCE_CONTEXT"; resourceContext: any }
 	| { type: "FAIL" }
 	| { type: "RETRY" };
 
@@ -58,14 +54,14 @@ export const langgraphMachine = createMachine({
 	initial: "initializing",
 	context: {
 		graphState: {
-			base_url: null,
-			api_key: null,
-			model_name: null,
-			kubeconfig_encoded: null,
+			baseURL: null,
+			apiKey: null,
+			modelName: null,
+			kubeconfigEncoded: null,
 			messages: [],
 			route: null,
-			project_context: null,
-			resource_context: null,
+			projectContext: null,
+			resourceContext: null,
 		},
 		deploymentUrl: "",
 		graphId: "",
@@ -141,7 +137,7 @@ export const langgraphMachine = createMachine({
 					actions: assign({
 						graphState: ({ context, event }) => ({
 							...context.graphState,
-							project_context: event.project_context,
+							projectContext: event.projectContext,
 						}),
 					}),
 				},
@@ -149,7 +145,7 @@ export const langgraphMachine = createMachine({
 					actions: assign({
 						graphState: ({ context, event }) => ({
 							...context.graphState,
-							resource_context: event.resource_context,
+							resourceContext: event.resourceContext,
 						}),
 					}),
 				},

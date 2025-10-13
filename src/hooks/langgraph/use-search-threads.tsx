@@ -1,12 +1,15 @@
 "use client";
 
+import type { Metadata } from "@langchain/langgraph-sdk";
 import { useQuery } from "@tanstack/react-query";
 import { useTRPCClients } from "../trpc/use-trpc-clients";
 
-export const useSearchThreads = (metadata: Record<string, string>) => {
+export const useSearchThreads = (metadata: Metadata) => {
 	const { langgraph } = useTRPCClients();
 
-	const query = useQuery(langgraph.searchThreads.queryOptions(metadata));
+	const query = useQuery(
+		langgraph.searchThreads.queryOptions({ metadata: metadata || {} })
+	);
 
 	return {
 		data: query.data,

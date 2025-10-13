@@ -38,9 +38,13 @@ export const langgraphRouter = t.router({
 	}),
 
 	searchThreads: t.procedure
-		.input(z.record(z.any()))
+		.input(
+			z.object({
+				metadata: z.record(z.any()),
+			}),
+		)
 		.query(async ({ input }) => {
-			return await searchThreads(input);
+			return await searchThreads(input.metadata);
 		}),
 
 	// ===== MUTATION PROCEDURES =====
@@ -49,7 +53,7 @@ export const langgraphRouter = t.router({
 	createThread: t.procedure
 		.input(
 			z.object({
-				metadata: z.record(z.any()).optional(),
+				metadata: z.record(z.any()),
 			}),
 		)
 		.mutation(async ({ input }) => {
@@ -68,7 +72,7 @@ export const langgraphRouter = t.router({
 			];
 
 			return await createThread({
-				metadata: metadata || {},
+				metadata: metadata,
 				supersteps,
 			});
 		}),
@@ -78,13 +82,12 @@ export const langgraphRouter = t.router({
 		.input(
 			z.object({
 				threadId: z.string(),
-				values: z.any(),
-				asNode: z.string(),
+				values: z.record(z.any()),
 			}),
 		)
 		.mutation(async ({ input }) => {
-			const { threadId, values, asNode } = input;
-			return await updateThreadState(threadId, values, asNode);
+			const { threadId, values } = input;
+			return await updateThreadState(threadId, values);
 		}),
 
 	// Delete thread
@@ -97,7 +100,7 @@ export const langgraphRouter = t.router({
 		.input(
 			z.object({
 				threadId: z.string(),
-				metadata: z.record(z.any()),
+				metadata: z.record(z.any()).optional(),
 			}),
 		)
 		.mutation(async ({ input }) => {

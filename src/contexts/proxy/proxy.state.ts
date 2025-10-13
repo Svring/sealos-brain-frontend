@@ -4,14 +4,14 @@ import { assign, createMachine } from "xstate";
 
 // Proxy context interface
 export interface ProxyContext {
-	base_url: string;
-	api_key: string;
-	model_name: string;
+	baseURL: string;
+	apiKey: string;
+	modelName: string;
 }
 
 export type ProxyEvent =
-	| { type: "SET_CONFIG"; base_url: string; api_key: string; model_name: string }
-	| { type: "SET_MODEL_NAME"; model_name: string }
+	| { type: "SET_CONFIG"; baseURL: string; apiKey: string; modelName: string }
+	| { type: "SET_MODEL_NAME"; modelName: string }
 	| { type: "FAIL" }
 	| { type: "RETRY" };
 
@@ -23,9 +23,9 @@ export const proxyMachine = createMachine({
 	id: "proxy",
 	initial: "initializing",
 	context: {
-		base_url: "",
-		api_key: "",
-		model_name: "gpt-4",
+		baseURL: "",
+		apiKey: "",
+		modelName: "gpt-4",
 	},
 	states: {
 		initializing: {
@@ -33,9 +33,9 @@ export const proxyMachine = createMachine({
 				SET_CONFIG: {
 					target: "ready",
 					actions: assign({
-						base_url: ({ event }) => event.base_url,
-						api_key: ({ event }) => event.api_key,
-						model_name: ({ event }) => event.model_name,
+						baseURL: ({ event }) => event.baseURL,
+						apiKey: ({ event }) => event.apiKey,
+						modelName: ({ event }) => event.modelName,
 					}),
 				},
 				FAIL: {
@@ -47,7 +47,7 @@ export const proxyMachine = createMachine({
 			on: {
 				SET_MODEL_NAME: {
 					actions: assign({
-						model_name: ({ event }) => event.model_name,
+						modelName: ({ event }) => event.modelName,
 					}),
 				},
 				FAIL: {

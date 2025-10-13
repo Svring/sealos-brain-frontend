@@ -20,9 +20,9 @@ export function ProxyAdapter({ children }: { children: ReactNode }) {
 			if (firstToken && auth?.regionUrl) {
 				send({
 					type: "SET_CONFIG",
-					base_url: composeAiProxyChatUrl(auth.regionUrl),
-					api_key: firstToken.key,
-					model_name: "gpt-4.1",
+					baseURL: composeAiProxyChatUrl(auth.regionUrl),
+					apiKey: firstToken.key,
+					modelName: "gpt-4.1",
 				});
 			}
 		}
@@ -35,9 +35,9 @@ export function ProxyAdapter({ children }: { children: ReactNode }) {
 	return (
 		<proxyMachineContext.Provider
 			value={{
-				base_url: state.context.base_url,
-				api_key: state.context.api_key,
-				model_name: state.context.model_name,
+				baseURL: state.context.baseURL,
+				apiKey: state.context.apiKey,
+				modelName: state.context.modelName,
 				state,
 				send,
 			}}

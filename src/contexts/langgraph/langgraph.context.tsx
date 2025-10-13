@@ -70,10 +70,10 @@ export function useLangGraphEvents() {
 		setRoute: (route: GraphState["route"]) =>
 			send({ type: "SET_ROUTE", route }),
 		addMessage: (message: Message) => send({ type: "ADD_MESSAGE", message }),
-		setProjectContext: (project_context: any) =>
-			send({ type: "SET_PROJECT_CONTEXT", project_context }),
-		setResourceContext: (resource_context: any) =>
-			send({ type: "SET_RESOURCE_CONTEXT", resource_context }),
+		setProjectContext: (projectContext: any) =>
+			send({ type: "SET_PROJECT_CONTEXT", projectContext }),
+		setResourceContext: (resourceContext: any) =>
+			send({ type: "SET_RESOURCE_CONTEXT", resourceContext }),
 		fail: () => send({ type: "FAIL" }),
 		retry: () => send({ type: "RETRY" }),
 	};
