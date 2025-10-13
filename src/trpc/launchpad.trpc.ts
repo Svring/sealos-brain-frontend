@@ -96,28 +96,24 @@ export const launchpadRouter = t.router({
 	start: t.procedure
 		.input(BuiltinResourceTargetSchema)
 		.mutation(async ({ input, ctx }) => {
-			if (!input.name) throw new Error("Launchpad name is required");
 			return await startLaunchpad(ctx, input.name);
 		}),
 
 	pause: t.procedure
 		.input(BuiltinResourceTargetSchema)
 		.mutation(async ({ input, ctx }) => {
-			if (!input.name) throw new Error("Launchpad name is required");
 			return await pauseLaunchpad(ctx, input.name);
 		}),
 
 	restart: t.procedure
 		.input(BuiltinResourceTargetSchema)
 		.mutation(async ({ input, ctx }) => {
-			if (!input.name) throw new Error("Launchpad name is required");
 			return await restartLaunchpad(ctx, input.name);
 		}),
 
 	delete: t.procedure
 		.input(BuiltinResourceTargetSchema)
 		.mutation(async ({ input, ctx }) => {
-			if (!input.name) throw new Error("Launchpad name is required");
 			return await deleteLaunchpad(ctx, input.name);
 		}),
 });

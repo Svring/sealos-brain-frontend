@@ -12,6 +12,7 @@ import type { InstanceRouter } from "@/trpc/instance.trpc";
 import type { K8sRouter } from "@/trpc/k8s.trpc";
 import type { LanggraphRouter } from "@/trpc/langgraph.trpc";
 import type { LaunchpadRouter } from "@/trpc/launchpad.trpc";
+import type { OsbRouter } from "@/trpc/osb.trpc";
 
 export const k8sClient = createTRPCContext<K8sRouter>();
 export const instanceClient = createTRPCContext<InstanceRouter>();
@@ -20,6 +21,7 @@ export const clusterClient = createTRPCContext<ClusterRouter>();
 export const launchpadClient = createTRPCContext<LaunchpadRouter>();
 export const langgraphClient = createTRPCContext<LanggraphRouter>();
 export const aiProxyClient = createTRPCContext<AiProxyRouter>();
+export const osbClient = createTRPCContext<OsbRouter>();
 
 interface TRPCConfigProps {
 	children: React.ReactNode;
@@ -128,6 +130,20 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 		}),
 	);
 
+	const [osbTrpcClient] = useState(() =>
+		createTRPCClient<OsbRouter>({
+			links: [
+				httpBatchLink({
+					url: "/api/trpc/osb",
+					maxURLLength: 6000,
+					headers: () => ({
+						kubeconfigEncoded: auth.kubeconfigEncoded,
+					}),
+				}),
+			],
+		}),
+	);
+
 	return (
 		<k8sClient.TRPCProvider
 			trpcClient={k8sTrpcClient}
@@ -157,7 +173,12 @@ export default function TRPCConfig({ children, queryClient }: TRPCConfigProps) {
 									trpcClient={aiProxyTrpcClient}
 									queryClient={queryClient}
 								>
-									{children}
+									<osbClient.TRPCProvider
+										trpcClient={osbTrpcClient}
+										queryClient={queryClient}
+									>
+										{children}
+									</osbClient.TRPCProvider>
 								</aiProxyClient.TRPCProvider>
 							</langgraphClient.TRPCProvider>
 						</launchpadClient.TRPCProvider>

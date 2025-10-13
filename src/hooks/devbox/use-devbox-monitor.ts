@@ -9,8 +9,6 @@ export const useDevboxMonitor = (target: CustomResourceTarget) => {
 
 	const query = useQuery(devbox.monitor.queryOptions(target));
 
-	console.log("query", query.data);
-
 	return {
 		data: query.data,
 		isLoading: query.isLoading,

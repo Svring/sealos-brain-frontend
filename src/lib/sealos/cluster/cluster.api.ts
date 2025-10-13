@@ -2,9 +2,11 @@
 
 import https from "node:https";
 import axios from "axios";
+import { composeObjectFromTarget } from "@/lib/bridge/bridge-query.api";
 import { getRegionUrlFromKubeconfig } from "@/lib/k8s/k8s-server.utils";
 import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
+import { ClusterBridgeSchema } from "@/mvvm/sealos/cluster/models/cluster-bridge.model";
 import type { ClusterCreateData } from "@/mvvm/sealos/cluster/models/cluster-create.model";
 import type { ClusterUpdateData } from "@/mvvm/sealos/cluster/models/cluster-update.model";
 
@@ -54,11 +56,10 @@ export const listClusters = async (_context: K8sContext) => {
  * Get a specific cluster by CustomResourceTarget
  */
 export const getCluster = async (
-	_context: K8sContext,
-	_target: CustomResourceTarget,
+	context: K8sContext,
+	target: CustomResourceTarget,
 ) => {
-	// TODO: Implement get cluster
-	throw new Error("Not implemented");
+	return await composeObjectFromTarget(context, target, ClusterBridgeSchema);
 };
 
 /**
@@ -82,21 +83,9 @@ export const getClusterMonitorData = async (
 };
 
 /**
- * Get cluster combined monitor
- */
-export const getClusterCombinedMonitor = async (
-	_context: K8sContext,
-	_dbName: string,
-	_dbType: string,
-) => {
-	// TODO: Implement get cluster combined monitor
-	throw new Error("Not implemented");
-};
-
-/**
  * Get cluster backup list
  */
-export const getClusterBackupList = async (
+export const getClusterBackups = async (
 	context: K8sContext,
 	target: CustomResourceTarget,
 ) => {

@@ -2,11 +2,14 @@
 
 import https from "node:https";
 import axios from "axios";
+import { composeObjectFromTarget } from "@/lib/bridge/bridge-query.api";
 import { getRegionUrlFromKubeconfig } from "@/lib/k8s/k8s-server.utils";
 import type { BuiltinResourceTarget } from "@/mvvm/k8s/models/k8s-builtin.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
+import { DeploymentBridgeSchema } from "@/mvvm/sealos/launchpad/models/deployment/deployment-bridge.model";
 import type { LaunchpadCreateData } from "@/mvvm/sealos/launchpad/models/launchpad-create.model";
 import type { LaunchpadUpdateData } from "@/mvvm/sealos/launchpad/models/launchpad-update.model";
+import { StatefulsetBridgeSchema } from "@/mvvm/sealos/launchpad/models/statefulset/statefulset-bridge.model";
 
 /**
  * Creates axios instance for launchpad API calls
@@ -51,14 +54,21 @@ export const listLaunchpads = async (_context: K8sContext) => {
 };
 
 /**
- * Get a specific launchpad by CustomResourceTarget
+ * Get a specific launchpad by BuiltinResourceTarget
  */
 export const getLaunchpad = async (
-	_context: K8sContext,
-	_target: BuiltinResourceTarget,
+	context: K8sContext,
+	target: BuiltinResourceTarget,
 ) => {
-	// TODO: Implement get launchpad
-	throw new Error("Not implemented");
+	// Choose the appropriate schema based on resource type
+	const schema =
+		target.resourceType === "deployment"
+			? DeploymentBridgeSchema
+			: target.resourceType === "statefulset"
+				? StatefulsetBridgeSchema
+				: DeploymentBridgeSchema; // Default to deployment
+
+	return await composeObjectFromTarget(context, target, schema);
 };
 
 /**

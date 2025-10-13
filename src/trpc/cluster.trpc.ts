@@ -8,7 +8,7 @@ import {
 	disableClusterPublicAccess,
 	enableClusterPublicAccess,
 	getCluster,
-	getClusterBackupList,
+	getClusterBackups,
 	getClusterLogs,
 	getClusterVersions,
 	listClusters,
@@ -55,14 +55,14 @@ export const clusterRouter = t.router({
 
 	list: t.procedure
 		.input(z.string().optional().default("cluster"))
-		.query(async ({ ctx, input: _input }) => {
+		.query(async ({ ctx }) => {
 			return await listClusters(ctx);
 		}),
 
 	backups: t.procedure
 		.input(CustomResourceTargetSchema)
 		.query(async ({ input, ctx }) => {
-			return await getClusterBackupList(ctx, input);
+			return await getClusterBackups(ctx, input);
 		}),
 
 	logs: t.procedure
@@ -77,12 +77,13 @@ export const clusterRouter = t.router({
 
 	// Monitoring
 	monitor: t.procedure
-		.input(CustomResourceTargetSchema)
+		.input(
+			CustomResourceTargetSchema.extend({
+				dbType: z.string(),
+			}),
+		)
 		.query(async ({ input, ctx }) => {
-			if (!input.name) throw new Error("Cluster name is required");
-			// For cluster monitoring, we need to determine the dbType from the cluster
-			// This is a simplified implementation - in practice, you might need to fetch cluster details first
-			return await getClusterMonitor(ctx, input.name, "postgresql"); // Default type, should be determined from cluster
+			return await getClusterMonitor(ctx, input.name, input.dbType);
 		}),
 
 	// ===== MUTATION PROCEDURES =====
@@ -97,21 +98,18 @@ export const clusterRouter = t.router({
 	start: t.procedure
 		.input(CustomResourceTargetSchema)
 		.mutation(async ({ input, ctx }) => {
-			if (!input.name) throw new Error("Cluster name is required");
 			return await startCluster(ctx, input.name);
 		}),
 
 	pause: t.procedure
 		.input(CustomResourceTargetSchema)
 		.mutation(async ({ input, ctx }) => {
-			if (!input.name) throw new Error("Cluster name is required");
 			return await pauseCluster(ctx, input.name);
 		}),
 
 	restart: t.procedure
 		.input(CustomResourceTargetSchema)
 		.mutation(async ({ input, ctx }) => {
-			if (!input.name) throw new Error("Cluster name is required");
 			return await restartCluster(ctx, input.name);
 		}),
 

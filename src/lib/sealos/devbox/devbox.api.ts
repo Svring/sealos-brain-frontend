@@ -2,9 +2,11 @@
 
 import https from "node:https";
 import axios from "axios";
+import { composeObjectFromTarget } from "@/lib/bridge/bridge-query.api";
 import { getRegionUrlFromKubeconfig } from "@/lib/k8s/k8s-server.utils";
 import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
+import { DevboxBridgeSchema } from "@/mvvm/sealos/devbox/models/devbox-bridge.model";
 import type { DevboxCreateData } from "@/mvvm/sealos/devbox/models/devbox-create.model";
 import type { DevboxUpdateData } from "@/mvvm/sealos/devbox/models/devbox-update.model";
 
@@ -54,11 +56,10 @@ export const listDevboxes = async (_context: K8sContext) => {
  * Get a specific devbox by CustomResourceTarget
  */
 export const getDevbox = async (
-	_context: K8sContext,
-	_target: CustomResourceTarget,
+	context: K8sContext,
+	target: CustomResourceTarget,
 ) => {
-	// TODO: Implement get devbox
-	throw new Error("Not implemented");
+	return await composeObjectFromTarget(context, target, DevboxBridgeSchema);
 };
 
 /**

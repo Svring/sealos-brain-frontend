@@ -7,6 +7,7 @@ import {
 	deleteDevbox,
 	deleteDevboxRelease,
 	deployDevbox,
+	getDevbox,
 	getDevboxReleases,
 	getDevboxTemplates,
 	pauseDevbox,
@@ -54,9 +55,8 @@ export const devboxRouter = t.router({
 
 	get: t.procedure
 		.input(CustomResourceTargetSchema)
-		.query(async ({ input: _input, ctx: _ctx }) => {
-			// TODO: Implement get devbox
-			throw new Error("Not implemented");
+		.query(async ({ input, ctx }) => {
+			return await getDevbox(ctx, input);
 		}),
 
 	monitor: t.procedure
