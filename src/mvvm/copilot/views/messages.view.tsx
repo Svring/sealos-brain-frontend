@@ -3,7 +3,7 @@
 import type { Message } from "@langchain/langgraph-sdk";
 import { Loader2 } from "lucide-react";
 import { useMemo, useRef } from "react";
-import { useAutoScroll } from "@/hooks/use-auto-scroll";
+import { useAutoScroll } from "@/hooks/utils/use-auto-scroll";
 import { RenderTextMessage } from "./text-message.view";
 
 interface MessagesViewProps {
