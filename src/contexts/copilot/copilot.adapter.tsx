@@ -1,14 +1,11 @@
 "use client";
 
 import type { Interrupt, Message, Thread } from "@langchain/langgraph-sdk";
-import { useMount } from "@reactuses/core";
 import { useQueryState } from "nuqs";
 import type { ReactNode } from "react";
 import { createContext, use } from "react";
-import {
-	useLangGraphEvents,
-	useLangGraphState,
-} from "@/contexts/langgraph/langgraph.context";
+import { useLangGraphState } from "@/contexts/langgraph/langgraph.context";
+import { useCopilotMount } from "@/hooks/copilot/use-copilot-mount";
 import { useCreateThread } from "@/hooks/langgraph/use-create-thread";
 import { useSearchThreads } from "@/hooks/langgraph/use-search-threads";
 import { useStreamContext } from "@/hooks/langgraph/use-stream-context";
@@ -41,19 +38,9 @@ interface CopilotAdapterProps {
 export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 	const [threadId, setThreadId] = useQueryState("threadId");
 	const { deploymentUrl, graphId } = useLangGraphState();
-	const { setRoute } = useLangGraphEvents();
 
-	// Set route based on metadata content on mount
-	useMount(() => {
-		const route = metadata.resourceId
-			? "resourceNode"
-			: metadata.projectId
-				? "projectNode"
-				: metadata.kubeconfigEncoded
-					? "proposeNode"
-					: null;
-		if (route) setRoute(route);
-	});
+	// Handle mount logic (health check and route setting)
+	useCopilotMount({ metadata });
 
 	// Search threads based on metadata
 	const { data: threads, isSuccess } = useSearchThreads(metadata);
@@ -65,7 +52,6 @@ export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 			{ metadata },
 			{
 				onSuccess: (data) => {
-					console.log("createNewThread", data);
 					setThreadId(data.thread_id);
 				},
 			},
@@ -95,9 +81,6 @@ export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 		threadId: threadId || "",
 	});
 
-	// Compute hasMessages
-	const hasMessages = messages && messages.length > 0;
-
 	return (
 		<copilotAdapterContext.Provider
 			value={{
@@ -111,7 +94,7 @@ export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 				isLoading,
 				stop,
 				messages,
-				hasMessages,
+				hasMessages: messages && messages.length > 0,
 				interrupt,
 				joinStream,
 			}}
