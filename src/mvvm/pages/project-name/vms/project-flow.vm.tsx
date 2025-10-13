@@ -1,10 +1,11 @@
 "use client";
 
+import type { Edge, Node } from "@xyflow/react";
 import { ProjectFlowView } from "../views/project-flow.view";
 
 interface ProjectFlowProps {
-	nodes?: any[];
-	edges?: any[];
+	nodes?: Node[];
+	edges?: Edge[];
 }
 
 export function ProjectFlow({ nodes = [], edges = [] }: ProjectFlowProps) {
@@ -13,8 +14,9 @@ export function ProjectFlow({ nodes = [], edges = [] }: ProjectFlowProps) {
 		// TODO: Implement pane click logic
 	};
 
-	const handleEdgeClick = (event: React.MouseEvent, edge: any) => {
+	const handleEdgeClick = (event: React.MouseEvent) => {
 		// TODO: Implement edge click logic
+		console.log(event);
 	};
 
 	return (
