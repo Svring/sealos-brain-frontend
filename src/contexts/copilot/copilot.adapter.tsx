@@ -19,10 +19,12 @@ interface CopilotAdapterContextValue {
 	threadId: string;
 	metadata?: Record<string, string>;
 	setThreadId: (threadId: string) => void;
+	createNewThread: () => void;
 	submitWithContext: (data: { messages: Message[] }) => void;
 	isLoading: boolean;
 	stop: () => void;
 	messages: Message[];
+	hasMessages: boolean;
 	interrupt: Interrupt<unknown> | undefined;
 	joinStream: (runId: string) => Promise<void>;
 }
@@ -57,19 +59,25 @@ export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 	const { data: threads, isSuccess } = useSearchThreads(metadata);
 	const { mutate: createThread } = useCreateThread();
 
+	// Create new thread function
+	const createNewThread = () => {
+		createThread(
+			{ metadata },
+			{
+				onSuccess: (data) => {
+					console.log("createNewThread", data);
+					setThreadId(data.thread_id);
+				},
+			},
+		);
+	};
+
 	// Auto-select first thread or create new thread when search is successful
 	useEffectOnCondition(() => {
 		if (threads && threads.length > 0 && threads[0]?.thread_id) {
 			setThreadId(threads[0].thread_id);
 		} else {
-			createThread(
-				{ metadata },
-				{
-					onSuccess: (data) => {
-						setThreadId(data.thread_id);
-					},
-				},
-			);
+			createNewThread();
 		}
 	}, isSuccess && !threadId);
 
@@ -87,6 +95,9 @@ export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 		threadId: threadId || "",
 	});
 
+	// Compute hasMessages
+	const hasMessages = messages && messages.length > 0;
+
 	return (
 		<copilotAdapterContext.Provider
 			value={{
@@ -95,10 +106,12 @@ export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 				threadId: threadId || "",
 				metadata,
 				setThreadId,
+				createNewThread,
 				submitWithContext,
 				isLoading,
 				stop,
 				messages,
+				hasMessages,
 				interrupt,
 				joinStream,
 			}}
