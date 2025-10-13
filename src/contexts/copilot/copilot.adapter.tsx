@@ -1,15 +1,18 @@
 "use client";
 
 import type { Interrupt, Message, Thread } from "@langchain/langgraph-sdk";
-import { useStream } from "@langchain/langgraph-sdk/react";
+import { useMount } from "@reactuses/core";
 import { useQueryState } from "nuqs";
 import type { ReactNode } from "react";
 import { createContext, use } from "react";
-import { useLangGraphState } from "@/contexts/langgraph/langgraph.context";
+import {
+	useLangGraphEvents,
+	useLangGraphState,
+} from "@/contexts/langgraph/langgraph.context";
 import { useCreateThread } from "@/hooks/langgraph/use-create-thread";
 import { useSearchThreads } from "@/hooks/langgraph/use-search-threads";
+import { useStreamContext } from "@/hooks/langgraph/use-stream-context";
 import { useEffectOnCondition } from "@/hooks/use-effect-on-condition";
-import { useAuthState } from "../auth/auth.context";
 
 interface CopilotAdapterContextValue {
 	threads: Thread[];
@@ -35,8 +38,20 @@ interface CopilotAdapterProps {
 
 export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 	const [threadId, setThreadId] = useQueryState("threadId");
-	const { deploymentUrl, graphId, graphState } = useLangGraphState();
-	const { auth } = useAuthState();
+	const { deploymentUrl, graphId } = useLangGraphState();
+	const { setRoute } = useLangGraphEvents();
+
+	// Set route based on metadata content on mount
+	useMount(() => {
+		const route = metadata.resourceId
+			? "resourceNode"
+			: metadata.projectId
+				? "projectNode"
+				: metadata.kubeconfigEncoded
+					? "proposeNode"
+					: null;
+		if (route) setRoute(route);
+	});
 
 	// Search threads based on metadata
 	const { data: threads, isSuccess } = useSearchThreads(metadata);
@@ -44,28 +59,13 @@ export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 
 	// Auto-select first thread or create new thread when search is successful
 	useEffectOnCondition(() => {
-		console.log("[CopilotAdapter] useEffectOnCondition triggered", {
-			threads,
-			isSuccess,
-			threadId,
-			metadata,
-		});
 		if (threads && threads.length > 0 && threads[0]?.thread_id) {
-			console.log("[CopilotAdapter] Selecting existing thread", {
-				selectedThreadId: threads[0].thread_id,
-			});
 			setThreadId(threads[0].thread_id);
 		} else {
-			console.log("[CopilotAdapter] No threads found. Creating new thread.", {
-				metadata,
-			});
 			createThread(
 				{ metadata },
 				{
 					onSuccess: (data) => {
-						console.log("[CopilotAdapter] New thread created", {
-							newThreadId: data.thread_id,
-						});
 						setThreadId(data.thread_id);
 					},
 				},
@@ -73,43 +73,25 @@ export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 		}
 	}, isSuccess && !threadId);
 
-	const { submit, isLoading, stop, messages, interrupt, joinStream } =
-		useStream({
-			apiUrl: deploymentUrl,
-			assistantId: graphId,
-			threadId: threadId,
-			messagesKey: "messages",
-			reconnectOnMount: true,
-		});
-
-	const submitWithContext = (data: { messages: Message[] }) => {
-		return submit(
-			{
-				api_key: graphState.apiKey,
-				base_url: graphState.baseURL,
-				model_name: graphState.modelName,
-				region_url: auth?.regionUrl,
-				kubeconfigEncoded: auth?.kubeconfigEncoded,
-				messages: data.messages,
-			},
-			{
-				optimisticValues(prev) {
-					const prevMessages = prev.messages ?? [];
-					// @ts-expect-error Suppress iterable type error for newMessages
-					const newMessages = [...prevMessages, ...data.messages];
-					return { ...prev, messages: newMessages };
-				},
-			},
-		);
-	};
+	// Use stream context hook
+	const {
+		submitWithContext,
+		isLoading,
+		stop,
+		messages,
+		interrupt,
+		joinStream,
+	} = useStreamContext({
+		apiUrl: deploymentUrl,
+		assistantId: graphId,
+		threadId: threadId || "",
+	});
 
 	return (
 		<copilotAdapterContext.Provider
 			value={{
-				threads: (threads || []).map((thread) => ({
-					...thread,
-					metadata: thread.metadata || {},
-				})),
+				// @ts-expect-error Suppress iterable type error for threads
+				threads: threads,
 				threadId: threadId || "",
 				metadata,
 				setThreadId,
