@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, use } from "react";
+import { createContext, use, useCallback } from "react";
 import type { EventFrom, StateFrom } from "xstate";
 import type { proxyMachine } from "./proxy.state";
 
@@ -55,11 +55,11 @@ export function useProxyEvents() {
 	const { send } = useProxyContext();
 
 	return {
-		setConfig: (baseURL: string, apiKey: string, modelName: string) =>
-			send({ type: "SET_CONFIG", baseURL, apiKey, modelName }),
-		setModelName: (modelName: string) =>
-			send({ type: "SET_MODEL_NAME", modelName }),
-		fail: () => send({ type: "FAIL" }),
-		retry: () => send({ type: "RETRY" }),
+		setConfig: useCallback((baseURL: string, apiKey: string, modelName: string) =>
+			send({ type: "SET_CONFIG", baseURL, apiKey, modelName }), [send]),
+		setModelName: useCallback((modelName: string) =>
+			send({ type: "SET_MODEL_NAME", modelName }), [send]),
+		fail: useCallback(() => send({ type: "FAIL" }), [send]),
+		retry: useCallback(() => send({ type: "RETRY" }), [send]),
 	};
 }

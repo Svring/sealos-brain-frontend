@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, use } from "react";
+import { createContext, use, useCallback } from "react";
 import type { EventFrom, StateFrom } from "xstate";
-import type { ProjectContext, projectMachine } from "./project.state";
+import type { InstanceObject } from "@/mvvm/sealos/instance/models/instance-object.model";
+import type { ProjectContext, projectMachine, Resource } from "./project.state";
 
 interface ProjectContextValue {
 	project: ProjectContext;
@@ -44,19 +45,36 @@ export function useProjectEvents() {
 	const { send } = useProjectContext();
 
 	return {
-		setProject: (project: any) => send({ type: "SET_PROJECT", project }),
-		clearProject: () => send({ type: "CLEAR_PROJECT" }),
-		setAllResources: (resources: any[]) =>
-			send({ type: "SET_ALL_RESOURCES", resources }),
-		addResource: (resource: any) => send({ type: "ADD_RESOURCE", resource }),
-		updateResource: (resource: any) =>
-			send({ type: "UPDATE_RESOURCE", resource }),
-		removeResource: (resourceUid: string) =>
-			send({ type: "REMOVE_RESOURCE", resourceUid }),
-		setActiveResource: (resource: any) =>
-			send({ type: "SET_ACTIVE_RESOURCE", resource }),
-		clearActiveResource: () => send({ type: "CLEAR_ACTIVE_RESOURCE" }),
-		fail: () => send({ type: "FAIL" }),
-		retry: () => send({ type: "RETRY" }),
+		setProject: useCallback(
+			(project: InstanceObject) => send({ type: "SET_PROJECT", project }),
+			[send],
+		),
+		clearProject: useCallback(() => send({ type: "CLEAR_PROJECT" }), [send]),
+		setAllResources: useCallback(
+			(resources: Resource[]) => send({ type: "SET_ALL_RESOURCES", resources }),
+			[send],
+		),
+		addResource: useCallback(
+			(resource: Resource) => send({ type: "ADD_RESOURCE", resource }),
+			[send],
+		),
+		updateResource: useCallback(
+			(resource: Resource) => send({ type: "UPDATE_RESOURCE", resource }),
+			[send],
+		),
+		removeResource: useCallback(
+			(resourceUid: string) => send({ type: "REMOVE_RESOURCE", resourceUid }),
+			[send],
+		),
+		setActiveResource: useCallback(
+			(resource: Resource) => send({ type: "SET_ACTIVE_RESOURCE", resource }),
+			[send],
+		),
+		clearActiveResource: useCallback(
+			() => send({ type: "CLEAR_ACTIVE_RESOURCE" }),
+			[send],
+		),
+		fail: useCallback(() => send({ type: "FAIL" }), [send]),
+		retry: useCallback(() => send({ type: "RETRY" }), [send]),
 	};
 }

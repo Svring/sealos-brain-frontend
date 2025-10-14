@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, use } from "react";
+import { createContext, use, useCallback } from "react";
 import type { EventFrom, StateFrom } from "xstate";
 import type { EnvContext, envMachine } from "./env.state";
 
@@ -52,11 +52,11 @@ export function useEnvEvents() {
 	const { send } = useEnvContext();
 
 	return {
-		setEnv: (
+		setEnv: useCallback((
 			mode: "development" | "production",
 			variables: Record<string, string | undefined>,
-		) => send({ type: "SET_ENV", mode, variables }),
-		fail: () => send({ type: "FAIL" }),
-		retry: () => send({ type: "RETRY" }),
+		) => send({ type: "SET_ENV", mode, variables }), [send]),
+		fail: useCallback(() => send({ type: "FAIL" }), [send]),
+		retry: useCallback(() => send({ type: "RETRY" }), [send]),
 	};
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, use } from "react";
+import { createContext, use, useCallback } from "react";
 import type { EventFrom, StateFrom } from "xstate";
 import type { GraphState, langgraphMachine, Message } from "./langgraph.state";
 
@@ -55,26 +55,52 @@ export function useLangGraphEvents() {
 	const { send } = useLangGraphContext();
 
 	return {
-		setGraphState: (graphState: Partial<GraphState>) =>
-			send({
-				type: "SET_GRAPH_STATE",
-				graphState,
-			}),
-		setDeploymentUrl: (deploymentUrl: string) =>
-			send({ type: "SET_DEPLOYMENT_URL", deploymentUrl }),
-		setGraphId: (graphId: string) => send({ type: "SET_GRAPH_ID", graphId }),
-		setDeployment: (deploymentUrl: string, graphId: string) =>
-			send({ type: "SET_DEPLOYMENT", deploymentUrl, graphId }),
-		updateGraphState: (graphState: Partial<GraphState>) =>
-			send({ type: "UPDATE_GRAPH_STATE", graphState }),
-		setRoute: (route: GraphState["route"]) =>
-			send({ type: "SET_ROUTE", route }),
-		addMessage: (message: Message) => send({ type: "ADD_MESSAGE", message }),
-		setProjectContext: (projectContext: any) =>
-			send({ type: "SET_PROJECT_CONTEXT", projectContext }),
-		setResourceContext: (resourceContext: any) =>
-			send({ type: "SET_RESOURCE_CONTEXT", resourceContext }),
-		fail: () => send({ type: "FAIL" }),
-		retry: () => send({ type: "RETRY" }),
+		setGraphState: useCallback(
+			(graphState: Partial<GraphState>) =>
+				send({
+					type: "SET_GRAPH_STATE",
+					graphState,
+				}),
+			[send],
+		),
+		setDeploymentUrl: useCallback(
+			(deploymentUrl: string) =>
+				send({ type: "SET_DEPLOYMENT_URL", deploymentUrl }),
+			[send],
+		),
+		setGraphId: useCallback(
+			(graphId: string) => send({ type: "SET_GRAPH_ID", graphId }),
+			[send],
+		),
+		setDeployment: useCallback(
+			(deploymentUrl: string, graphId: string) =>
+				send({ type: "SET_DEPLOYMENT", deploymentUrl, graphId }),
+			[send],
+		),
+		updateGraphState: useCallback(
+			(graphState: Partial<GraphState>) =>
+				send({ type: "UPDATE_GRAPH_STATE", graphState }),
+			[send],
+		),
+		setRoute: useCallback(
+			(route: GraphState["route"]) => send({ type: "SET_ROUTE", route }),
+			[send],
+		),
+		addMessage: useCallback(
+			(message: Message) => send({ type: "ADD_MESSAGE", message }),
+			[send],
+		),
+		setProjectContext: useCallback(
+			(projectContext: any) =>
+				send({ type: "SET_PROJECT_CONTEXT", projectContext }),
+			[send],
+		),
+		setResourceContext: useCallback(
+			(resourceContext: any) =>
+				send({ type: "SET_RESOURCE_CONTEXT", resourceContext }),
+			[send],
+		),
+		fail: useCallback(() => send({ type: "FAIL" }), [send]),
+		retry: useCallback(() => send({ type: "RETRY" }), [send]),
 	};
 }

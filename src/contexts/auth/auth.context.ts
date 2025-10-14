@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, use } from "react";
+import { createContext, use, useCallback } from "react";
 import type { EventFrom, StateFrom } from "xstate";
 import type { Auth, authMachine } from "./auth.state";
 
@@ -50,8 +50,8 @@ export function useAuthEvents() {
 	const { send } = useAuthContext();
 
 	return {
-		setAuth: (auth: Auth) => send({ type: "SET_AUTH", auth }),
-		fail: () => send({ type: "FAIL" }),
-		retry: () => send({ type: "RETRY" }),
+		setAuth: useCallback((auth: Auth) => send({ type: "SET_AUTH", auth }), [send]),
+		fail: useCallback(() => send({ type: "FAIL" }), [send]),
+		retry: useCallback(() => send({ type: "RETRY" }), [send]),
 	};
 }

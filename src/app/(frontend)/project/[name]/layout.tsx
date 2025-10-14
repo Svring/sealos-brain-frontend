@@ -22,7 +22,7 @@ export default function Layout({ children }: LayoutProps) {
 		if (instance) {
 			setProject(instance);
 		}
-	}, [instance]);
+	}, [instance, setProject]);
 
 	return <>{children}</>;
 }

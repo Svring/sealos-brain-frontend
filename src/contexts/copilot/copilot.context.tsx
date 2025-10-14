@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, use } from "react";
+import { createContext, use, useCallback } from "react";
 import type { EventFrom, StateFrom } from "xstate";
 import type { Chat, copilotMachine } from "./copilot.state";
 
@@ -39,14 +39,14 @@ export function useCopilotEvents() {
 	const { send } = useCopilotMachineContext();
 
 	return {
-		addChat: (chat: Chat) => send({ type: "ADD_CHAT", chat }),
-		pushChat: (chat: Chat) => send({ type: "PUSH_CHAT", chat }),
-		updateChat: (index: number, chat: Partial<Chat>) =>
-			send({ type: "UPDATE_CHAT", index, chat }),
-		setChats: (chats: Chat[]) => send({ type: "SET_CHATS", chats }),
-		clearChats: () => send({ type: "CLEAR_CHATS" }),
-		open: () => send({ type: "OPEN_COPILOT" }),
-		close: () => send({ type: "CLOSE_COPILOT" }),
-		toggleCopilot: () => send({ type: "TOGGLE_COPILOT" }),
+		addChat: useCallback((chat: Chat) => send({ type: "ADD_CHAT", chat }), [send]),
+		pushChat: useCallback((chat: Chat) => send({ type: "PUSH_CHAT", chat }), [send]),
+		updateChat: useCallback((index: number, chat: Partial<Chat>) =>
+			send({ type: "UPDATE_CHAT", index, chat }), [send]),
+		setChats: useCallback((chats: Chat[]) => send({ type: "SET_CHATS", chats }), [send]),
+		clearChats: useCallback(() => send({ type: "CLEAR_CHATS" }), [send]),
+		open: useCallback(() => send({ type: "OPEN_COPILOT" }), [send]),
+		close: useCallback(() => send({ type: "CLOSE_COPILOT" }), [send]),
+		toggleCopilot: useCallback(() => send({ type: "TOGGLE_COPILOT" }), [send]),
 	};
 }
