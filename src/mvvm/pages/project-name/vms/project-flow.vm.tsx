@@ -1,6 +1,12 @@
 "use client";
 
 import type { Edge, Node } from "@xyflow/react";
+import { useAuthState } from "@/contexts/auth/auth.context";
+import {
+	useCopilotEvents,
+	useCopilotState,
+} from "@/contexts/copilot/copilot.context";
+import { composeMetadata } from "@/lib/langgraph/langgraph.utils";
 import { ProjectFlowView } from "../views/project-flow.view";
 
 interface ProjectFlowProps {
@@ -9,9 +15,25 @@ interface ProjectFlowProps {
 }
 
 export function ProjectFlow({ nodes = [], edges = [] }: ProjectFlowProps) {
-	// Empty handlers for now - will be filled with real logic later
+	const { auth } = useAuthState();
+	const { chats, opened } = useCopilotState();
+	const { addChat, closeCopilot } = useCopilotEvents();
+
 	const handlePaneClick = () => {
-		// TODO: Implement pane click logic
+		const newMetadata = composeMetadata(auth?.kubeconfigEncoded);
+		const latestChat = chats[chats.length - 1];
+
+		// Check if the latest chat has the same metadata
+		if (
+			latestChat && opened &&
+			JSON.stringify(latestChat.metadata) === JSON.stringify(newMetadata)
+		) {
+			closeCopilot();
+		} else {
+			addChat({
+				metadata: newMetadata,
+			});
+		}
 	};
 
 	const handleEdgeClick = (event: React.MouseEvent) => {

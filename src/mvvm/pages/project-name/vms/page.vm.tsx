@@ -13,17 +13,6 @@ export const Page = () => {
 
 	// Use flow hook with instance
 	const { nodes, edges } = useFlow(instance);
-	// TODO: Use flowData to populate nodes and edges
-	console.log("Flow data:", { nodes, edges });
-
-	const handlePaneClick = () => {
-		// TODO: Implement pane click logic
-	};
-
-	const handleEdgeClick = (event: React.MouseEvent) => {
-		// TODO: Implement edge click logic
-		console.log(event);
-	};
 
 	const handleOpenCommand = () => {
 		// TODO: Implement command dialog logic
@@ -45,8 +34,6 @@ export const Page = () => {
 		<PageView
 			nodes={nodes}
 			edges={edges}
-			onPaneClick={handlePaneClick}
-			onEdgeClick={handleEdgeClick}
 			onOpenCommand={handleOpenCommand}
 			onZoomIn={handleZoomIn}
 			onZoomOut={handleZoomOut}

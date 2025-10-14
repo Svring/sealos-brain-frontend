@@ -10,6 +10,7 @@ export interface Chat {
 // Copilot context interface
 export interface CopilotContext {
 	chats: Chat[];
+	opened: boolean;
 }
 
 export type CopilotEvent =
@@ -17,7 +18,10 @@ export type CopilotEvent =
 	| { type: "PUSH_CHAT"; chat: Chat }
 	| { type: "UPDATE_CHAT"; index: number; chat: Partial<Chat> }
 	| { type: "SET_CHATS"; chats: Chat[] }
-	| { type: "CLEAR_CHATS" };
+	| { type: "CLEAR_CHATS" }
+	| { type: "OPEN_COPILOT" }
+	| { type: "CLOSE_COPILOT" }
+	| { type: "TOGGLE_COPILOT" };
 
 export const copilotMachine = createMachine({
 	types: {} as {
@@ -28,6 +32,7 @@ export const copilotMachine = createMachine({
 	initial: "idle",
 	context: {
 		chats: [],
+		opened: false,
 	},
 	states: {
 		idle: {
@@ -35,6 +40,7 @@ export const copilotMachine = createMachine({
 				ADD_CHAT: {
 					actions: assign({
 						chats: ({ context, event }) => [...context.chats, event.chat],
+						opened: true,
 					}),
 				},
 				PUSH_CHAT: {
@@ -55,6 +61,17 @@ export const copilotMachine = createMachine({
 				},
 				CLEAR_CHATS: {
 					actions: assign({ chats: [] }),
+				},
+				OPEN_COPILOT: {
+					actions: assign({ opened: true }),
+				},
+				CLOSE_COPILOT: {
+					actions: assign({ opened: false }),
+				},
+				TOGGLE_COPILOT: {
+					actions: assign({
+						opened: ({ context }) => !context.opened,
+					}),
 				},
 			},
 		},

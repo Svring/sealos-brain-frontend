@@ -6,6 +6,7 @@ import type { Chat, copilotMachine } from "./copilot.state";
 
 interface CopilotMachineContextValue {
 	chats: Chat[];
+	opened: boolean;
 	state: StateFrom<typeof copilotMachine>;
 	send: (event: EventFrom<typeof copilotMachine>) => void;
 }
@@ -29,6 +30,7 @@ export function useCopilotState() {
 
 	return {
 		chats: state.context.chats,
+		opened: state.context.opened,
 		isIdle: state.matches("idle"),
 	};
 }
@@ -43,5 +45,8 @@ export function useCopilotEvents() {
 			send({ type: "UPDATE_CHAT", index, chat }),
 		setChats: (chats: Chat[]) => send({ type: "SET_CHATS", chats }),
 		clearChats: () => send({ type: "CLEAR_CHATS" }),
+		openCopilot: () => send({ type: "OPEN_COPILOT" }),
+		closeCopilot: () => send({ type: "CLOSE_COPILOT" }),
+		toggleCopilot: () => send({ type: "TOGGLE_COPILOT" }),
 	};
 }
