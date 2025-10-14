@@ -1,38 +1,27 @@
 "use client";
 
-import type { Message } from "@langchain/langgraph-sdk";
+import { useCopilotAdapterContext } from "@/contexts/copilot/copilot.adapter";
 import { ChatboxView } from "../views/chatbox.view";
 
 interface ChatboxProps {
 	title?: string;
-	messages?: Message[];
-	isLoading?: boolean;
-	autoFocus?: boolean;
-	disableInput?: boolean;
-	disableSend?: boolean;
-	exhibition?: boolean;
 }
 
 export const Chatbox = (props: ChatboxProps) => {
-	const {
-		title = "Chat",
-		messages = [],
-		isLoading = false,
-		autoFocus = false,
-		disableInput = false,
-		disableSend = false,
-		exhibition = false,
-	} = props;
+	const { title = "Chat" } = props;
 
-	// Empty function implementations for now
+	// Get copilot adapter context
+	const { submitWithContext, isLoading, stop, messages } =
+		useCopilotAdapterContext();
+
 	const handleSend = (message: string) => {
-		// TODO: Implement send message logic
-		console.log("Send message:", message);
+		submitWithContext({
+			messages: [{ type: "human", content: message }],
+		});
 	};
 
 	const handleStop = () => {
-		// TODO: Implement stop logic
-		console.log("Stop");
+		stop();
 	};
 
 	return (
@@ -42,10 +31,6 @@ export const Chatbox = (props: ChatboxProps) => {
 			isLoading={isLoading}
 			onSend={handleSend}
 			onStop={handleStop}
-			autoFocus={autoFocus}
-			disableInput={disableInput}
-			disableSend={disableSend}
-			exhibition={exhibition}
 		/>
 	);
 };

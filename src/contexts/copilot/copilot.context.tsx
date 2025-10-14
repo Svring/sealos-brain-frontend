@@ -45,8 +45,8 @@ export function useCopilotEvents() {
 			send({ type: "UPDATE_CHAT", index, chat }),
 		setChats: (chats: Chat[]) => send({ type: "SET_CHATS", chats }),
 		clearChats: () => send({ type: "CLEAR_CHATS" }),
-		openCopilot: () => send({ type: "OPEN_COPILOT" }),
-		closeCopilot: () => send({ type: "CLOSE_COPILOT" }),
+		open: () => send({ type: "OPEN_COPILOT" }),
+		close: () => send({ type: "CLOSE_COPILOT" }),
 		toggleCopilot: () => send({ type: "TOGGLE_COPILOT" }),
 	};
 }

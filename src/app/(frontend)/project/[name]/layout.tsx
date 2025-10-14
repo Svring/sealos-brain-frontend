@@ -1,9 +1,11 @@
 "use client";
 
-import { useMount } from "@reactuses/core";
 import { useParams } from "next/navigation";
 import type React from "react";
+import { useEffect } from "react";
 import { useProjectEvents } from "@/contexts/project/project.context";
+import { useInstanceObject } from "@/hooks/instance/use-instance-object";
+import { instanceParser } from "@/lib/sealos/instance/instance.parser";
 
 interface LayoutProps {
 	children: React.ReactNode;
@@ -12,12 +14,15 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
 	const { name } = useParams();
 	const { setProject } = useProjectEvents();
+	const { data: instance } = useInstanceObject(
+		instanceParser.toTarget(name as string),
+	);
 
-	useMount(() => {
-		setProject({
-			name,
-		});
-	});
+	useEffect(() => {
+		if (instance) {
+			setProject(instance);
+		}
+	}, [instance]);
 
 	return <>{children}</>;
 }

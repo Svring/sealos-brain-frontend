@@ -33,7 +33,7 @@ export function MessagesView({
 
 		const messageElements = messages.map((message) => {
 			return (
-				<div key={message.id} className="mb-4">
+				<div key={message.id}>
 					<RenderTextMessage message={message} inProgress={false} />
 				</div>
 			);
@@ -42,7 +42,7 @@ export function MessagesView({
 		// Add "Thinking..." indicator when streaming
 		if (isLoading) {
 			messageElements.push(
-				<div key="thinking-indicator" className="mb-4">
+				<div key="thinking-indicator">
 					<div className="flex justify-start">
 						<div className="flex items-center gap-2 text-xs opacity-70 px-1">
 							<Loader2 className="w-3 h-3 animate-spin" />
