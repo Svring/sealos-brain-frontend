@@ -17,7 +17,7 @@ import {
 	startDevbox,
 	updateDevbox,
 } from "@/lib/sealos/devbox/devbox.api";
-import { getDevboxMonitor } from "@/lib/sealos/devbox/devbox-service.api";
+import { getDevboxMonitor, getDevboxResources } from "@/lib/sealos/devbox/devbox-service.api";
 import { createErrorFormatter } from "@/lib/trpc/trpc.utils";
 import { CustomResourceTargetSchema } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
@@ -63,6 +63,17 @@ export const devboxRouter = t.router({
 		.input(CustomResourceTargetSchema)
 		.query(async ({ input, ctx }) => {
 			return await getDevboxMonitor(ctx, input);
+		}),
+
+	resources: t.procedure
+		.input(
+			z.object({
+				target: CustomResourceTargetSchema,
+				resources: z.array(z.string()).optional().default(["ingress", "service", "secret", "pod", "issuers", "certificates"]),
+			}),
+		)
+		.query(async ({ input, ctx }) => {
+			return await getDevboxResources(ctx, input.target, input.resources);
 		}),
 
 	network: t.procedure

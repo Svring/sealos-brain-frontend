@@ -1,7 +1,14 @@
 "use server";
 
+import { CLUSTER_LABELS } from "@/constants/cluster/cluster-labels.constant";
+import { BUILTIN_RESOURCES } from "@/constants/k8s/k8s-builtin.constant";
+import { CUSTOM_RESOURCES } from "@/constants/k8s/k8s-custom.constant";
+import { selectResources } from "@/lib/k8s/k8s-service.api";
 import { transformMonitorData } from "@/lib/resource/resource.utils";
+import type { ResourceTypeTarget } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
+import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s-custom.model";
+import type { K8sResource } from "@/mvvm/k8s/models/k8s-resource.model";
 import type { MonitorData } from "@/mvvm/resource/models/resource-monitor.model";
 import { getClusterMonitorData } from "./cluster.api";
 
@@ -38,4 +45,66 @@ export const getClusterMonitor = async (
 	};
 
 	return transformMonitorData(monitorData);
+};
+
+/**
+ * Get cluster related resources
+ * @param context - K8s context
+ * @param target - Cluster target
+ * @param resources - Array of resource types to fetch (both builtin and custom)
+ * @returns Array of K8sResource objects
+ */
+export const getClusterResources = async (
+	context: K8sContext,
+	target: CustomResourceTarget,
+	resources: string[] = [
+		"serviceaccount",
+		"role",
+		"rolebinding",
+		"secret",
+		"pod",
+		"cronjob",
+		"backup",
+	],
+): Promise<K8sResource[]> => {
+	const clusterName = target.name;
+
+	// Type guards
+	const isBuiltinResource = (
+		resource: string,
+	): resource is keyof typeof BUILTIN_RESOURCES =>
+		resource in BUILTIN_RESOURCES;
+
+	const isCustomResource = (
+		resource: string,
+	): resource is keyof typeof CUSTOM_RESOURCES => resource in CUSTOM_RESOURCES;
+
+	// Separate resources by type
+	const builtinResources = resources.filter((resource) =>
+		isBuiltinResource(resource),
+	);
+
+	const customResources = resources.filter((resource) =>
+		isCustomResource(resource),
+	);
+
+	// Build targets for cluster resources using APP_KUBERNETES_INSTANCE label
+	const targets: ResourceTypeTarget[] = [
+		// Builtin resources
+		...builtinResources.map((resourceType) => ({
+			type: "builtin" as const,
+			resourceType: resourceType,
+			name: clusterName,
+			label: CLUSTER_LABELS.APP_KUBERNETES_INSTANCE,
+		})),
+		// Custom resources
+		...customResources.map((resourceType) => ({
+			type: "custom" as const,
+			resourceType: resourceType,
+			name: clusterName,
+			label: CLUSTER_LABELS.APP_KUBERNETES_INSTANCE,
+		})),
+	];
+
+	return selectResources(context, targets);
 };

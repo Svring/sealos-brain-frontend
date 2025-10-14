@@ -12,7 +12,7 @@ import {
 	startLaunchpad,
 	updateLaunchpad,
 } from "@/lib/sealos/launchpad/launchpad.api";
-import { getLaunchpadMonitor } from "@/lib/sealos/launchpad/launchpad-service.api";
+import { getLaunchpadMonitor, getLaunchpadResources } from "@/lib/sealos/launchpad/launchpad-service.api";
 import { createErrorFormatter } from "@/lib/trpc/trpc.utils";
 import { BuiltinResourceTargetSchema } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
@@ -74,7 +74,26 @@ export const launchpadRouter = t.router({
 			return await getLaunchpadMonitor(ctx, input.name, input.step);
 		}),
 
-	pods: t.procedure.input(z.string()).query(async ({ input, ctx }) => {
+	resources: t.procedure
+		.input(
+			z.object({
+				target: BuiltinResourceTargetSchema,
+				resources: z.array(z.string()).optional().default([
+					"ingress",
+					"service",
+					"pvc",
+					"configmap",
+					"pod",
+					"issuer",
+					"certificate",
+				]),
+			}),
+		)
+		.query(async ({ input, ctx }) => {
+			return await getLaunchpadResources(ctx, input.target, input.resources);
+		}),
+
+	pods: t.procedure.input(z.string()).query(async ({ input: _input, ctx: _ctx }) => {
 		// return await getLaunchpadApplicationPods(ctx, input);
 	}),
 

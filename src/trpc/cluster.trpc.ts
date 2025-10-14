@@ -18,7 +18,10 @@ import {
 	startCluster,
 	updateCluster,
 } from "@/lib/sealos/cluster/cluster.api";
-import { getClusterMonitor } from "@/lib/sealos/cluster/cluster-service.api";
+import {
+	getClusterMonitor,
+	getClusterResources,
+} from "@/lib/sealos/cluster/cluster-service.api";
 import { createErrorFormatter } from "@/lib/trpc/trpc.utils";
 import { CustomResourceTargetSchema } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
@@ -84,6 +87,28 @@ export const clusterRouter = t.router({
 		)
 		.query(async ({ input, ctx }) => {
 			return await getClusterMonitor(ctx, input.name, input.dbType);
+		}),
+
+	resources: t.procedure
+		.input(
+			z.object({
+				target: CustomResourceTargetSchema,
+				resources: z
+					.array(z.string())
+					.optional()
+					.default([
+						"serviceaccount",
+						"role",
+						"rolebinding",
+						"secret",
+						"pod",
+						"cronjob",
+						"backup",
+					]),
+			}),
+		)
+		.query(async ({ input, ctx }) => {
+			return await getClusterResources(ctx, input.target, input.resources);
 		}),
 
 	// ===== MUTATION PROCEDURES =====
