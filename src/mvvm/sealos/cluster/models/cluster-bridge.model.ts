@@ -4,6 +4,8 @@ import {
 	formatIsoDateToReadable,
 } from "@/lib/date/date-utils";
 import { standardizeUnit } from "@/lib/k8s/k8s-client.utils";
+import { getCurrentNamespace, getRegionUrlFromKubeconfig } from "@/lib/k8s/k8s-server.utils";
+import { transformRegionUrl } from "@/lib/network/network.utils";
 import type { K8sResource } from "@/mvvm/k8s/models/k8s-resource.model";
 import type { ClusterResource, ComponentSpec } from "./cluster-resource.model";
 
@@ -120,99 +122,144 @@ export const ClusterBridgeSchema = z.object({
 				};
 			});
 		}),
-	connection: z.object({
-		privateConnection: z.object({
-			endpoint: z
-				.any()
-				.nullable()
-				.describe(
-					JSON.stringify({
-						resourceType: "secret",
-						label: "app.kubernetes.io/instance",
-						name: "{{instanceName}}-conn-credential$",
-						path: ["data.endpoint"],
-					}),
-				)
-				.transform((val) =>
-					val ? Buffer.from(val, "base64").toString("utf-8") : null,
-				),
-			host: z
-				.any()
-				.nullable()
-				.describe(
-					JSON.stringify({
-						resourceType: "secret",
-						label: "app.kubernetes.io/instance",
-						name: "^{{instanceName}}-conn-credential$",
-						path: ["data.host"],
-					}),
-				)
-				.transform((val) =>
-					val ? Buffer.from(val, "base64").toString("utf-8") : null,
-				),
-			port: z
-				.any()
-				.nullable()
-				.describe(
-					JSON.stringify({
-						resourceType: "secret",
-						label: "app.kubernetes.io/instance",
-						name: "^{{instanceName}}-conn-credential$",
-						path: ["data.port"],
-					}),
-				)
-				.transform((val) =>
-					val ? Buffer.from(val, "base64").toString("utf-8") : null,
-				),
-			username: z
-				.any()
-				.nullable()
-				.describe(
-					JSON.stringify({
-						resourceType: "secret",
-						label: "app.kubernetes.io/instance",
-						name: "^{{instanceName}}-conn-credential$",
-						path: ["data.username"],
-					}),
-				)
-				.transform((val) =>
-					val ? Buffer.from(val, "base64").toString("utf-8") : null,
-				),
-			password: z
-				.any()
-				.nullable()
-				.describe(
-					JSON.stringify({
-						resourceType: "secret",
-						label: "app.kubernetes.io/instance",
-						name: "^{{instanceName}}-conn-credential$",
-						path: ["data.password"],
-					}),
-				)
-				.transform((val) =>
-					val ? Buffer.from(val, "base64").toString("utf-8") : null,
-				),
-		}),
-		publicConnection: z
-			.any()
-			.optional()
-			.describe(
-				JSON.stringify({
+	connection: z
+		.any()
+		.describe(
+			JSON.stringify([
+				{
+					resourceType: "secret",
+					label: "app.kubernetes.io/instance",
+					name: "{{instanceName}}-conn-credential$",
+					path: ["data"],
+				},
+				{
 					resourceType: "service",
 					label: "app.kubernetes.io/instance",
 					name: "^{{instanceName}}-export$",
-					path: [""],
-				}),
-			)
-			.transform((service) => {
-				if (!service || !service.spec?.ports?.[0]?.nodePort) {
-					return null;
-				}
+				},
+				{
+					resourceType: "cluster",
+					path: ["spec.clusterDefinitionRef"],
+				},
+				{
+					resourceType: "context",
+					path: ["kubeconfig"],
+				},
+			]),
+		)
+		.transform(async (resources) => {
+			if (!resources || !Array.isArray(resources) || resources.length < 4) {
 				return {
-					port: service.spec.ports[0].nodePort,
+					privateConnection: {},
+					publicConnection: null,
 				};
-			}),
-	}),
+			}
+
+			const [secretData, exportService, clusterType, kubeconfig] = resources;
+
+			// Decode secret data
+			const endpoint = secretData?.endpoint
+				? Buffer.from(secretData.endpoint, "base64").toString("utf-8")
+				: null;
+			const host = secretData?.host
+				? Buffer.from(secretData.host, "base64").toString("utf-8")
+				: null;
+			const port = secretData?.port
+				? Buffer.from(secretData.port, "base64").toString("utf-8")
+				: null;
+			const username = secretData?.username
+				? Buffer.from(secretData.username, "base64").toString("utf-8")
+				: null;
+			const password = secretData?.password
+				? Buffer.from(secretData.password, "base64").toString("utf-8")
+				: null;
+
+			// Get namespace for private connection
+			const namespace = await getCurrentNamespace(kubeconfig);
+
+			// Compose private connection string
+			let privateConnectionString: string | null = null;
+			if (host && port && username && password && namespace && clusterType) {
+				const internalUrl = `${host}.${namespace}.svc`;
+				const type = clusterType.toLowerCase();
+
+				switch (type) {
+					case "postgresql":
+						privateConnectionString = `postgresql://${username}:${password}@${internalUrl}:${port}`;
+						break;
+					case "mongodb":
+						privateConnectionString = `mongodb://${username}:${password}@${internalUrl}:${port}`;
+						break;
+					case "redis":
+						privateConnectionString = `redis://${username}:${password}@${internalUrl}:${port}`;
+						break;
+					case "apecloud-mysql":
+						privateConnectionString = `mysql://${username}:${password}@${internalUrl}:${port}`;
+						break;
+					case "kafka":
+						privateConnectionString = `${internalUrl}-kafka-broker:${port}`;
+						break;
+					case "milvus":
+						privateConnectionString = `${internalUrl}-milvus:${port}`;
+						break;
+					default:
+						privateConnectionString = `${type}://${username}:${password}@${internalUrl}:${port}`;
+				}
+			}
+
+			// Compose public connection
+			let publicConnection = null;
+			if (exportService?.spec?.ports?.[0]?.nodePort) {
+				const nodePort = exportService.spec.ports[0].nodePort;
+				const regionUrl = await getRegionUrlFromKubeconfig(kubeconfig);
+
+				let publicConnectionString: string | null = null;
+				if (regionUrl && username && password && clusterType) {
+					const dbconnUrl = transformRegionUrl(regionUrl).replace("sealos", "dbconn.");
+					const type = clusterType.toLowerCase();
+
+					switch (type) {
+						case "postgresql":
+							publicConnectionString = `postgresql://${username}:${password}@${dbconnUrl}:${nodePort}`;
+							break;
+						case "mongodb":
+							publicConnectionString = `mongodb://${username}:${password}@${dbconnUrl}:${nodePort}`;
+							break;
+						case "redis":
+							publicConnectionString = `redis://${username}:${password}@${dbconnUrl}:${nodePort}`;
+							break;
+						case "apecloud-mysql":
+							publicConnectionString = `mysql://${username}:${password}@${dbconnUrl}:${nodePort}`;
+							break;
+						case "kafka":
+							publicConnectionString = `${dbconnUrl}:${nodePort}`;
+							break;
+						case "milvus":
+							publicConnectionString = `${dbconnUrl}:${nodePort}`;
+							break;
+						default:
+							publicConnectionString = `${type}://${username}:${password}@${dbconnUrl}:${nodePort}`;
+					}
+				}
+
+				publicConnection = {
+					port: nodePort,
+					connectionString: publicConnectionString,
+				};
+			}
+
+			return {
+				privateConnection: {
+					endpoint,
+					host,
+					port,
+					username,
+					password,
+					connectionString: privateConnectionString,
+				},
+				publicConnection,
+			};
+		}),
 	backup: z.any().describe(
 		JSON.stringify({
 			resourceType: "cluster",

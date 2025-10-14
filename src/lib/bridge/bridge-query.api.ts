@@ -235,7 +235,8 @@ export async function composeObjectFromTarget(
 	context: K8sContext,
 	target: ResourceTarget,
 	// biome-ignore lint/suspicious/noExplicitAny: Generic schema processing
-	schema: z.ZodObject<any>,
+	bridgeSchema: z.ZodObject<any>,
+	objectSchema: z.ZodObject<any>,
 	// biome-ignore lint/suspicious/noExplicitAny: Generic schema processing
 ): Promise<any> {
 	if (!target.name) {
@@ -244,7 +245,7 @@ export async function composeObjectFromTarget(
 		);
 	}
 
-	const schemaDescriptions = parseFieldDescriptions(schema);
+	const schemaDescriptions = parseFieldDescriptions(bridgeSchema);
 
 	const resources = await getResourcesByFieldDescriptions(
 		context,
@@ -264,8 +265,8 @@ export async function composeObjectFromTarget(
 
 	// Apply Zod schema parsing to handle transforms and validation (supports async transforms)
 	try {
-		const parsedData = await schema.parseAsync(reconstructedData);
-		return parsedData;
+		const parsedData = await bridgeSchema.parseAsync(reconstructedData);
+		return objectSchema.parse(parsedData);
 	} catch (error) {
 		console.warn("Schema parsing failed, returning raw extracted data:", error);
 		return reconstructedData;

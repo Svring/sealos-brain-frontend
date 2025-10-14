@@ -1,5 +1,12 @@
 import { z } from "zod";
+import { LAUNCHPAD_LABELS } from "@/constants/launchpad/launchpad-labels.constant";
 import {
+	getCurrentNamespace,
+	getRegionUrlFromKubeconfig,
+} from "@/lib/k8s/k8s-server.utils";
+import { composePortsFromResources } from "@/lib/network/network.utils";
+import {
+	determineLaunchpadStatus,
 	transformConfigMap,
 	transformImage,
 	transformLaunchCommand,
@@ -49,12 +56,30 @@ export const StatefulsetBridgeSchema = z.object({
 			}),
 		)
 		.transform(transformStatefulSetResource),
-	status: z.any().describe(
-		JSON.stringify({
-			resourceType: "statefulset",
-			path: [""],
+	status: z
+		.any()
+		.describe(
+			JSON.stringify({
+				resourceType: "statefulset",
+				path: [""],
+			}),
+		)
+		.transform((resource) => {
+			if (!resource) return "Unknown";
+
+			const status = resource.status || {};
+			const paused =
+				resource.metadata?.annotations?.["deploy.cloud.sealos.io/pause"];
+			const statusObject = {
+				replicas: status.replicas || 0,
+				readyReplicas: status.readyReplicas || 0,
+				unavailableReplicas: status.unavailableReplicas || 0,
+				availableReplicas: status.availableReplicas || 0,
+				paused,
+			};
+
+			return determineLaunchpadStatus(statusObject);
 		}),
-	),
 	strategy: z
 		.any()
 		.describe(
@@ -83,7 +108,47 @@ export const StatefulsetBridgeSchema = z.object({
 		)
 		.transform(transformStatefulSetEnv)
 		.optional(),
-	ports: z.any().optional(),
+	ports: z
+		.any()
+		.optional()
+		.describe(
+			JSON.stringify([
+				{
+					resourceType: "service",
+					label: LAUNCHPAD_LABELS.APP_DEPLOY_MANAGER,
+				},
+				{
+					resourceType: "ingress",
+					label: LAUNCHPAD_LABELS.APP_DEPLOY_MANAGER,
+				},
+				{
+					resourceType: "context",
+					path: ["kubeconfig"],
+				},
+			]),
+		)
+		.transform(async (resources) => {
+			if (!resources || !Array.isArray(resources) || resources.length < 3) {
+				return [];
+			}
+
+			const [services, ingresses, kubeconfig] = resources;
+
+			// Extract namespace and regionUrl from context
+			const namespace = await getCurrentNamespace(kubeconfig);
+			const regionUrl = await getRegionUrlFromKubeconfig(kubeconfig);
+
+			// Compose ports using the modular function
+			if (!namespace || !regionUrl) {
+				return [];
+			}
+			return await composePortsFromResources(
+				services,
+				ingresses,
+				namespace,
+				regionUrl,
+			);
+		}),
 	launchCommand: z
 		.any()
 		.describe(

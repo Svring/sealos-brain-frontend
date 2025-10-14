@@ -4,6 +4,7 @@ import { composeObjectFromTarget } from "@/lib/bridge/bridge-query.api";
 import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
 import { OsbBridgeSchema } from "@/mvvm/sealos/osb/models/osb-bridge.model";
+import { OsbObjectSchema } from "@/mvvm/sealos/osb/models/osb-object.model";
 
 // ============================================================================
 // OSB API Functions
@@ -24,5 +25,5 @@ export const getOsbBucket = async (
 	context: K8sContext,
 	target: CustomResourceTarget,
 ) => {
-	return await composeObjectFromTarget(context, target, OsbBridgeSchema);
+	return await composeObjectFromTarget(context, target, OsbBridgeSchema, OsbObjectSchema);
 };

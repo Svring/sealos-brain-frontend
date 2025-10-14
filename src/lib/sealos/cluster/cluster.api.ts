@@ -8,6 +8,7 @@ import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
 import { ClusterBridgeSchema } from "@/mvvm/sealos/cluster/models/cluster-bridge.model";
 import type { ClusterCreateData } from "@/mvvm/sealos/cluster/models/cluster-create.model";
+import { ClusterObjectSchema } from "@/mvvm/sealos/cluster/models/cluster-object.model";
 import type { ClusterUpdateData } from "@/mvvm/sealos/cluster/models/cluster-update.model";
 
 /**
@@ -59,7 +60,12 @@ export const getCluster = async (
 	context: K8sContext,
 	target: CustomResourceTarget,
 ) => {
-	return await composeObjectFromTarget(context, target, ClusterBridgeSchema);
+	return await composeObjectFromTarget(
+		context,
+		target,
+		ClusterBridgeSchema,
+		ClusterObjectSchema,
+	);
 };
 
 /**

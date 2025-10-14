@@ -69,6 +69,29 @@ export const transformImage = (resources: unknown[]) => {
 	};
 };
 
+export const determineLaunchpadStatus = (
+  status: any | undefined
+): string => {
+  if (!status) return "Pending";
+
+  if (status.paused) {
+    return "Stopped";
+  }
+
+  if (
+    status.unavailableReplicas !== undefined &&
+    status.unavailableReplicas > 0
+  ) {
+    return "Pending";
+  }
+
+  if (status.readyReplicas === status.replicas) {
+    return "Running";
+  }
+
+  return "Pending";
+};
+
 /**
  * Transform resource information for deployments (CPU and memory only)
  */
@@ -76,8 +99,9 @@ export const transformDeploymentResource = (spec: unknown) => {
 	if (!spec) return {};
 
 	const resource = spec as any;
-	const replicas = resource.spec?.replicas;
-	const containers = resource.spec?.template?.spec?.containers;
+	// Note: spec is already the deployment spec object, not the full resource
+	const replicas = resource.replicas || 0;
+	const containers = resource.template?.spec?.containers;
 
 	if (Array.isArray(containers) && containers.length > 0) {
 		const limits = containers[0].resources?.limits || {};
@@ -96,7 +120,7 @@ export const transformDeploymentResource = (spec: unknown) => {
 		};
 
 		const result: any = {
-			replicas,
+			replicas: Number(replicas),
 			cpu: convertedResource.cpu,
 			memory: convertedResource.memory,
 		};
@@ -104,7 +128,7 @@ export const transformDeploymentResource = (spec: unknown) => {
 		return result;
 	}
 
-	return { replicas };
+	return { replicas: Number(replicas) };
 };
 
 /**
@@ -114,8 +138,9 @@ export const transformStatefulSetResource = (spec: unknown) => {
 	if (!spec) return {};
 
 	const resource = spec as any;
-	const replicas = resource.spec?.replicas;
-	const containers = resource.spec?.template?.spec?.containers;
+	// Note: spec is already the statefulset spec object, not the full resource
+	const replicas = resource.replicas || 0;
+	const containers = resource.template?.spec?.containers;
 
 	if (Array.isArray(containers) && containers.length > 0) {
 		const limits = containers[0].resources?.limits || {};
@@ -125,7 +150,7 @@ export const transformStatefulSetResource = (spec: unknown) => {
 		};
 
 		// For StatefulSet, also extract storage
-		const volumeClaimTemplates = resource.spec?.volumeClaimTemplates;
+		const volumeClaimTemplates = resource.volumeClaimTemplates;
 		const storage =
 			Array.isArray(volumeClaimTemplates) && volumeClaimTemplates.length > 0
 				? volumeClaimTemplates[0].spec?.resources?.requests?.storage || ""
@@ -142,7 +167,7 @@ export const transformStatefulSetResource = (spec: unknown) => {
 		};
 
 		const result: any = {
-			replicas,
+			replicas: Number(replicas),
 			cpu: convertedResource.cpu,
 			memory: convertedResource.memory,
 		};
@@ -160,7 +185,7 @@ export const transformStatefulSetResource = (spec: unknown) => {
 	}
 
 	// Convert storage even when no containers are found
-	const volumeClaimTemplates = resource.spec?.volumeClaimTemplates;
+	const volumeClaimTemplates = resource.volumeClaimTemplates;
 	const storage =
 		Array.isArray(volumeClaimTemplates) && volumeClaimTemplates.length > 0
 			? volumeClaimTemplates[0].spec?.resources?.requests?.storage || ""
@@ -170,7 +195,7 @@ export const transformStatefulSetResource = (spec: unknown) => {
 		"storage",
 	);
 	return {
-		replicas,
+		replicas: Number(replicas),
 		storage: convertedStorage,
 	};
 };

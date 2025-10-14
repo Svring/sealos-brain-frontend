@@ -68,7 +68,7 @@ export const LocalStorageSchema = z.object({
 export const StatefulsetObjectSchema = z.object({
 	name: z.string(),
 	uid: z.string(),
-	resourceType: z.literal("statefulset"),
+	resourceType: z.string().default("statefulset"),
 	image: ImageSchema,
 	resource: StatefulsetResourceSchema,
 	status: z.string().nullable(),

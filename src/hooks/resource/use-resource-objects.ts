@@ -46,7 +46,7 @@ export const useResourceObjects = (resources: K8sItem[] | K8sResource[]) => {
 		}),
 		combine: (results) => {
 			return {
-				data: results,
+				data: results.map((result) => result.data),
 				pending: results.some((result) => result.isPending),
 				error: results.find((result) => result.error)?.error,
 				isLoading: results.some((result) => result.isLoading),

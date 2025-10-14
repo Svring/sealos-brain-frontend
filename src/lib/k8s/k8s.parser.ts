@@ -6,8 +6,8 @@ import type {
 	CustomResourceTarget,
 	CustomResourceTypeTarget,
 } from "@/mvvm/k8s/models/k8s.model";
-import type { K8sObject } from "@/mvvm/k8s/models/k8s-object.model";
 import type { K8sResource } from "@/mvvm/k8s/models/k8s-resource.model";
+import type { ResourceObject } from "@/mvvm/resource/models/resource-object.model";
 
 /**
  * Convert a resource type string to a resource type target
@@ -95,7 +95,7 @@ const fromResourceToTarget = (
  * @returns Resource target for specific resource operations
  */
 const fromObjectToTarget = (
-	object: K8sObject,
+	object: ResourceObject,
 ): BuiltinResourceTarget | CustomResourceTarget => {
 	const lowerResourceType = object.resourceType.toLowerCase();
 

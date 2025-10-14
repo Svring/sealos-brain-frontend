@@ -10,11 +10,11 @@ export const useInstanceResources = (target: CustomResourceTarget) => {
 
 	const query = useQuery(instance.resources.queryOptions(target));
 
-	useDevboxObject({
-		type: "custom",
-		name: "frontend-dev-pji581",
-		resourceType: "devbox",
-	});
+	// useDevboxObject({
+	// 	type: "custom",
+	// 	name: "frontend-dev-pji581",
+	// 	resourceType: "devbox",
+	// });
 
 	return {
 		data: query.data,

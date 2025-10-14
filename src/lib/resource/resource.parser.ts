@@ -17,13 +17,17 @@ import {
 	K8sItemSchema,
 	K8sResourceSchema,
 } from "@/mvvm/k8s/models/k8s-resource.model";
+import {
+	type ResourceObject,
+	ResourceObjectSchema,
+} from "@/mvvm/resource/models/resource-object.model";
 
 /**
  * Safely parse and determine resource type
  */
 const parseResource = (
 	input: unknown,
-): { name: string; kind: string; type: "resource" | "item" } => {
+): { name: string; kind: string; type: "resource" | "item" | "object" } => {
 	// Try to parse as K8sResource first
 	const resourceResult = K8sResourceSchema.safeParse(input);
 	if (resourceResult.success) {
@@ -43,6 +47,17 @@ const parseResource = (
 			name: item.name,
 			kind: item.resourceType.toLowerCase(),
 			type: "item",
+		};
+	}
+
+	// Try to parse as ResourceObject
+	const objectResult = ResourceObjectSchema.safeParse(input);
+	if (objectResult.success) {
+		const object = objectResult.data;
+		return {
+			name: object.name,
+			kind: object.resourceType.toLowerCase(),
+			type: "object",
 		};
 	}
 
@@ -137,6 +152,16 @@ const toItem = (resource: unknown): K8sItem => {
 	if (type === "item") {
 		// Already an item, return as-is
 		return resource as K8sItem;
+	}
+
+	if (type === "object") {
+		// Convert ResourceObject to K8sItem
+		const object = resource as ResourceObject;
+		return {
+			name: object.name,
+			uid: "", // ResourceObject doesn't have uid
+			resourceType: object.resourceType.toLowerCase(),
+		};
 	}
 
 	// Try specific parsers first

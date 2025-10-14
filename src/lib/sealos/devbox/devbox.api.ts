@@ -8,6 +8,7 @@ import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
 import { DevboxBridgeSchema } from "@/mvvm/sealos/devbox/models/devbox-bridge.model";
 import type { DevboxCreateData } from "@/mvvm/sealos/devbox/models/devbox-create.model";
+import { DevboxObjectSchema } from "@/mvvm/sealos/devbox/models/devbox-object.model";
 import type { DevboxUpdateData } from "@/mvvm/sealos/devbox/models/devbox-update.model";
 
 /**
@@ -59,7 +60,12 @@ export const getDevbox = async (
 	context: K8sContext,
 	target: CustomResourceTarget,
 ) => {
-	return await composeObjectFromTarget(context, target, DevboxBridgeSchema);
+	return await composeObjectFromTarget(
+		context,
+		target,
+		DevboxBridgeSchema,
+		DevboxObjectSchema,
+	);
 };
 
 /**
