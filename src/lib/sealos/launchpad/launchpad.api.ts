@@ -92,29 +92,6 @@ export const getLaunchpadMonitorData = async (
 };
 
 /**
- * Get launchpad combined monitor
- */
-export const getLaunchpadCombinedMonitor = async (
-	_context: K8sContext,
-	_queryName: string,
-	_step: string = "2m",
-) => {
-	// TODO: Implement get launchpad combined monitor
-	throw new Error("Not implemented");
-};
-
-/**
- * Check launchpad ready status
- */
-export const checkLaunchpadReady = async (
-	_context: K8sContext,
-	_queryName: string,
-) => {
-	// TODO: Implement check launchpad ready
-	throw new Error("Not implemented");
-};
-
-/**
  * Get launchpad logs
  */
 export const getLaunchpadLogs = async (
@@ -122,28 +99,6 @@ export const getLaunchpadLogs = async (
 	_target: BuiltinResourceTarget,
 ) => {
 	// TODO: Implement get launchpad logs
-	throw new Error("Not implemented");
-};
-
-/**
- * Get launchpad application pods
- */
-export const getLaunchpadApplicationPods = async (
-	_context: K8sContext,
-	_name: string,
-) => {
-	// TODO: Implement get launchpad application pods
-	throw new Error("Not implemented");
-};
-
-/**
- * Get launchpad pods metrics
- */
-export const getLaunchpadPodsMetrics = async (
-	_context: K8sContext,
-	_name: string,
-) => {
-	// TODO: Implement get launchpad pods metrics
 	throw new Error("Not implemented");
 };
 

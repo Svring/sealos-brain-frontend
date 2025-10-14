@@ -26,9 +26,14 @@ async function getResourceByFieldValue(
 	context: K8sContext,
 	fieldValue: BridgeQueryItem,
 	instanceName: string,
-): Promise<K8sResource | K8sResource[] | null> {
+): Promise<K8sResource | K8sResource[] | K8sContext | null> {
 	if (fieldValue.resourceType === "external") {
 		return null;
+	}
+
+	// Handle context resource type
+	if (fieldValue.resourceType === "context") {
+		return context;
 	}
 
 	// Try exact name fetch first if possible
@@ -164,9 +169,11 @@ async function getResourcesByFieldDescriptions(
 
 	const entries = Object.entries(flattenedDescriptions);
 
-	// Cache to store fetched resources by their locator key
-	// biome-ignore lint/suspicious/noExplicitAny: Generic resource caching
-	const resourceCache = new Map<string, any>();
+	// Cache to store fetched resources by their locator key (includes K8sResource, K8sContext, etc.)
+	const resourceCache = new Map<
+		string,
+		K8sResource | K8sResource[] | K8sContext | null
+	>();
 
 	// Group fields by their resource locator to identify duplicates
 	const fieldsByLocator = new Map<string, string[]>();
@@ -255,9 +262,9 @@ export async function composeObjectFromTarget(
 	// Reconstruct array results from indexed fields
 	const reconstructedData = reconstructArrayResults(extractedData);
 
-	// Apply Zod schema parsing to handle transforms and validation
+	// Apply Zod schema parsing to handle transforms and validation (supports async transforms)
 	try {
-		const parsedData = schema.parse(reconstructedData);
+		const parsedData = await schema.parseAsync(reconstructedData);
 		return parsedData;
 	} catch (error) {
 		console.warn("Schema parsing failed, returning raw extracted data:", error);

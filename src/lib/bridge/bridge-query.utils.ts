@@ -178,6 +178,10 @@ export function createResourceLocatorKey(
 		return `external:${fieldValue.resourceType}`;
 	}
 
+	if (fieldValue.resourceType === "context") {
+		return `context:${fieldValue.path?.join(".") || ""}`;
+	}
+
 	const parts = [fieldValue.resourceType];
 
 	if (fieldValue.label) {
