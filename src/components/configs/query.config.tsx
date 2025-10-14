@@ -48,7 +48,7 @@ export default function QueryConfig({
 	return (
 		<QueryClientProvider client={queryClient}>
 			<TRPCConfig queryClient={queryClient}>{children}</TRPCConfig>
-			<ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
+			<ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
 		</QueryClientProvider>
 	);
 }

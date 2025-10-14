@@ -16,7 +16,7 @@ export const BaseNode = forwardRef<HTMLDivElement, BaseNodeProps>(
 		// Determine the appropriate styling based on props
 		const getNodeStyling = () => {
 			let baseStyles =
-				"relative cursor-pointer rounded-xl border bg-node-background p-5 text-card-foreground h-50";
+				"relative cursor-pointer rounded-xl border bg-background-secondary p-5 text-card-foreground h-50";
 
 			// Add width classes based on width prop
 			if (width === "auto") {
