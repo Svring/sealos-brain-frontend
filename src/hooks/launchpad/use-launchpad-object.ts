@@ -9,7 +9,7 @@ export const useLaunchpadObject = (target: BuiltinResourceTarget) => {
 
 	const query = useQuery(launchpad.get.queryOptions(target));
 
-	console.log("query", query.data);
+	// console.log("query", query.data);
 
 	return {
 		data: query.data,

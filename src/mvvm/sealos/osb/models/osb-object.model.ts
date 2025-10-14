@@ -22,6 +22,7 @@ export const OsbObjectSchema = z.object({
 	uid: z.string(),
 	displayName: z.string(),
 	kind: z.string(),
+	resourceType: z.string().default("objectstoragebucket"),
 	policy: OsbPolicySchema,
 	access: OsbAccessSchema,
 });

@@ -146,6 +146,14 @@
   }
 }
 
+.react-flow__handle {
+  opacity: 0;
+  height: 0;
+  width: 0;
+  top: auto;
+  bottom: auto;
+}
+
 @layer utilities {
   .animate-text-reveal {
     animation: text-reveal 1.3s cubic-bezier(0.19, 1, 0.22, 1) backwards;

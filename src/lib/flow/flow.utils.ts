@@ -16,7 +16,9 @@ import { applySplitLayout } from "./layout/layout-split.utils";
 export const convertObjectsToNodes = (objects: ResourceObject[]): Node[] =>
 	_.map(objects, ({ name, resourceType }) => ({
 		id: `${resourceType.toLowerCase()}-${name}`,
-		type: resourceType.toLowerCase(),
+		type: ["deployment", "statefulset"].includes(resourceType.toLowerCase())
+			? "launchpad"
+			: resourceType.toLowerCase(),
 		position: { x: 0, y: 0 },
 		data: { target: resourceParser.toTarget({ resourceType, name }) },
 	}));
@@ -152,14 +154,13 @@ export const deriveNetworkNodesAndEdges = (
 	return { nodes, edges };
 };
 
-export const createDevGroup = (nodes: Node[], edges: Edge[] = []): Node[] => {
+export const createDevGroup = (nodes: Node[]): Node[] => {
 	const devboxNodes = _.filter(nodes, { type: "devbox" });
 	if (_.isEmpty(devboxNodes)) return nodes;
 
 	const devboxNames = new Set(
 		_.map(devboxNodes, (node) => node.data?.name as string),
 	);
-	const devboxNodeIds = new Set(_.map(devboxNodes, "id"));
 
 	// Find devbox network nodes
 	const devboxNetworkNodes = _.filter(

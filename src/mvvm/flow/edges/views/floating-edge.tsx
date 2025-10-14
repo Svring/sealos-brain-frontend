@@ -35,7 +35,6 @@ function FloatingEdge(props: EdgeProps) {
 	});
 
 	const edgeStyle = {
-		stroke: isHovered ? "var(--color-theme-blue)" : "hsl(var(--primary))",
 		strokeWidth: isHovered ? 1.5 : 1,
 		transition: "all 0.15s ease-in-out",
 		...style,
@@ -79,7 +78,7 @@ function FloatingEdge(props: EdgeProps) {
 								: "hsl(var(--foreground))",
 							pointerEvents: "none",
 							whiteSpace: "nowrap",
-							zIndex: 1000,
+							// zIndex: 1000,
 							boxShadow: "none",
 							backdropFilter: "none",
 							transition: "color 0.2s ease-in-out",

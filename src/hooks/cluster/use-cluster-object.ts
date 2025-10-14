@@ -9,7 +9,7 @@ export const useClusterObject = (target: CustomResourceTarget) => {
 
 	const query = useQuery(cluster.get.queryOptions(target));
 
-	console.log("query", query.data);
+	// console.log("query", query.data);
 
 	return {
 		data: query.data,

@@ -1,6 +1,5 @@
 "use client";
 
-import type { Edge, Node } from "@xyflow/react";
 import { useParams } from "next/navigation";
 import { useFlow } from "@/hooks/flow/use-flow";
 import { instanceParser } from "@/lib/sealos/instance/instance.parser";
@@ -13,12 +12,9 @@ export const Page = () => {
 	const instance = instanceParser.toTarget(name as string);
 
 	// Use flow hook with instance
-	const flowData = useFlow(instance);
+	const { nodes, edges } = useFlow(instance);
 	// TODO: Use flowData to populate nodes and edges
-	console.log("Flow data:", flowData);
-
-	const nodes: Node[] = [];
-	const edges: Edge[] = [];
+	console.log("Flow data:", { nodes, edges });
 
 	const handlePaneClick = () => {
 		// TODO: Implement pane click logic

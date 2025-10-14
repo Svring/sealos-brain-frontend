@@ -25,6 +25,15 @@ export const DeploymentBridgeSchema = z.object({
 			path: ["metadata.name"],
 		}),
 	),
+	resourceType: z
+		.any()
+		.describe(
+			JSON.stringify({
+				resourceType: "deployment",
+				path: [""],
+			}),
+		)
+		.transform((resource) => resource.kind.toLowerCase()),
 	uid: z.any().describe(
 		JSON.stringify({
 			resourceType: "deployment",

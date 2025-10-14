@@ -17,7 +17,7 @@ export default function NodeTitle({
         <span className="flex items-center gap-4">
           <img
             src={iconURL}
-            alt={`${resourceType} Icon`}
+            alt={`Icon`}
             width={24}
             height={24}
             className="rounded-lg h-9 w-9 flex-shrink-0 p-1 bg-muted"

@@ -84,6 +84,7 @@ export const getLaunchpad = async (
 		bridgeSchema,
 		objectSchema,
 	);
+	
 	return LaunchpadObjectSchema.parse(launchpadObject);
 };
 

@@ -23,7 +23,7 @@ export const useFlow = (instance: CustomResourceTarget) => {
 	const { nodes, edges } = useMemo(() => {
 		if (!objects || isLoadingObjects) return { nodes: [], edges: [] };
 
-		console.log("useFlowObjects", objects);
+		// console.log("useFlowObjects", objects);
 
 		const baseNodes = convertObjectsToNodes(objects);
 
@@ -34,10 +34,7 @@ export const useFlow = (instance: CustomResourceTarget) => {
 		const { nodes: networkNodes, edges: networkEdges } =
 			deriveNetworkNodesAndEdges(objects);
 
-		const groupedNodes = createDevGroup(
-			[...baseNodes, ...networkNodes],
-			[...baseEdges, ...networkEdges],
-		);
+		const groupedNodes = createDevGroup([...baseNodes, ...networkNodes]);
 
 		const allEdges = [...baseEdges, ...networkEdges];
 
@@ -46,7 +43,7 @@ export const useFlow = (instance: CustomResourceTarget) => {
 		return { nodes: layoutedNodes, edges: allEdges };
 	}, [objects, isLoadingObjects]);
 
-	console.log("useFlowNodes", { nodes, edges });
+	// console.log("useFlowNodes", { nodes, edges });
 
 	return { nodes, edges };
 };

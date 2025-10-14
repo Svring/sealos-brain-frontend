@@ -9,7 +9,7 @@ export const useDevboxObject = (target: CustomResourceTarget) => {
 
 	const query = useQuery(devbox.get.queryOptions(target));
 
-	console.log("query", query.data);
+	// console.log("query", query.data);
 
 	return {
 		data: query.data,

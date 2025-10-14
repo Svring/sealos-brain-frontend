@@ -9,7 +9,7 @@ export const useOsbObject = (target: CustomResourceTarget) => {
 
 	const query = useQuery(osb.get.queryOptions(target));
 
-	console.log("query", query.data);
+	// console.log("query", query.data);
 
 	return {
 		data: query.data,

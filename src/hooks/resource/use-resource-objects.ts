@@ -56,7 +56,7 @@ export const useResourceObjects = (resources: K8sItem[] | K8sResource[]) => {
 		},
 	});
 
-	// console.log("Combined queries:", combinedQueries.data);
+	// console.log("Combined queries:", queries.data);
 
 	return queries;
 };
