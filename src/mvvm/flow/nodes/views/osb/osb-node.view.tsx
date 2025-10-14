@@ -3,6 +3,7 @@
 import { Copy, Globe, MoreHorizontal } from "lucide-react";
 import React from "react";
 import { BaseNode } from "@/components/flow/nodes/base-node";
+import NodeTitle from "@/components/flow/nodes/node-title";
 import { Switch } from "@/components/ui/switch";
 import type { OsbObject } from "@/mvvm/sealos/osb/models/osb-object.model";
 
@@ -40,12 +41,11 @@ export function OSBNodeView({ data }: OSBNodeViewProps) {
 			<div className="flex h-full flex-col gap-2 justify-between">
 				{/* Header with Name and Dropdown */}
 				<div className="flex items-center justify-between">
-					<div className="flex flex-col">
-						<div className="text-lg font-semibold text-foreground truncate">
-							{name}
-						</div>
-						<div className="text-xs text-muted-foreground">Object Storage</div>
-					</div>
+					<NodeTitle 
+						resourceType="object storage"
+						name={name}
+						iconURL="/osb-icon.svg"
+					/>
 
 					{/* Actions Dropdown Menu - Simulated */}
 					<div className="flex flex-row items-center gap-2 flex-shrink-0">

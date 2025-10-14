@@ -2,6 +2,7 @@
 
 import { Globe, HardDrive } from "lucide-react";
 import { BaseNode } from "@/components/flow/nodes/base-node";
+import NodeTitle from "@/components/flow/nodes/node-title";
 import type { ClusterObject } from "@/mvvm/sealos/cluster/models/cluster-object.model";
 
 interface ClusterNodeViewProps {
@@ -17,14 +18,11 @@ export function ClusterNodeView({ data }: ClusterNodeViewProps) {
 			<div className="flex h-full flex-col gap-4 justify-between">
 				{/* Header with Name and Type */}
 				<div className="flex items-center justify-between">
-					<div className="flex flex-col">
-						<div className="text-lg font-semibold text-foreground truncate">
-							{name}
-						</div>
-						<div className="text-xs text-muted-foreground capitalize">
-							{type}
-						</div>
-					</div>
+					<NodeTitle 
+						resourceType={type}
+						name={name}
+						iconURL="/cluster-icon.svg"
+					/>
 
 					{/* Actions Dropdown Menu - Simulated */}
 					<div className="flex flex-row items-center gap-2 flex-shrink-0">

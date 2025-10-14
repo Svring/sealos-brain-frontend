@@ -1,8 +1,8 @@
 "use client";
 
 import { HardDrive, Package } from "lucide-react";
-import React from "react";
 import { BaseNode } from "@/components/flow/nodes/base-node";
+import NodeTitle from "@/components/flow/nodes/node-title";
 import type { LaunchpadObject } from "@/mvvm/sealos/launchpad/models/launchpad-object.model";
 
 interface LaunchpadNodeViewProps {
@@ -11,32 +11,21 @@ interface LaunchpadNodeViewProps {
 
 export function LaunchpadNodeView({ data }: LaunchpadNodeViewProps) {
 	const { name, resourceType } = data;
-	
+
 	// Extract data based on resource type
-	const image = data.resourceType === "deployment" 
-		? data.image?.imageName || "N/A"
-		: data.image?.imageName || "N/A";
-	
-	const replicas = data.resourceType === "deployment" 
-		? data.resource?.replicas || 1
-		: data.resource?.replicas || 1;
-	
-	const storage = data.resourceType === "statefulset" 
-		? data.resource?.storage || 20
-		: undefined;
+	const image = data.image?.imageName || "N/A";
+
+	const storage =
+		data.resourceType === "statefulset"
+			? (data.resource as { storage: number }).storage || 20
+			: undefined;
+
 	return (
 		<BaseNode width="fixed">
 			<div className="flex h-full flex-col gap-2 justify-between">
 				{/* Header with Name and Dropdown */}
 				<div className="flex items-center justify-between">
-					<div className="flex flex-col">
-						<div className="text-lg font-semibold text-foreground truncate">
-							{name}
-						</div>
-						<div className="text-xs text-muted-foreground capitalize">
-							{resourceType}
-						</div>
-					</div>
+					<NodeTitle resourceType={resourceType} name={name} iconURL={image} />
 
 					{/* Actions Dropdown Menu - Simulated */}
 					<div className="flex flex-row items-center gap-2 flex-shrink-0">

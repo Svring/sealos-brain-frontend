@@ -60,12 +60,13 @@ export const getCluster = async (
 	context: K8sContext,
 	target: CustomResourceTarget,
 ) => {
-	return await composeObjectFromTarget(
+	const clusterObject = await composeObjectFromTarget(
 		context,
 		target,
 		ClusterBridgeSchema,
 		ClusterObjectSchema,
 	);
+	return ClusterObjectSchema.parse(clusterObject);
 };
 
 /**

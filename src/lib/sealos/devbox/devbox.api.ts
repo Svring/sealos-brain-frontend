@@ -60,12 +60,13 @@ export const getDevbox = async (
 	context: K8sContext,
 	target: CustomResourceTarget,
 ) => {
-	return await composeObjectFromTarget(
+	const devboxObject = await composeObjectFromTarget(
 		context,
 		target,
 		DevboxBridgeSchema,
 		DevboxObjectSchema,
 	);
+	return DevboxObjectSchema.parse(devboxObject);
 };
 
 /**

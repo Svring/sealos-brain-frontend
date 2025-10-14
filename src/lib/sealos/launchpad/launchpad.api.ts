@@ -9,6 +9,7 @@ import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
 import { DeploymentBridgeSchema } from "@/mvvm/sealos/launchpad/models/deployment/deployment-bridge.model";
 import { DeploymentObjectSchema } from "@/mvvm/sealos/launchpad/models/deployment/deployment-object.model";
 import type { LaunchpadCreateData } from "@/mvvm/sealos/launchpad/models/launchpad-create.model";
+import { LaunchpadObjectSchema } from "@/mvvm/sealos/launchpad/models/launchpad-object.model";
 import type { LaunchpadUpdateData } from "@/mvvm/sealos/launchpad/models/launchpad-update.model";
 import { StatefulsetBridgeSchema } from "@/mvvm/sealos/launchpad/models/statefulset/statefulset-bridge.model";
 import { StatefulsetObjectSchema } from "@/mvvm/sealos/launchpad/models/statefulset/statefulset-object.model";
@@ -77,12 +78,13 @@ export const getLaunchpad = async (
 				? StatefulsetObjectSchema
 				: DeploymentObjectSchema;
 
-	return await composeObjectFromTarget(
+	const launchpadObject = await composeObjectFromTarget(
 		context,
 		target,
 		bridgeSchema,
 		objectSchema,
 	);
+	return LaunchpadObjectSchema.parse(launchpadObject);
 };
 
 /**

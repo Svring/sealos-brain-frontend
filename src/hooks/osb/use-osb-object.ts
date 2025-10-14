@@ -2,12 +2,12 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useTRPCClients } from "@/hooks/trpc/use-trpc-clients";
-import type { BuiltinResourceTarget } from "@/mvvm/k8s/models/k8s.model";
+import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s.model";
 
-export const useLaunchpadObject = (target: BuiltinResourceTarget) => {
-	const { launchpad } = useTRPCClients();
+export const useOsbObject = (target: CustomResourceTarget) => {
+	const { osb } = useTRPCClients();
 
-	const query = useQuery(launchpad.get.queryOptions(target));
+	const query = useQuery(osb.get.queryOptions(target));
 
 	console.log("query", query.data);
 

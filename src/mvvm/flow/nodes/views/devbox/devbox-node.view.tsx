@@ -1,8 +1,8 @@
 "use client";
 
 import { Package } from "lucide-react";
-import React from "react";
 import { BaseNode } from "@/components/flow/nodes/base-node";
+import NodeTitle from "@/components/flow/nodes/node-title";
 import type { DevboxObject } from "@/mvvm/sealos/devbox/models/devbox-object.model";
 
 interface DevboxNodeViewProps {
@@ -16,12 +16,11 @@ export function DevboxNodeView({ data }: DevboxNodeViewProps) {
 			<div className="flex h-full flex-col gap-2 justify-between">
 				{/* Header with Name and Dropdown */}
 				<div className="flex items-center justify-between">
-					<div className="flex flex-col">
-						<div className="text-lg font-semibold text-foreground truncate">
-							{name}
-						</div>
-						<div className="text-xs text-muted-foreground">Devbox</div>
-					</div>
+					<NodeTitle 
+						resourceType="devbox"
+						name={name}
+						iconURL={image}
+					/>
 
 					{/* Actions Dropdown Menu - Simulated */}
 					<div className="flex flex-row items-center gap-2 flex-shrink-0">

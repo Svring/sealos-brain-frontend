@@ -25,5 +25,11 @@ export const getOsbBucket = async (
 	context: K8sContext,
 	target: CustomResourceTarget,
 ) => {
-	return await composeObjectFromTarget(context, target, OsbBridgeSchema, OsbObjectSchema);
+	const osbObject = await composeObjectFromTarget(
+		context,
+		target,
+		OsbBridgeSchema,
+		OsbObjectSchema,
+	);
+	return OsbObjectSchema.parse(osbObject);
 };

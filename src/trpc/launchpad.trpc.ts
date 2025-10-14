@@ -61,7 +61,9 @@ export const launchpadRouter = t.router({
 			return await getLaunchpadLogs(ctx, input);
 		}),
 
-	network: t.procedure.input(z.string()).query(async ({ input, ctx }) => {}),
+	network: t.procedure
+		.input(BuiltinResourceTargetSchema)
+		.query(async ({ input, ctx }) => {}),
 
 	// Monitoring
 	monitor: t.procedure

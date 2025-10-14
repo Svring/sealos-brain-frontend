@@ -18,7 +18,7 @@ export const convertObjectsToNodes = (objects: ResourceObject[]): Node[] =>
 		id: `${resourceType.toLowerCase()}-${name}`,
 		type: resourceType.toLowerCase(),
 		position: { x: 0, y: 0 },
-		data: { name, resourceType },
+		data: { target: resourceParser.toTarget({ resourceType, name }) },
 	}));
 
 export const inferObjectsReliances = (
