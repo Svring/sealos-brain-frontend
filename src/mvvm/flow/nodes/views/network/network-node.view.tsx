@@ -23,9 +23,14 @@ interface NetworkPortData {
 interface NetworkNodeViewProps {
 	data: NetworkPortData[];
 	target: ResourceTarget;
+	onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
-export function NetworkNodeView({ data, target }: NetworkNodeViewProps) {
+export function NetworkNodeView({
+	data,
+	target,
+	onClick,
+}: NetworkNodeViewProps) {
 	// Extract ports from network data
 	const ports = data || [];
 
@@ -36,8 +41,8 @@ export function NetworkNodeView({ data, target }: NetworkNodeViewProps) {
 
 	if (!firstPort) {
 		return (
-			<BaseNode target={target} height={14}>
-				<div className="flex items-center justify-center h-full">
+			<BaseNode height={14}>
+				<div className="flex items-center justify-center h-full" onClick={onClick}>
 					<div className="flex items-center justify-center gap-2 text-sm w-full">
 						<Globe className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
 						<span className="text-muted-foreground">No ports available</span>
@@ -65,8 +70,8 @@ export function NetworkNodeView({ data, target }: NetworkNodeViewProps) {
 	const isReachable = isPublicReachable || isPrivateReachable;
 
 	return (
-		<BaseNode target={target} height={14}>
-			<div className="flex items-center justify-center h-full">
+		<BaseNode height={14}>
+			<div className="flex items-center justify-center h-full" onClick={onClick}>
 				<div className="flex items-center justify-center gap-2 text-sm w-full">
 					{!isReachable ? (
 						<TooltipProvider>

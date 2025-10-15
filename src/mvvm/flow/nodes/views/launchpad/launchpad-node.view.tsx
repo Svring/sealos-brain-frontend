@@ -13,6 +13,7 @@ import { LaunchpadMenuTrigger, LaunchpadMenuView } from "./launchpad-menu.view";
 
 interface LaunchpadNodeViewProps {
 	data: LaunchpadObject;
+	onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
 	status?: string;
 	showDeleteDialog?: boolean;
 	setShowDeleteDialog?: (show: boolean) => void;
@@ -28,6 +29,7 @@ interface LaunchpadNodeViewProps {
 
 export function LaunchpadNodeView({
 	data,
+	onClick,
 	status = "Running",
 	showDeleteDialog = false,
 	setShowDeleteDialog = () => {},
@@ -54,8 +56,8 @@ export function LaunchpadNodeView({
 	const target = launchpadParser.toTarget(name, resourceType);
 
 	return (
-		<BaseNode target={target}>
-			<div className="flex h-full flex-col gap-2 justify-between">
+		<BaseNode>
+			<div className="flex h-full flex-col gap-2 justify-between" onClick={onClick}>
 				{/* Header with Name and Dropdown */}
 				<div className="flex items-center justify-between gap-2">
 					<NodeTitle

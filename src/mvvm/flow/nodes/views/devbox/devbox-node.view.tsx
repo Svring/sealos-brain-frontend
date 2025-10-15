@@ -13,6 +13,7 @@ import { DevboxMenuTrigger, DevboxMenuView } from "./devbox-menu.view";
 
 interface DevboxNodeViewProps {
 	data: DevboxObject;
+	onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
 	status?: string;
 	showDeleteDialog?: boolean;
 	setShowDeleteDialog?: (show: boolean) => void;
@@ -27,6 +28,7 @@ interface DevboxNodeViewProps {
 
 export function DevboxNodeView({ 
 	data,
+	onClick,
 	status = "Running",
 	showDeleteDialog = false,
 	setShowDeleteDialog = () => {},
@@ -46,8 +48,8 @@ export function DevboxNodeView({
 	const iconURL = `${DEVBOX_ICON_BASE_URL}/${runtime}.svg`;
 
 	return (
-		<BaseNode target={target}>
-			<div className="flex h-full flex-col gap-2 justify-between">
+		<BaseNode>
+			<div className="flex h-full flex-col gap-2 justify-between" onClick={onClick}>
 				{/* Header with Name and Dropdown */}
 				<div className="flex items-center justify-between">
 					<NodeTitle

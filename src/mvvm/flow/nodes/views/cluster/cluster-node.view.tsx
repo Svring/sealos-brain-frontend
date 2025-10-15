@@ -18,6 +18,7 @@ import { ClusterMenuTrigger, ClusterMenuView } from "./cluster-menu.view";
 
 interface ClusterNodeViewProps {
 	data: ClusterObject;
+	onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
 	status?: string;
 	showDeleteDialog?: boolean;
 	setShowDeleteDialog?: (show: boolean) => void;
@@ -32,6 +33,7 @@ interface ClusterNodeViewProps {
 
 export function ClusterNodeView({
 	data,
+	onClick,
 	status = "Running",
 	showDeleteDialog = false,
 	setShowDeleteDialog = () => {},
@@ -51,8 +53,8 @@ export function ClusterNodeView({
 	const target = clusterParser.toTarget(name);
 
 	return (
-		<BaseNode target={target}>
-			<div className="flex h-full flex-col gap-4 justify-between">
+		<BaseNode>
+			<div className="flex h-full flex-col gap-4 justify-between" onClick={onClick}>
 				{/* Header with Name and Type */}
 				<div className="flex items-center justify-between gap-2">
 					<NodeTitle

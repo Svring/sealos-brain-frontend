@@ -11,9 +11,10 @@ import type { OsbObject } from "@/mvvm/sealos/osb/models/osb-object.model";
 
 interface OSBNodeViewProps {
 	data: OsbObject;
+	onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
-export function OSBNodeView({ data }: OSBNodeViewProps) {
+export function OSBNodeView({ data, onClick }: OSBNodeViewProps) {
 	const { name, policy } = data;
 	const [staticHosting, setStaticHosting] = React.useState(false);
 
@@ -42,8 +43,8 @@ export function OSBNodeView({ data }: OSBNodeViewProps) {
 	);
 
 	return (
-		<BaseNode target={target}>
-			<div className="flex h-full flex-col gap-2 justify-between">
+		<BaseNode>
+			<div className="flex h-full flex-col gap-2 justify-between" onClick={onClick}>
 				{/* Header with Name and Dropdown */}
 				<div className="flex items-center justify-between">
 					<NodeTitle
