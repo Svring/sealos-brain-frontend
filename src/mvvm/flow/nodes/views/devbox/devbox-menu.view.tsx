@@ -12,8 +12,10 @@ import {
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
+	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 
@@ -31,6 +33,10 @@ interface DevboxMenuViewProps {
 	isDeleteConfirmationValid: boolean;
 }
 
+export function DevboxMenuTrigger({ children }: { children: React.ReactNode }) {
+	return <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>;
+}
+
 export function DevboxMenuView({
 	devboxName,
 	status,
@@ -46,7 +52,10 @@ export function DevboxMenuView({
 }: DevboxMenuViewProps) {
 	return (
 		<>
-			<DropdownMenuContent align="start">
+			<DropdownMenuContent
+				className="rounded-xl bg-background-secondary"
+				align="start"
+			>
 				{status !== "Running" && (
 					<DropdownMenuItem
 						onClick={() => executeAction("start", devboxName)}

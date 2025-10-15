@@ -22,7 +22,7 @@ export const PortSchema = z.object({
 	privateAddress: z.string().optional(),
 	privateHost: z.string().optional(),
 	networkName: z.string().optional(),
-	host: z.string().optional(),
+	publicHost: z.string().optional(),
 	publicAddress: z.string().optional(),
 	customDomain: z.string().optional(),
 });

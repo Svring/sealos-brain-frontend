@@ -11,7 +11,7 @@ export const PortSchema = z.object({
 	privateHost: z.string().optional(),
 	publicAddress: z.string().optional(),
 	networkName: z.string().optional(),
-	host: z.string().optional(),
+	publicHost: z.string().optional(),
 });
 
 export const ResourceSchema = z.object({

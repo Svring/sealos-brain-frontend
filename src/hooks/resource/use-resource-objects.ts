@@ -5,6 +5,7 @@ import { resourceParser } from "@/lib/resource/resource.parser";
 import type {
 	BuiltinResourceTarget,
 	CustomResourceTarget,
+	ResourceTarget,
 } from "@/mvvm/k8s/models/k8s.model";
 import type {
 	K8sItem,
@@ -17,11 +18,12 @@ import { useTRPCClients } from "../trpc/use-trpc-clients";
  * @param resources - Array of K8sItem or K8sResource objects
  * @returns Combined query results with data, loading states, and errors
  */
-export const useResourceObjects = (resources: K8sItem[] | K8sResource[]) => {
+export const useResourceObjects = (
+	resources: K8sItem[] | K8sResource[] | ResourceTarget[],
+) => {
 	const { devbox, cluster, osb, launchpad } = useTRPCClients();
 
 	const targets = resourceParser.toTargets(resources);
-	// console.log("Resource targets:", targets);
 
 	// Create queries for each target
 	const queries = useQueries({

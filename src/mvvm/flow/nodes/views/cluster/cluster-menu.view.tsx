@@ -14,6 +14,7 @@ import {
 import {
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 
@@ -29,6 +30,14 @@ interface ClusterMenuViewProps {
 	executeAction: (action: string, name: string) => void;
 	isPending: (action: string) => boolean;
 	isDeleteConfirmationValid: boolean;
+}
+
+export function ClusterMenuTrigger({ children }: { children: React.ReactNode }) {
+	return (
+		<DropdownMenuTrigger asChild>
+			{children}
+		</DropdownMenuTrigger>
+	);
 }
 
 export function ClusterMenuView({

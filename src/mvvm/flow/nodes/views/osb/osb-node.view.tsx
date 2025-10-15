@@ -5,6 +5,8 @@ import React from "react";
 import { BaseNode } from "@/components/flow/nodes/base-node";
 import NodeTitle from "@/components/flow/nodes/node-title";
 import { Switch } from "@/components/ui/switch";
+import { OBJECTSTORAGE_DEFAULT_ICON } from "@/constants/osb/osb-icons.constant";
+import { osbParser } from "@/lib/sealos/osb/osb.parser";
 import type { OsbObject } from "@/mvvm/sealos/osb/models/osb-object.model";
 
 interface OSBNodeViewProps {
@@ -14,6 +16,9 @@ interface OSBNodeViewProps {
 export function OSBNodeView({ data }: OSBNodeViewProps) {
 	const { name, policy } = data;
 	const [staticHosting, setStaticHosting] = React.useState(false);
+
+	// Create target for node components
+	const target = osbParser.toTarget(name);
 
 	const hemComponent = policy !== "private" && (
 		<div className="flex items-center justify-between gap-2">
@@ -37,14 +42,14 @@ export function OSBNodeView({ data }: OSBNodeViewProps) {
 	);
 
 	return (
-		<BaseNode width="fixed">
+		<BaseNode target={target}>
 			<div className="flex h-full flex-col gap-2 justify-between">
 				{/* Header with Name and Dropdown */}
 				<div className="flex items-center justify-between">
-					<NodeTitle 
+					<NodeTitle
 						resourceType="object storage"
 						name={name}
-						iconURL="/osb-icon.svg"
+						iconURL={OBJECTSTORAGE_DEFAULT_ICON}
 					/>
 
 					{/* Actions Dropdown Menu - Simulated */}

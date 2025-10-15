@@ -9,6 +9,8 @@ import type {
 	ResourceTarget,
 	ResourceTypeTarget,
 } from "@/mvvm/k8s/models/k8s.model";
+import { BuiltinResourceTargetSchema } from "@/mvvm/k8s/models/k8s-builtin.model";
+import { CustomResourceTargetSchema } from "@/mvvm/k8s/models/k8s-custom.model";
 import type {
 	K8sItem,
 	K8sResource,
@@ -27,8 +29,34 @@ import {
  */
 const parseResource = (
 	input: unknown,
-): { name: string; kind: string; type: "resource" | "item" | "object" } => {
-	// Try to parse as K8sResource first
+): {
+	name: string;
+	kind: string;
+	type: "resource" | "item" | "object" | "target";
+} => {
+	// Try to parse as BuiltinResourceTarget first
+	const builtinTargetResult = BuiltinResourceTargetSchema.safeParse(input);
+	if (builtinTargetResult.success) {
+		const target = builtinTargetResult.data;
+		return {
+			name: target.name,
+			kind: target.resourceType.toLowerCase(),
+			type: "target",
+		};
+	}
+
+	// Try to parse as CustomResourceTarget
+	const customTargetResult = CustomResourceTargetSchema.safeParse(input);
+	if (customTargetResult.success) {
+		const target = customTargetResult.data;
+		return {
+			name: target.name,
+			kind: target.resourceType.toLowerCase(),
+			type: "target",
+		};
+	}
+
+	// Try to parse as K8sResource
 	const resourceResult = K8sResourceSchema.safeParse(input);
 	if (resourceResult.success) {
 		const resource = resourceResult.data;
@@ -69,7 +97,13 @@ const parseResource = (
  * Delegates to specific parsers based on resource type
  */
 const toTarget = (resource: unknown): ResourceTarget => {
-	const { kind } = parseResource(resource);
+	const { kind, type } = parseResource(resource);
+
+	// If input is already a target, return it as-is
+	if (type === "target") {
+		return resource as ResourceTarget;
+	}
+
 	const k8sResource = resource as K8sResource;
 
 	// Try specific parsers first

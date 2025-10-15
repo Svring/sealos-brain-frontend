@@ -1,23 +1,49 @@
 "use client";
 
-import { HardDrive, Package } from "lucide-react";
+import { HardDrive, MoreHorizontal, Package } from "lucide-react";
 import { BaseNode } from "@/components/flow/nodes/base-node";
 import NodeLog from "@/components/flow/nodes/node-log";
 import NodeMonitor from "@/components/flow/nodes/node-monitor";
 import NodeStatus from "@/components/flow/nodes/node-status";
 import NodeTitle from "@/components/flow/nodes/node-title";
+import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { launchpadParser } from "@/lib/sealos/launchpad/launchpad.parser";
 import type { LaunchpadObject } from "@/mvvm/sealos/launchpad/models/launchpad-object.model";
+import { LaunchpadMenuTrigger, LaunchpadMenuView } from "./launchpad-menu.view";
 
 interface LaunchpadNodeViewProps {
 	data: LaunchpadObject;
+	status?: string;
+	showDeleteDialog?: boolean;
+	setShowDeleteDialog?: (show: boolean) => void;
+	deleteConfirmationValue?: string;
+	setDeleteConfirmationValue?: (value: string) => void;
+	handleDeleteClick?: () => void;
+	handleDeleteConfirm?: () => void;
+	executeAction?: (action: string, name: string) => void;
+	isPending?: (action: string) => boolean;
+	isDeleteConfirmationValid?: boolean;
+	showRestart?: boolean;
 }
 
-export function LaunchpadNodeView({ data }: LaunchpadNodeViewProps) {
-	const { name } = data;
+export function LaunchpadNodeView({
+	data,
+	status = "Running",
+	showDeleteDialog = false,
+	setShowDeleteDialog = () => {},
+	deleteConfirmationValue = "",
+	setDeleteConfirmationValue = () => {},
+	handleDeleteClick = () => {},
+	handleDeleteConfirm = () => {},
+	executeAction = () => {},
+	isPending = () => false,
+	isDeleteConfirmationValid = false,
+	showRestart = true,
+}: LaunchpadNodeViewProps) {
+	const { name, resourceType, image } = data;
 
 	// Extract data based on resource type
-	const image = data.image?.imageName || "N/A";
+	const iconURL = "/icons/launchpad/default.svg";
 
 	const storage =
 		data.resourceType === "statefulset"
@@ -25,32 +51,50 @@ export function LaunchpadNodeView({ data }: LaunchpadNodeViewProps) {
 			: undefined;
 
 	// Create target for node components
-	const target = launchpadParser.toTarget(name);
+	const target = launchpadParser.toTarget(name, resourceType);
 
 	return (
-		<BaseNode width="fixed">
+		<BaseNode target={target}>
 			<div className="flex h-full flex-col gap-2 justify-between">
 				{/* Header with Name and Dropdown */}
-				<div className="flex items-center justify-between">
+				<div className="flex items-center justify-between gap-2">
 					<NodeTitle
 						resourceType={data.resourceType}
 						name={name}
-						iconURL={image}
+						iconURL={iconURL}
 					/>
 
-					{/* Actions Dropdown Menu - Simulated */}
+					{/* Actions Dropdown Menu */}
 					<div className="flex flex-row items-center gap-2 flex-shrink-0">
-						<div className="w-6 h-6 rounded border border-border bg-background hover:bg-muted cursor-pointer flex items-center justify-center">
-							<span className="text-xs">⋯</span>
-						</div>
+						<DropdownMenu>
+							<LaunchpadMenuTrigger>
+								<div className="w-6 h-6 rounded bg-background hover:bg-muted cursor-pointer flex items-center justify-center">
+									<MoreHorizontal className="h-4 w-4" />
+								</div>
+							</LaunchpadMenuTrigger>
+							<LaunchpadMenuView
+								name={name}
+								status={status}
+								showDeleteDialog={showDeleteDialog}
+								setShowDeleteDialog={setShowDeleteDialog}
+								deleteConfirmationValue={deleteConfirmationValue}
+								setDeleteConfirmationValue={setDeleteConfirmationValue}
+								handleDeleteClick={handleDeleteClick}
+								handleDeleteConfirm={handleDeleteConfirm}
+								executeAction={executeAction}
+								isPending={isPending}
+								isDeleteConfirmationValid={isDeleteConfirmationValid}
+								showRestart={showRestart}
+							/>
+						</DropdownMenu>
 					</div>
 				</div>
 
 				{/* Image with Package Icon */}
-				<div className="flex items-center gap-2 mt-2">
+				<div className="flex items-center gap-2 mt-2 px-1">
 					<Package className="h-4 w-4 text-muted-foreground" />
 					<div className="text-md text-muted-foreground truncate flex-1">
-						Image: {image}
+						Image: {image.imageName}
 					</div>
 				</div>
 

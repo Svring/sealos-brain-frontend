@@ -1,13 +1,8 @@
 "use client";
 
 import type { Edge, Node } from "@xyflow/react";
-import { useAuthState } from "@/contexts/auth/auth.context";
-import {
-	useCopilotEvents,
-	useCopilotState,
-} from "@/contexts/copilot/copilot.context";
 import { useProjectState } from "@/contexts/project/project.context";
-import { composeMetadata } from "@/lib/langgraph/langgraph.utils";
+import { useAddChat } from "@/hooks/copilot/use-add-chat";
 import { ProjectFlowView } from "../views/project-flow.view";
 
 interface ProjectFlowProps {
@@ -16,27 +11,11 @@ interface ProjectFlowProps {
 }
 
 export function ProjectFlow({ nodes = [], edges = [] }: ProjectFlowProps) {
-	const { auth } = useAuthState();
-	const { chats, opened } = useCopilotState();
-	const { addChat, close: closeCopilot } = useCopilotEvents();
 	const { project } = useProjectState();
+	const { handleAddChat } = useAddChat();
 
 	const handlePaneClick = () => {
-		const newMetadata = composeMetadata(auth?.kubeconfigEncoded, project?.uid);
-		const latestChat = chats[chats.length - 1];
-
-		// Check if the latest chat has the same metadata
-		if (
-			latestChat &&
-			opened &&
-			JSON.stringify(latestChat.metadata) === JSON.stringify(newMetadata)
-		) {
-			closeCopilot();
-		} else {
-			addChat({
-				metadata: newMetadata,
-			});
-		}
+		handleAddChat(project?.uid);
 	};
 
 	const handleEdgeClick = (event: React.MouseEvent) => {

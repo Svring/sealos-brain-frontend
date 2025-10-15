@@ -6,6 +6,14 @@
   --color-background-primary: #090909;
   --color-background-secondary: #0E0E10;
   --color-background-tertiary: #17181B;
+
+  --color-theme-blue: #1c86fb;
+  --color-theme-green: #12b981;
+  --color-theme-red: #f87270;
+  --color-theme-yellow: #facc14;
+  --color-theme-purple: #a78afa;
+  --color-theme-gray: #a1a1aa;
+  --color-theme-darkblue: #3c5f89;
 }
 
 @theme inline {

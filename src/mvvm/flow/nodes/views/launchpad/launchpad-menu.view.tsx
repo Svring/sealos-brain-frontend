@@ -14,6 +14,7 @@ import {
 import {
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 
@@ -30,6 +31,14 @@ interface LaunchpadMenuViewProps {
 	isPending: (action: string) => boolean;
 	isDeleteConfirmationValid: boolean;
 	showRestart?: boolean;
+}
+
+export function LaunchpadMenuTrigger({ children }: { children: React.ReactNode }) {
+	return (
+		<DropdownMenuTrigger asChild>
+			{children}
+		</DropdownMenuTrigger>
+	);
 }
 
 export function LaunchpadMenuView({
