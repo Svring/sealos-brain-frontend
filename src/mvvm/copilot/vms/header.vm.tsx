@@ -1,32 +1,40 @@
 "use client";
 
+import { useCopilotAdapterContext } from "@/contexts/copilot/copilot.adapter";
 import { useCopilotEvents } from "@/contexts/copilot/copilot.context";
+import { useProjectState } from "@/contexts/project/project.context";
 import { HeaderView } from "../views/header.view";
 
 interface HeaderProps {
-	title?: string;
 	isCreatingThread?: boolean;
 	isMaximized?: boolean;
 	showFocusToggle?: boolean;
-	threads?: Array<{
-		thread_id: string;
-		title?: string;
-		updated_at?: string;
-	}>;
-	currentThreadId?: string;
 }
 
 export const Header = (props: HeaderProps) => {
 	const {
-		title = "Chat",
 		isCreatingThread = false,
 		isMaximized = false,
 		showFocusToggle = false,
-		threads = [],
-		currentThreadId,
 	} = props;
-  
-  const { close } = useCopilotEvents();
+
+	const { close } = useCopilotEvents();
+	const { project, activeResource } = useProjectState();
+	const { metadata, threads, threadId } = useCopilotAdapterContext();
+
+	// Determine title based on metadata and active resource
+	const getTitle = () => {
+		console.log("Metadata:", metadata);
+		// If metadata contains resourceId, use the active resource's target name
+		if (metadata?.resourceUid && activeResource) {
+			return activeResource.target.name;
+		}
+
+		// Otherwise, use project displayName
+		return project?.displayName || "Chat";
+	};
+
+	const title = getTitle();
 
 	// Empty function implementations
 	const handleNewChat = () => {
@@ -56,7 +64,7 @@ export const Header = (props: HeaderProps) => {
 			isMaximized={isMaximized}
 			showFocusToggle={showFocusToggle}
 			threads={threads}
-			currentThreadId={currentThreadId}
+			currentThreadId={threadId}
 		/>
 	);
 };

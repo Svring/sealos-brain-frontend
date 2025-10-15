@@ -6,8 +6,6 @@ import { InputBox } from "../vms/input-box.vm";
 import { MessagesView } from "./messages.view";
 
 interface ChatboxViewProps {
-	// Header props
-	title?: string;
 	// Messages props
 	messages: Message[];
 	isLoading: boolean;
@@ -17,12 +15,12 @@ interface ChatboxViewProps {
 }
 
 export function ChatboxView(props: ChatboxViewProps) {
-	const { title = "Chat", messages, isLoading, onSend, onStop } = props;
+	const { messages, isLoading, onSend, onStop } = props;
 
 	return (
 		<div className="h-full w-full flex flex-col bg-background-secondary border rounded-lg">
 			{/* Header */}
-			<Header title={title} />
+			<Header/>
 
 			{/* Messages */}
 			<div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide">

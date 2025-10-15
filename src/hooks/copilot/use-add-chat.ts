@@ -29,6 +29,9 @@ export const useAddChat = () => {
 		);
 		const latestChat = chats[chats.length - 1];
 
+		// console.log("Latest chat:", latestChat);
+		console.log("New metadata:", newMetadata);
+
 		// Check if the latest chat has the same metadata
 		if (
 			latestChat &&

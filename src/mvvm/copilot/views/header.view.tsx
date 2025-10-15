@@ -48,7 +48,7 @@ export function HeaderView(props: HeaderViewProps) {
 		<div className="p-2 shrink-0 bg-transparent">
 			<div className="flex items-center justify-between gap-2">
 				<div className="flex items-center gap-2 min-w-0 flex-1">
-
+					<h2 className="text-sm font-medium truncate">{title}</h2>
 				</div>
 
 				<div className="flex items-center gap-1">

@@ -1,7 +1,10 @@
 "use client";
 
 import { Handle, Position } from "@xyflow/react";
-import { useProjectState } from "@/contexts/project/project.context";
+import {
+	useProjectEvents,
+	useProjectState,
+} from "@/contexts/project/project.context";
 import { useAddChat } from "@/hooks/copilot/use-add-chat";
 import { useResourceObjects } from "@/hooks/resource/use-resource-objects";
 import type { ResourceTarget } from "@/mvvm/k8s/models/k8s.model";
@@ -18,6 +21,7 @@ export const BaseNode = ({
 	target,
 }: BaseNodeProps) => {
 	const { project } = useProjectState();
+	const { setActiveResource } = useProjectEvents();
 	const { data } = useResourceObjects([target]);
 	const { handleAddChat } = useAddChat();
 
@@ -31,13 +35,20 @@ export const BaseNode = ({
 			return;
 		}
 
+		// Set the active resource
+		setActiveResource({
+			uid: resourceId,
+			target: target,
+		});
+
+		// Add chat with project and resource ID
 		handleAddChat(project?.uid, resourceId);
 	};
 
 	// Determine the appropriate styling based on props
 	const getNodeStyling = () => {
 		let baseStyles =
-			"relative cursor-pointer rounded-xl border bg-background-secondary p-5 text-card-foreground h-50";
+			"relative cursor-pointer rounded-xl border bg-background-secondary p-5 text-card-foreground h-50 hover:brightness-120";
 
 		// Add width classes based on width prop
 		if (width === "auto") {
@@ -45,9 +56,6 @@ export const BaseNode = ({
 		} else {
 			baseStyles += " w-70";
 		}
-
-		// Add hover effect
-		baseStyles += " hover:brightness-120";
 
 		return baseStyles;
 	};
