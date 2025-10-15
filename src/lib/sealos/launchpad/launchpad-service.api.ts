@@ -4,13 +4,14 @@ import { BUILTIN_RESOURCES } from "@/constants/k8s/k8s-builtin.constant";
 import { CUSTOM_RESOURCES } from "@/constants/k8s/k8s-custom.constant";
 import { LAUNCHPAD_LABELS } from "@/constants/launchpad/launchpad-labels.constant";
 import { selectResources } from "@/lib/k8s/k8s-service.api";
+import { checkPorts } from "@/lib/network/network.api";
 import { transformMonitorData } from "@/lib/resource/resource.utils";
 import type { ResourceTypeTarget } from "@/mvvm/k8s/models/k8s.model";
 import type { BuiltinResourceTarget } from "@/mvvm/k8s/models/k8s-builtin.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
 import type { K8sResource } from "@/mvvm/k8s/models/k8s-resource.model";
 import type { MonitorData } from "@/mvvm/resource/models/resource-monitor.model";
-import { getLaunchpadMonitorData } from "./launchpad.api";
+import { getLaunchpad, getLaunchpadMonitorData } from "./launchpad.api";
 
 // ============================================================================
 // Launchpad Service Functions (Higher-level business logic)
@@ -148,4 +149,72 @@ export const getLaunchpadResources = async (
 
 		return selectResources(context, targets);
 	}
+};
+
+/**
+ * Get launchpad network status by checking port reachability
+ * @param context - K8s context
+ * @param target - Launchpad target
+ * @returns Launchpad ports with reachability status for public and private addresses
+ */
+export const getLaunchpadNetwork = async (
+	context: K8sContext,
+	target: BuiltinResourceTarget,
+) => {
+	// Get the launchpad object first
+	const launchpad = await getLaunchpad(context, target);
+
+	// Extract ports from the launchpad object
+	const ports = launchpad.ports || [];
+
+	// Check reachability for each port
+	const portChecks = await Promise.all(
+		ports.map(async (port) => {
+			const results: {
+				port: typeof port;
+				publicReachable?: boolean;
+				privateReachable?: boolean;
+			} = {
+				port,
+			};
+
+			// Check public address reachability if available
+			if (port.publicHost) {
+				try {
+					const publicResults = await checkPorts(
+						[port.number],
+						port.publicHost,
+					);
+					results.publicReachable = publicResults[0]?.reachable || false;
+				} catch (error) {
+					console.error(
+						`Error checking public address ${port.publicHost}:`,
+						error,
+					);
+					results.publicReachable = false;
+				}
+			}
+
+			// Check private address reachability if available
+			if (port.privateHost) {
+				try {
+					const privateResults = await checkPorts(
+						[port.number],
+						port.privateHost,
+					);
+					results.privateReachable = privateResults[0]?.reachable || false;
+				} catch (error) {
+					console.error(
+						`Error checking private address ${port.privateHost}:`,
+						error,
+					);
+					results.privateReachable = false;
+				}
+			}
+
+			return results;
+		}),
+	);
+
+	return portChecks;
 };

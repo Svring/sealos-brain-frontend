@@ -44,3 +44,16 @@ export async function checkPorts(
 
 	return results;
 }
+
+// Run test cases directly when the file is executed (e.g., `bun run thisfile.ts` or `bun thisfile.ts`)
+// Uses `import.meta.main` to detect direct execution in Bun (ES module main entry point).
+if (import.meta.main) {
+	(async () => {
+		console.log("Running test...\n");
+		const openPortResult = await checkPort(443, "google.com");
+		console.log(
+			"Test - Open port (443 on google.com):",
+			openPortResult ? "PASS (reachable)" : "FAIL (not reachable)",
+		);
+	})();
+}

@@ -4,13 +4,14 @@ import { DEVBOX_LABELS } from "@/constants/devbox/devbox-labels.constant";
 import { BUILTIN_RESOURCES } from "@/constants/k8s/k8s-builtin.constant";
 import { CUSTOM_RESOURCES } from "@/constants/k8s/k8s-custom.constant";
 import { selectResources } from "@/lib/k8s/k8s-service.api";
+import { checkPorts } from "@/lib/network/network.api";
 import { transformMonitorData } from "@/lib/resource/resource.utils";
 import type { ResourceTypeTarget } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
 import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s-custom.model";
 import type { K8sResource } from "@/mvvm/k8s/models/k8s-resource.model";
 import type { MonitorData } from "@/mvvm/resource/models/resource-monitor.model";
-import { getDevboxMonitorData } from "./devbox.api";
+import { getDevbox, getDevboxMonitorData } from "./devbox.api";
 
 // ============================================================================
 // DevBox Service Functions (Higher-level business logic)
@@ -127,4 +128,72 @@ export const getDevboxResources = async (
 	}
 
 	return selectResources(context, targets);
+};
+
+/**
+ * Get devbox network status by checking port reachability
+ * @param context - K8s context
+ * @param target - Devbox target
+ * @returns Devbox ports with reachability status for public and private addresses
+ */
+export const getDevboxNetwork = async (
+	context: K8sContext,
+	target: CustomResourceTarget,
+) => {
+	// Get the devbox object first
+	const devbox = await getDevbox(context, target);
+
+	// Extract ports from the devbox object
+	const ports = devbox.ports || [];
+
+	// Check reachability for each port
+	const portChecks = await Promise.all(
+		ports.map(async (port) => {
+			const results: {
+				port: typeof port;
+				publicReachable?: boolean;
+				privateReachable?: boolean;
+			} = {
+				port,
+			};
+
+			// Check public address reachability if available
+			if (port.publicHost) {
+				try {
+					const publicResults = await checkPorts(
+						[port.number],
+						port.publicHost,
+					);
+					results.publicReachable = publicResults[0]?.reachable || false;
+				} catch (error) {
+					console.error(
+						`Error checking public address ${port.publicAddress}:`,
+						error,
+					);
+					results.publicReachable = false;
+				}
+			}
+
+			// Check private address reachability if available
+			if (port.privateHost) {
+				try {
+					const privateResults = await checkPorts(
+						[port.number],
+						port.privateHost,
+					);
+					results.privateReachable = privateResults[0]?.reachable || false;
+				} catch (error) {
+					console.error(
+						`Error checking private address ${port.privateAddress}:`,
+						error,
+					);
+					results.privateReachable = false;
+				}
+			}
+
+			return results;
+		}),
+	);
+
+	return portChecks;
 };

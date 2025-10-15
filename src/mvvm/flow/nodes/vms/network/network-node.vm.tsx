@@ -11,11 +11,11 @@ interface NetworkNodeProps {
 }
 
 export function NetworkNode({ data: { target } }: NetworkNodeProps) {
-	// const { data, isLoading, isError, error } = useNetworkStatus(target);
+	const { data, isLoading, isError, error } = useNetworkStatus(target);
 
-	// if (isLoading) return <div>Loading...</div>;
-	// if (isError) return <div>Error: {error?.message}</div>;
-	// if (!data) return <div>No data</div>;
+	if (isLoading) return <div>Loading...</div>;
+	if (isError) return <div>Error: {error?.message}</div>;
+	if (!data) return <div>No data</div>;
 
-	// return <NetworkNodeView data={data} />;
+	return <NetworkNodeView data={data} target={target} />;
 }

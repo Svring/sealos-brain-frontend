@@ -19,6 +19,7 @@ import {
 } from "@/lib/sealos/devbox/devbox.api";
 import {
 	getDevboxMonitor,
+	getDevboxNetwork,
 	getDevboxResources,
 } from "@/lib/sealos/devbox/devbox-service.api";
 import { createErrorFormatter } from "@/lib/trpc/trpc.utils";
@@ -92,9 +93,7 @@ export const devboxRouter = t.router({
 	network: t.procedure
 		.input(CustomResourceTargetSchema)
 		.query(async ({ input, ctx }) => {
-			// return await checkDevboxReady(ctx, input.name);
-			// // TODO: Implement check devbox ready
-			// throw new Error("Not implemented");
+			return await getDevboxNetwork(ctx, input);
 		}),
 
 	// Release Information

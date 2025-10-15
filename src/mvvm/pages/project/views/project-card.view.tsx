@@ -4,9 +4,15 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import React from "react";
 import { AvatarCircles } from "@/components/ui/avatar-circles";
-import { CLUSTER_TYPE_ICON_MAP } from "@/constants/cluster/cluster-icons.constant";
-import { DEVBOX_RUNTIME_ICONS } from "@/constants/devbox/devbox-icons.constant";
+import { 
+	CLUSTER_DEFAULT_ICON,
+	CLUSTER_TYPE_ICON_MAP 
+} from "@/constants/cluster/cluster-icons.constant";
+import { 
+	DEVBOX_ICON_BASE_URL
+} from "@/constants/devbox/devbox-icons.constant";
 import { LAUNCHPAD_DEFAULT_ICON } from "@/constants/launchpad/launchpad-icons.constant";
+import { OBJECTSTORAGE_DEFAULT_ICON } from "@/constants/osb/osb-icons.constant";
 import type { K8sItem } from "@/mvvm/k8s/models/k8s-resource.model";
 import type { InstanceObject } from "@/mvvm/sealos/instance/models/instance-object.model";
 
@@ -36,25 +42,28 @@ export const ProjectCardView = ({
 			{} as Record<string, K8sItem[]>,
 		);
 
-		// Generate icons for each resource
+		// Generate icons for each resource using the same logic as node views
 		const allIcons = resources
 			.map((item) => {
 				switch (item.resourceType) {
 					case "devbox":
-						return (
-							DEVBOX_RUNTIME_ICONS[item.runtime as string] ||
-							"/app_launchpad_icon.svg"
-						);
+						// Use the same logic as DevboxNodeView
+						return `${DEVBOX_ICON_BASE_URL}/${item.runtime}.svg`;
 					case "cluster":
+						// Use the same logic as ClusterNodeView
 						return (
 							CLUSTER_TYPE_ICON_MAP[item.type as string] ||
-							"/app_launchpad_icon.svg"
+							CLUSTER_DEFAULT_ICON
 						);
 					case "deployment":
 					case "statefulset":
-						return LAUNCHPAD_DEFAULT_ICON;
+						// Use the same logic as LaunchpadNodeView
+						return "/icons/launchpad/default.svg";
+					case "objectstorage":
+						// Use the same logic as OSBNodeView
+						return OBJECTSTORAGE_DEFAULT_ICON;
 					default:
-						return "/app_launchpad_icon.svg";
+						return LAUNCHPAD_DEFAULT_ICON;
 				}
 			})
 			.filter(Boolean) as string[];
@@ -76,21 +85,26 @@ export const ProjectCardView = ({
 
 					switch (item.resourceType) {
 						case "devbox":
-							iconUrl =
-								DEVBOX_RUNTIME_ICONS[item.runtime as string] ||
-								"/app_launchpad_icon.svg";
+							// Use the same logic as DevboxNodeView
+							iconUrl = `${DEVBOX_ICON_BASE_URL}/${item.runtime}.svg`;
 							break;
 						case "cluster":
+							// Use the same logic as ClusterNodeView
 							iconUrl =
 								CLUSTER_TYPE_ICON_MAP[item.type as string] ||
-								"/app_launchpad_icon.svg";
+								CLUSTER_DEFAULT_ICON;
 							break;
 						case "deployment":
 						case "statefulset":
-							iconUrl = LAUNCHPAD_DEFAULT_ICON;
+							// Use the same logic as LaunchpadNodeView
+							iconUrl = "/icons/launchpad/default.svg";
+							break;
+						case "objectstorage":
+							// Use the same logic as OSBNodeView
+							iconUrl = OBJECTSTORAGE_DEFAULT_ICON;
 							break;
 						default:
-							iconUrl = "/app_launchpad_icon.svg";
+							iconUrl = LAUNCHPAD_DEFAULT_ICON;
 					}
 
 					if (iconUrl) {

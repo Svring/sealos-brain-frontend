@@ -13,6 +13,7 @@ import {
 } from "@/lib/sealos/launchpad/launchpad.api";
 import {
 	getLaunchpadMonitor,
+	getLaunchpadNetwork,
 	getLaunchpadResources,
 } from "@/lib/sealos/launchpad/launchpad-service.api";
 import { createErrorFormatter } from "@/lib/trpc/trpc.utils";
@@ -63,7 +64,9 @@ export const launchpadRouter = t.router({
 
 	network: t.procedure
 		.input(BuiltinResourceTargetSchema)
-		.query(async ({ input, ctx }) => {}),
+		.query(async ({ input, ctx }) => {
+			return await getLaunchpadNetwork(ctx, input);
+		}),
 
 	// Monitoring
 	monitor: t.procedure

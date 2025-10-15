@@ -6,56 +6,51 @@ import {
 	useProjectState,
 } from "@/contexts/project/project.context";
 import { useAddChat } from "@/hooks/copilot/use-add-chat";
-import { useResourceObjects } from "@/hooks/resource/use-resource-objects";
+import { useResourceObject } from "@/hooks/resource/use-resource-object";
 import type { ResourceTarget } from "@/mvvm/k8s/models/k8s.model";
 
 interface BaseNodeProps {
-	width?: "auto" | "fixed";
 	children?: React.ReactNode;
 	target: ResourceTarget;
+	height?: number;
 }
 
 export const BaseNode = ({
-	width = "fixed",
 	children,
 	target,
+	height = 50,
 }: BaseNodeProps) => {
 	const { project } = useProjectState();
 	const { setActiveResource } = useProjectEvents();
-	const { data } = useResourceObjects([target]);
+	const { data } = useResourceObject(target);
 	const { handleAddChat } = useAddChat();
 
-	const handleNodeClick = () => {
-		// Extract resource ID from data
-		const resourceData = data?.[0];
-		const resourceId = resourceData?.uid;
-
-		if (!resourceId) {
+	const handleNodeClick = (event: React.MouseEvent<HTMLDivElement>) => {
+		if (event.target !== event.currentTarget) {
+			return;
+		}
+		if (!data?.uid) {
 			console.warn("No resource ID found for target:", target);
 			return;
 		}
 
 		// Set the active resource
 		setActiveResource({
-			uid: resourceId,
+			uid: data.uid,
 			target: target,
 		});
 
 		// Add chat with project and resource ID
-		handleAddChat(project?.uid, resourceId);
+		handleAddChat(project?.uid, data.uid);
 	};
 
 	// Determine the appropriate styling based on props
 	const getNodeStyling = () => {
 		let baseStyles =
-			"relative cursor-pointer rounded-xl border bg-background-secondary p-5 text-card-foreground h-50 hover:brightness-120";
+			"relative cursor-pointer rounded-xl border bg-background-secondary p-5 text-card-foreground hover:brightness-120";
 
-		// Add width classes based on width prop
-		if (width === "auto") {
-			baseStyles += " w-auto min-w-70 max-w-96";
-		} else {
-			baseStyles += " w-70";
-		}
+		// Add height and width classes
+		baseStyles += ` h-${height} w-70`;
 
 		return baseStyles;
 	};
