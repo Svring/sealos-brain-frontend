@@ -59,18 +59,15 @@ export const ClusterObjectSchema = z.object({
 	name: z.string(),
 	uid: z.string(),
 	resourceType: z.string().default("cluster"),
-	type: z
-		.enum([
-			"postgresql",
-			"mongodb",
-			"redis",
-			"apecloud-mysql",
-			"kafka",
-			"milvus",
-			"weaviate",
-		])
-		.nullable()
-		.optional(),
+	type: z.enum([
+		"postgresql",
+		"mongodb",
+		"redis",
+		"apecloud-mysql",
+		"kafka",
+		"milvus",
+		"weaviate",
+	]),
 	version: z.string(),
 	operationalStatus: z.any(),
 	status: z.string(),

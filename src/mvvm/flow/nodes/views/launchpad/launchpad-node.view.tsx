@@ -2,7 +2,11 @@
 
 import { HardDrive, Package } from "lucide-react";
 import { BaseNode } from "@/components/flow/nodes/base-node";
+import NodeLog from "@/components/flow/nodes/node-log";
+import NodeMonitor from "@/components/flow/nodes/node-monitor";
+import NodeStatus from "@/components/flow/nodes/node-status";
 import NodeTitle from "@/components/flow/nodes/node-title";
+import { launchpadParser } from "@/lib/sealos/launchpad/launchpad.parser";
 import type { LaunchpadObject } from "@/mvvm/sealos/launchpad/models/launchpad-object.model";
 
 interface LaunchpadNodeViewProps {
@@ -10,7 +14,7 @@ interface LaunchpadNodeViewProps {
 }
 
 export function LaunchpadNodeView({ data }: LaunchpadNodeViewProps) {
-	const { name, resourceType } = data;
+	const { name } = data;
 
 	// Extract data based on resource type
 	const image = data.image?.imageName || "N/A";
@@ -20,12 +24,19 @@ export function LaunchpadNodeView({ data }: LaunchpadNodeViewProps) {
 			? (data.resource as { storage: number }).storage || 20
 			: undefined;
 
+	// Create target for node components
+	const target = launchpadParser.toTarget(name);
+
 	return (
 		<BaseNode width="fixed">
 			<div className="flex h-full flex-col gap-2 justify-between">
 				{/* Header with Name and Dropdown */}
 				<div className="flex items-center justify-between">
-					<NodeTitle resourceType={resourceType} name={name} iconURL={image} />
+					<NodeTitle
+						resourceType={data.resourceType}
+						name={name}
+						iconURL={image}
+					/>
 
 					{/* Actions Dropdown Menu - Simulated */}
 					<div className="flex flex-row items-center gap-2 flex-shrink-0">
@@ -45,25 +56,18 @@ export function LaunchpadNodeView({ data }: LaunchpadNodeViewProps) {
 
 				{/* Bottom section with status and icons */}
 				<div className="mt-auto flex justify-between items-center">
-					{/* Left: Status light - Simulated */}
-					<div className="flex items-center gap-2">
-						<div className="w-2 h-2 rounded-full bg-green-500"></div>
-						<span className="text-xs text-muted-foreground">Running</span>
-					</div>
+					{/* Left: Status component */}
+					<NodeStatus target={target} />
 
-					{/* Right: Icon components - Simulated */}
+					{/* Right: Action components */}
 					<div className="flex items-center gap-2">
-						<div className="w-6 h-6 rounded border border-border bg-background hover:bg-muted cursor-pointer flex items-center justify-center">
-							<span className="text-xs">📋</span>
-						</div>
-						<div className="w-6 h-6 rounded border border-border bg-background hover:bg-muted cursor-pointer flex items-center justify-center">
-							<span className="text-xs">📊</span>
-						</div>
+						<NodeLog target={target} />
+						<NodeMonitor target={target} />
 					</div>
 				</div>
 
 				{/* Storage Volume Bar - Only for StatefulSet */}
-				{resourceType === "statefulset" && storage && (
+				{data.resourceType === "statefulset" && storage && (
 					<div className="relative bg-node-background w-full h-full flex items-center rounded-b-xl text-xs text-muted-foreground overflow-hidden px-2 py-1">
 						<div className="relative z-10 flex items-center justify-between w-full">
 							<div className="flex items-center gap-1">

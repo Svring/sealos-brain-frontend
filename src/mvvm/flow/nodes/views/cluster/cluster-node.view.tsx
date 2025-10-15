@@ -2,7 +2,12 @@
 
 import { Globe, HardDrive } from "lucide-react";
 import { BaseNode } from "@/components/flow/nodes/base-node";
+import NodeBackup from "@/components/flow/nodes/node-backup";
+import NodeLog from "@/components/flow/nodes/node-log";
+import NodeMonitor from "@/components/flow/nodes/node-monitor";
+import NodeStatus from "@/components/flow/nodes/node-status";
 import NodeTitle from "@/components/flow/nodes/node-title";
+import { clusterParser } from "@/lib/sealos/cluster/cluster.parser";
 import type { ClusterObject } from "@/mvvm/sealos/cluster/models/cluster-object.model";
 
 interface ClusterNodeViewProps {
@@ -13,12 +18,16 @@ export function ClusterNodeView({ data }: ClusterNodeViewProps) {
 	const { name, type, resource } = data;
 	const storage = resource.storage;
 	const hasPublicAccess = Array.isArray(data.connection.publicConnection);
+
+	// Create target for node components
+	const target = clusterParser.toTarget(name);
+
 	return (
 		<BaseNode width="fixed">
 			<div className="flex h-full flex-col gap-4 justify-between">
 				{/* Header with Name and Type */}
 				<div className="flex items-center justify-between">
-					<NodeTitle 
+					<NodeTitle
 						resourceType={type}
 						name={name}
 						iconURL="/cluster-icon.svg"
@@ -50,20 +59,14 @@ export function ClusterNodeView({ data }: ClusterNodeViewProps) {
 
 				{/* Bottom section with status and icons */}
 				<div className="mt-auto flex justify-between items-center">
-					{/* Left: Status light - Simulated */}
-					<div className="flex items-center gap-2">
-						<div className="w-2 h-2 rounded-full bg-green-500"></div>
-						<span className="text-xs text-muted-foreground">Running</span>
-					</div>
+					{/* Left: Status component */}
+					<NodeStatus target={target} />
 
-					{/* Right: Icon components - Simulated */}
+					{/* Right: Action components */}
 					<div className="flex items-center gap-2">
-						<div className="w-6 h-6 rounded border border-border bg-background hover:bg-muted cursor-pointer flex items-center justify-center">
-							<span className="text-xs">📋</span>
-						</div>
-						<div className="w-6 h-6 rounded border border-border bg-background hover:bg-muted cursor-pointer flex items-center justify-center">
-							<span className="text-xs">📊</span>
-						</div>
+						<NodeLog target={target} />
+						<NodeMonitor target={target} />
+						<NodeBackup target={target} />
 					</div>
 				</div>
 
