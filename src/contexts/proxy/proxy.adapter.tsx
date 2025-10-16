@@ -2,7 +2,7 @@
 
 import { useMachine } from "@xstate/react";
 import { type ReactNode, useEffect } from "react";
-import { useProxyToken } from "@/hooks/ai-proxy/use-proxy-token";
+import { useProxyToken } from "@/hooks/sealos/ai-proxy/use-proxy-token";
 import { composeAiProxyChatUrl } from "@/lib/sealos/ai-proxy/ai-proxy-utils";
 import { useAuthState } from "../auth/auth.context";
 import { proxyMachineContext } from "./proxy.context";

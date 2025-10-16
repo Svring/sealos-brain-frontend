@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import type React from "react";
 import { useEffect } from "react";
 import { useProjectEvents } from "@/contexts/project/project.context";
-import { useInstanceObject } from "@/hooks/instance/use-instance-object";
+import { useInstanceObject } from "@/hooks/sealos/instance/use-instance-object";
 import { instanceParser } from "@/lib/sealos/instance/instance.parser";
 
 interface LayoutProps {

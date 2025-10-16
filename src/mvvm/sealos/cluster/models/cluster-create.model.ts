@@ -5,12 +5,12 @@ import {
 	CLUSTER_REPLICAS_OPTIONS,
 	CLUSTER_STORAGE_OPTIONS,
 } from "@/constants/cluster/cluster-resource.constant";
-import { CLUSTER_ALL_TYPES } from "@/constants/cluster/cluster-type.constant";
+import { CLUSTER_AVAILABLE_TYPES } from "@/constants/cluster/cluster-type.constant";
 import { createNumberUnionSchema, nanoid } from "@/lib/utils";
 import { NameSchema } from "@/mvvm/k8s/models/k8s-resource.model";
 
 // Component schemas
-export const ClusterTypeSchema = z.enum(CLUSTER_ALL_TYPES);
+export const ClusterTypeSchema = z.enum(CLUSTER_AVAILABLE_TYPES);
 
 export const ClusterVersionSchema = z
 	.string()

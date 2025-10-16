@@ -1,6 +1,6 @@
 "use client";
 
-import { useInstanceResources } from "@/hooks/instance/use-instance-resources";
+import { useInstanceResources } from "@/hooks/sealos/instance/use-instance-resources";
 import { k8sParser } from "@/lib/k8s/k8s.parser";
 import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s-custom.model";
 import type { InstanceObject } from "@/mvvm/sealos/instance/models/instance-object.model";

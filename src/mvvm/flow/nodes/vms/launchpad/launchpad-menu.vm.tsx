@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useLaunchpadLifecycle } from "@/hooks/launchpad/use-launchpad-lifecycle";
+import { useLaunchpadLifecycle } from "@/hooks/sealos/launchpad/use-launchpad-lifecycle";
 import { LaunchpadMenuView } from "@/mvvm/flow/nodes/views/launchpad/launchpad-menu.view";
 import type { LaunchpadObject } from "@/mvvm/sealos/launchpad/models/launchpad-object.model";
 

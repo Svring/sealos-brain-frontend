@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useInstances } from "@/hooks/instance/use-instances";
+import { useInstances } from "@/hooks/sealos/instance/use-instances";
 import { PageView } from "../views/page.view";
 import { ProjectCard } from "./project-card.vm";
 

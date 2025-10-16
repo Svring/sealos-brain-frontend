@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useDevboxLifecycle } from "@/hooks/devbox/use-devbox-lifecycle";
+import { useDevboxLifecycle } from "@/hooks/sealos/devbox/use-devbox-lifecycle";
 import { DevboxMenuView } from "@/mvvm/flow/nodes/views/devbox/devbox-menu.view";
 import type { DevboxObject } from "@/mvvm/sealos/devbox/models/devbox-object.model";
 

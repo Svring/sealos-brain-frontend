@@ -24,7 +24,7 @@ export const DevboxPortCreateSchema = z.object({
 // Main devbox create form schema
 export const devboxCreateSchema = z.object({
 	name: NameSchema.default(() => `devbox-${nanoid()}`),
-	runtime: DevboxRuntimeSchema,
+	runtime: DevboxRuntimeSchema.default("next.js"),
 	resource: DevboxResourceSchema.default({
 		cpu: 1,
 		memory: 2,

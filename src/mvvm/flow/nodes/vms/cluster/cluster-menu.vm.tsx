@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useClusterLifecycle } from "@/hooks/cluster/use-cluster-lifecycle";
+import { useClusterLifecycle } from "@/hooks/sealos/cluster/use-cluster-lifecycle";
 import { ClusterMenuView } from "@/mvvm/flow/nodes/views/cluster/cluster-menu.view";
 import type { ClusterObject } from "@/mvvm/sealos/cluster/models/cluster-object.model";
 

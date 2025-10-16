@@ -155,7 +155,6 @@ export const deriveNetworkNodesAndEdges = (
 };
 
 export const createDevGroup = (nodes: Node[]): Node[] => {
-	console.log("createDevGroup", nodes);
 	const devboxNodes = _.filter(nodes, { type: "devbox" });
 	if (_.isEmpty(devboxNodes)) return nodes;
 
@@ -171,8 +170,6 @@ export const createDevGroup = (nodes: Node[]): Node[] => {
 			node.id.startsWith("network-") &&
 			devboxNames.has(node.id.replace("network-", "")),
 	);
-
-	console.log("devboxNetworkNodes", devboxNetworkNodes);
 
 	// Note: Database (cluster) nodes connected to devbox are no longer added to dev group
 	const clusterNodesConnectedToDevbox: Node[] = [];

@@ -1,5 +1,3 @@
-import type { NodeProps } from "@xyflow/react";
-
 export function DevGroupNodeView() {
 	return (
 		<div className="relative w-full h-full bg-transparent border border-border-primary border-dashed rounded-xl pointer-events-none">

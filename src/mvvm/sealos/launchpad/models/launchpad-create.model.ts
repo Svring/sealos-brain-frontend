@@ -32,7 +32,7 @@ export const LaunchpadResourceSchema = z.object({
 
 export const LaunchpadPortCreateSchema = z.object({
 	number: z.number().min(1).max(65535),
-	protocol: z.enum(["HTTP", "GRPC", "WS"]).default("HTTP"),
+	protocol: z.enum(["HTTP", "GRPC", "WS", "TCP", "UDP"]).default("HTTP"),
 	exposesPublicDomain: z.boolean().default(true),
 });
 

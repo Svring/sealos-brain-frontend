@@ -1,7 +1,7 @@
 "use client";
 
 import { useNodeClick } from "@/hooks/flow/use-node-click";
-import { useOsbObject } from "@/hooks/osb/use-osb-object";
+import { useOsbObject } from "@/hooks/sealos/osb/use-osb-object";
 import { OSBNodeView } from "@/mvvm/flow/nodes/views/osb/osb-node.view";
 import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s-custom.model";
 

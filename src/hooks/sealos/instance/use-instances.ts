@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useTRPCClients } from "../trpc/use-trpc-clients";
+import { useTRPCClients } from "../../trpc/use-trpc-clients";
 
 export const useInstances = () => {
 	const { instance } = useTRPCClients();

@@ -130,7 +130,7 @@ export const DevboxBridgeSchema = z.object({
 			path: ["status.phase"],
 		}),
 	),
-	resources: z
+	resource: z
 		.any()
 		.describe(
 			JSON.stringify({
