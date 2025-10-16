@@ -8,7 +8,7 @@ import { useLangGraphState } from "@/contexts/langgraph/langgraph.context";
 interface UseStreamContextProps {
 	apiUrl: string;
 	assistantId: string;
-	threadId: string;
+	threadId?: string;
 }
 
 export function useStreamContext({

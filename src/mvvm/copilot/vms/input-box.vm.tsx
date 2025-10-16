@@ -22,6 +22,7 @@ export const InputBox = React.forwardRef<HTMLDivElement, InputBoxVMProps>(
 			onSend = () => {},
 			onStop = () => {},
 			isLoading = false,
+			placeholder,
 			className,
 			textareaRef,
 			autoFocus = false,
@@ -73,14 +74,14 @@ export const InputBox = React.forwardRef<HTMLDivElement, InputBoxVMProps>(
 			}
 		}, [autoFocus]);
 
-		// Typewriter effect
+		// Typewriter effect - only show if no placeholder is provided
 		React.useEffect(() => {
-			if (exhibition && !input.trim() && !isFocused) {
+			if (exhibition && !input.trim() && !isFocused && !placeholder) {
 				const timer = setTimeout(() => setShowTypewriter(true), 1500);
 				return () => clearTimeout(timer);
 			}
 			setShowTypewriter(false);
-		}, [exhibition, input, isFocused]);
+		}, [exhibition, input, isFocused, placeholder]);
 
 		// Global keydown handler
 		React.useEffect(() => {
@@ -155,9 +156,10 @@ export const InputBox = React.forwardRef<HTMLDivElement, InputBoxVMProps>(
 				disabled={disableInput}
 				isLoading={isLoading}
 				showTypewriter={showTypewriter}
-				exhibitionTexts={exhibitionTexts}
+				exhibitionTexts={placeholder ? [] : exhibitionTexts}
 				value={input}
 				hasContent={hasContent}
+				placeholder={placeholder}
 				onInputChange={handleInputChange}
 				onKeyDown={handleKeyDown}
 				onFocus={handleFocus}

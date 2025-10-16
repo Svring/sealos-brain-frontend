@@ -5,18 +5,7 @@ import { useCopilotEvents } from "@/contexts/copilot/copilot.context";
 import { useProjectState } from "@/contexts/project/project.context";
 import { HeaderView } from "../views/header.view";
 
-interface HeaderProps {
-	isCreatingThread?: boolean;
-	isMaximized?: boolean;
-	showFocusToggle?: boolean;
-}
-
-export const Header = (props: HeaderProps) => {
-	const {
-		isCreatingThread = false,
-		isMaximized = false,
-		showFocusToggle = false,
-	} = props;
+export const Header = () => {
 
 	const { close } = useCopilotEvents();
 	const { project, activeResource } = useProjectState();
@@ -60,9 +49,6 @@ export const Header = (props: HeaderProps) => {
 			onClose={handleClose}
 			onFocusToggle={handleFocusToggle}
 			onThreadSelect={handleThreadSelect}
-			isCreatingThread={isCreatingThread}
-			isMaximized={isMaximized}
-			showFocusToggle={showFocusToggle}
 			threads={threads}
 			currentThreadId={threadId}
 		/>

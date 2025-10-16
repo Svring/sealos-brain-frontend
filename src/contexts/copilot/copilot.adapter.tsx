@@ -78,7 +78,7 @@ export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 	} = useStreamContext({
 		apiUrl: deploymentUrl,
 		assistantId: graphId,
-		threadId: threadId || "",
+		threadId: threadId ?? undefined,
 	});
 
 	return (

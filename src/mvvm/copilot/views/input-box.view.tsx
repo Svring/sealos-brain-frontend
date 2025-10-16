@@ -16,6 +16,7 @@ interface InputBoxProps {
 	exhibitionTexts?: string[];
 	value: string;
 	hasContent: boolean;
+	placeholder?: string;
 	onInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 	onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
 	onFocus: () => void;
@@ -37,6 +38,7 @@ export const InputBoxView = React.forwardRef<HTMLDivElement, InputBoxProps>(
 			exhibitionTexts = [],
 			value,
 			hasContent,
+			placeholder,
 			onInputChange,
 			onKeyDown,
 			onFocus,
@@ -61,6 +63,7 @@ export const InputBoxView = React.forwardRef<HTMLDivElement, InputBoxProps>(
 					<textarea
 						className="flex min-h-[44px] w-full resize-none rounded-md border-none bg-transparent px-3 py-2.5 focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50"
 						disabled={disabled}
+						placeholder={placeholder}
 						onChange={onInputChange}
 						onKeyDown={onKeyDown}
 						onCompositionStart={onCompositionStart}
