@@ -48,7 +48,7 @@ export function DevboxNodeView({
 	const iconURL = `${DEVBOX_ICON_BASE_URL}/${runtime}.svg`;
 
 	return (
-		<BaseNode>
+		<BaseNode height={50}>
 			<div className="flex h-full flex-col gap-2 justify-between" onClick={onClick}>
 				{/* Header with Name and Dropdown */}
 				<div className="flex items-center justify-between">

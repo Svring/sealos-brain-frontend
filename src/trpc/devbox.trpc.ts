@@ -18,6 +18,7 @@ import {
 	updateDevbox,
 } from "@/lib/sealos/devbox/devbox.api";
 import {
+	getDevboxDeployments,
 	getDevboxMonitor,
 	getDevboxNetwork,
 	getDevboxResources,
@@ -99,6 +100,10 @@ export const devboxRouter = t.router({
 	// Release Information
 	releases: t.procedure.input(z.string()).query(async ({ ctx, input }) => {
 		return await getDevboxReleases(ctx, input);
+	}),
+
+	deployments: t.procedure.input(z.string()).query(async ({ ctx, input }) => {
+		return await getDevboxDeployments(ctx, input);
 	}),
 
 	// Templates

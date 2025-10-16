@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useProjectState } from "@/contexts/project/project.context";
 import { OverlayControlView } from "../views/overlay-control.view";
 
 interface OverlayControlProps {
@@ -8,31 +9,12 @@ interface OverlayControlProps {
 }
 
 export function OverlayControl({ children }: OverlayControlProps) {
-	// Empty handlers for now - will be filled with real logic later
-	const handleOpenCommand = () => {
-		// TODO: Implement command dialog logic
-	};
+	const { project } = useProjectState();
 
-	const handleZoomIn = () => {
-		// TODO: Implement zoom in logic
-	};
+	// If project is null, just return children without overlay controls
+	if (!project) {
+		return <>{children}</>;
+	}
 
-	const handleZoomOut = () => {
-		// TODO: Implement zoom out logic
-	};
-
-	const handleReset = () => {
-		// TODO: Implement reset/fit view logic
-	};
-
-	return (
-		<OverlayControlView
-			onOpenCommand={handleOpenCommand}
-			onZoomIn={handleZoomIn}
-			onZoomOut={handleZoomOut}
-			onReset={handleReset}
-		>
-			{children}
-		</OverlayControlView>
-	);
+	return <OverlayControlView project={project}>{children}</OverlayControlView>;
 }

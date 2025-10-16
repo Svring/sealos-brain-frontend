@@ -5,11 +5,15 @@ import { BUILTIN_RESOURCES } from "@/constants/k8s/k8s-builtin.constant";
 import { CUSTOM_RESOURCES } from "@/constants/k8s/k8s-custom.constant";
 import { selectResources } from "@/lib/k8s/k8s-service.api";
 import { checkPorts } from "@/lib/network/network.api";
+import { resourceParser } from "@/lib/resource/resource.parser";
 import { transformMonitorData } from "@/lib/resource/resource.utils";
 import type { ResourceTypeTarget } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
 import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s-custom.model";
-import type { K8sResource } from "@/mvvm/k8s/models/k8s-resource.model";
+import type {
+	K8sItem,
+	K8sResource,
+} from "@/mvvm/k8s/models/k8s-resource.model";
 import type { MonitorData } from "@/mvvm/resource/models/resource-monitor.model";
 import { getDevbox, getDevboxMonitorData } from "./devbox.api";
 
@@ -196,4 +200,32 @@ export const getDevboxNetwork = async (
 	);
 
 	return portChecks;
+};
+
+/**
+ * Get devbox deployments
+ */
+export const getDevboxDeployments = async (
+	context: K8sContext,
+	devboxName: string,
+): Promise<K8sItem[]> => {
+	const targets: ResourceTypeTarget[] = [
+		{
+			type: "builtin",
+			resourceType: "deployment",
+			name: devboxName,
+			label: DEVBOX_LABELS.APP_DEVBOX_ID,
+		},
+		{
+			type: "builtin",
+			resourceType: "statefulset",
+			name: devboxName,
+			label: DEVBOX_LABELS.APP_DEVBOX_ID,
+		},
+	];
+
+	const selectedResources = await selectResources(context, targets);
+
+	// Convert resources to items using resourceParser
+	return resourceParser.toItems(selectedResources);
 };

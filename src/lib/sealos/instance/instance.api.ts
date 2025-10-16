@@ -3,8 +3,16 @@
 import https from "node:https";
 import axios from "axios";
 import _ from "lodash";
+import { INSTANCE_ANNOTATIONS } from "@/constants/instance/instance-annotations.constant";
 import { INSTANCE_LABELS } from "@/constants/instance/instance-labels.constant";
 import { k8sParser } from "@/lib/k8s/k8s.parser";
+import {
+	patchBuiltinResourceMetadata,
+	patchCustomResourceMetadata,
+	removeBuiltinResourceMetadata,
+	removeCustomResourceMetadata,
+	upsertCustomResource,
+} from "@/lib/k8s/k8s-mutation.api";
 import { getRegionUrlFromKubeconfig } from "@/lib/k8s/k8s-server.utils";
 import {
 	getResource,
@@ -13,7 +21,11 @@ import {
 } from "@/lib/k8s/k8s-service.api";
 import { resourceParser } from "@/lib/resource/resource.parser";
 import { instanceParser } from "@/lib/sealos/instance/instance.parser";
-import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s.model";
+import type {
+	BuiltinResourceTarget,
+	CustomResourceTarget,
+	ResourceTarget,
+} from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
 import type { K8sItem } from "@/mvvm/k8s/models/k8s-resource.model";
 import type { InstanceObject } from "@/mvvm/sealos/instance/models/instance-object.model";
@@ -151,4 +163,139 @@ export const deleteInstance = async (
 	const api = await createInstanceAxios(context, "v1/instance");
 	const response = await api.delete(`/${instanceName}`, {});
 	return response.data;
+};
+
+/**
+ * Add resources to instance
+ */
+export const addResourcesToInstance = async (
+	context: K8sContext,
+	target: CustomResourceTarget,
+	resources: ResourceTarget[],
+): Promise<{ success: boolean }> => {
+	// Add labels to all resources
+	for (const resource of resources) {
+		if (resource.type === "custom") {
+			await patchCustomResourceMetadata(
+				context,
+				resource,
+				"labels",
+				INSTANCE_LABELS.DEPLOY_ON_SEALOS,
+				target.name,
+			);
+		} else {
+			await patchBuiltinResourceMetadata(
+				context,
+				resource,
+				"labels",
+				INSTANCE_LABELS.DEPLOY_ON_SEALOS,
+				target.name,
+			);
+		}
+	}
+
+	return { success: true };
+};
+
+/**
+ * Remove resources from instance
+ */
+export const removeResourcesFromInstance = async (
+	context: K8sContext,
+	resources: ResourceTarget[],
+): Promise<{ success: boolean }> => {
+	// Remove instance label from all resources
+	for (const resource of resources) {
+		if (resource.type === "custom") {
+			await removeCustomResourceMetadata(
+				context,
+				resource,
+				"labels",
+				INSTANCE_LABELS.DEPLOY_ON_SEALOS,
+			);
+		} else {
+			// Type assertion for builtin resources
+			const builtinResource = resource as BuiltinResourceTarget;
+			await removeBuiltinResourceMetadata(
+				context,
+				builtinResource,
+				"labels",
+				INSTANCE_LABELS.DEPLOY_ON_SEALOS,
+			);
+		}
+	}
+
+	return { success: true };
+};
+
+/**
+ * Update instance display name
+ */
+export const updateInstanceName = async (
+	context: K8sContext,
+	input: { name: string; displayName: string },
+): Promise<{
+	name: string;
+	newDisplayName: string;
+}> => {
+	const { name, displayName } = input;
+	const target = {
+		type: "custom" as const,
+		resourceType: "instance" as const,
+		name,
+	};
+
+	await patchCustomResourceMetadata(
+		context,
+		target,
+		"annotations",
+		INSTANCE_ANNOTATIONS.DISPLAY_NAME,
+		displayName,
+	);
+
+	return {
+		name,
+		newDisplayName: displayName,
+	};
+};
+
+/**
+ * Create a new instance
+ */
+export const createInstance = async (
+	context: K8sContext,
+	input: { name: string },
+): Promise<InstanceObject> => {
+	const { name } = input;
+	const target = {
+		type: "custom" as const,
+		resourceType: "instance" as const,
+		name,
+	};
+
+	const resourceBody = {
+		apiVersion: "app.sealos.io/v1",
+		kind: "Instance",
+		metadata: {
+			name,
+			labels: {
+				[INSTANCE_LABELS.DEPLOY_ON_SEALOS]: name,
+			},
+		},
+		spec: {
+			templateType: "inline",
+			defaults: {
+				app_name: {
+					type: "string",
+					value: name,
+				},
+			},
+			title: name,
+		},
+	};
+
+	const instanceResource = await upsertCustomResource(context, target, resourceBody);
+
+	// Convert to instance object using parser
+	return instanceParser.toObject(instanceResource);
 };

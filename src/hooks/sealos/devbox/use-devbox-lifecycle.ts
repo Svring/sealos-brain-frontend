@@ -11,6 +11,7 @@ export const useDevboxLifecycle = () => {
 	const pauseMutation = useMutation(devbox.pause.mutationOptions());
 	const restartMutation = useMutation(devbox.restart.mutationOptions());
 	const shutdownMutation = useMutation(devbox.shutdown.mutationOptions());
+	const autostartMutation = useMutation(devbox.autostart.mutationOptions());
 
 	const executeAction = async (action: string, devboxName: string) => {
 		const target = devboxParser.toTarget(devboxName);
@@ -27,6 +28,9 @@ export const useDevboxLifecycle = () => {
 			case "shutdown":
 				await shutdownMutation.mutateAsync(target);
 				break;
+			case "autostart":
+				await autostartMutation.mutateAsync(target);
+				break;
 		}
 	};
 
@@ -42,6 +46,10 @@ export const useDevboxLifecycle = () => {
 					return restartMutation.isPending;
 				case "shutdown":
 					return shutdownMutation.isPending;
+				case "autostart":
+					return autostartMutation.isPending;
+				default:
+					return false;
 			}
 		},
 	};

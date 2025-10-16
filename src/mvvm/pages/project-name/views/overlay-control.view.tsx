@@ -1,8 +1,22 @@
 "use client";
 
-import { Command, Scan, ZoomIn, ZoomOut } from "lucide-react";
+import { ChevronDownIcon, Scan } from "lucide-react";
 import type { ReactNode } from "react";
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+	BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
 	Tooltip,
@@ -13,17 +27,16 @@ import {
 
 interface OverlayControlProps {
 	children: ReactNode;
-	onOpenCommand?: () => void;
-	onZoomIn?: () => void;
-	onZoomOut?: () => void;
+	project?: {
+		name: string;
+		displayName?: string;
+	};
 	onReset?: () => void;
 }
 
 export const OverlayControlView = ({
 	children,
-	onOpenCommand,
-	onZoomIn,
-	onZoomOut,
+	project,
 	onReset,
 }: OverlayControlProps) => {
 	return (
@@ -31,8 +44,34 @@ export const OverlayControlView = ({
 			{children}
 
 			{/* Floating control buttons overlay */}
-			<div className="absolute top-2 left-2 z-50">
+			<div className="absolute top-2 left-2 z-50 flex items-center gap-2">
 				<SidebarTrigger />
+
+				<Breadcrumb>
+					<BreadcrumbList>
+						<BreadcrumbItem>
+							<BreadcrumbLink href="/project">Project</BreadcrumbLink>
+						</BreadcrumbItem>
+						<BreadcrumbSeparator />
+						<BreadcrumbItem>
+							<DropdownMenu>
+								<DropdownMenuTrigger className="flex items-center gap-1 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5">
+									<BreadcrumbPage className="hover:underline cursor-pointer">
+										{project?.displayName?.slice(0, 12)}
+										{project?.displayName &&
+											project.displayName.length > 12 &&
+											"..."}
+									</BreadcrumbPage>
+									<ChevronDownIcon />
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="start">
+									<DropdownMenuItem>Project 1</DropdownMenuItem>
+									<DropdownMenuItem>Project 2</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</BreadcrumbItem>
+					</BreadcrumbList>
+				</Breadcrumb>
 			</div>
 
 			{/* Right side floating actions */}

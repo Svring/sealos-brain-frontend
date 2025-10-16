@@ -1,10 +1,14 @@
 import { initTRPC } from "@trpc/server";
 import { z } from "zod";
 import {
+	addResourcesToInstance,
+	createInstance,
 	deleteInstance,
 	getInstance,
 	getInstanceResources,
 	listInstances,
+	removeResourcesFromInstance,
+	updateInstanceName,
 } from "@/lib/sealos/instance/instance.api";
 import { createErrorFormatter } from "@/lib/trpc/trpc.utils";
 import {
@@ -13,8 +17,9 @@ import {
 } from "@/mvvm/k8s/models/k8s.model";
 import type { K8sContext } from "@/mvvm/k8s/models/k8s-context.model";
 import { K8sItemSchema } from "@/mvvm/k8s/models/k8s-resource.model";
+import { instanceCreateSchema } from "@/mvvm/sealos/instance/models/instance-create.model";
 import { InstanceObjectSchema } from "@/mvvm/sealos/instance/models/instance-object.model";
-import { InstanceResourceSchema } from "@/mvvm/sealos/instance/models/instance-resource.model";
+import { instanceUpdateSchema } from "@/mvvm/sealos/instance/models/instance-update.model";
 
 // Context creation function
 export async function createInstanceContext(opts: {
@@ -63,19 +68,10 @@ export const instanceRouter = t.router({
 
 	// Instance Lifecycle Management
 	create: t.procedure
-		.input(
-			z.object({
-				name: z.string(),
-				title: z.string().optional(),
-				description: z.string().optional(),
-				templateType: z.string().default("inline"),
-				defaults: z.record(z.string(), z.any()).optional(),
-			}),
-		)
-		.output(InstanceResourceSchema)
+		.input(instanceCreateSchema)
+		.output(InstanceObjectSchema)
 		.mutation(async ({ ctx, input }) => {
-			// TODO: Implement create instance
-			throw new Error("Not implemented");
+			return await createInstance(ctx, input);
 		}),
 
 	delete: t.procedure
@@ -86,34 +82,28 @@ export const instanceRouter = t.router({
 
 	// Instance Configuration
 	update: t.procedure
-		.input(
-			z.object({
-				target: CustomResourceTargetSchema,
-				newDisplayName: z.string(),
-			}),
-		)
+		.input(instanceUpdateSchema)
 		.output(
 			z.object({
-				target: CustomResourceTargetSchema,
+				name: z.string(),
 				newDisplayName: z.string(),
 			}),
 		)
 		.mutation(async ({ ctx, input }) => {
-			// TODO: Implement update instance name
-			throw new Error("Not implemented");
+			return await updateInstanceName(ctx, input);
 		}),
 
 	// Resource Management
 	addResources: t.procedure
 		.input(
 			z.object({
+				target: CustomResourceTargetSchema,
 				resources: z.array(resourceTargetSchema),
-				name: z.string(),
 			}),
 		)
+		.output(z.object({ success: z.boolean() }))
 		.mutation(async ({ ctx, input }) => {
-			// TODO: Implement add resources to instance
-			throw new Error("Not implemented");
+			return await addResourcesToInstance(ctx, input.target, input.resources);
 		}),
 
 	removeResources: t.procedure
@@ -122,9 +112,9 @@ export const instanceRouter = t.router({
 				resources: z.array(resourceTargetSchema),
 			}),
 		)
+		.output(z.object({ success: z.boolean() }))
 		.mutation(async ({ ctx, input }) => {
-			// TODO: Implement remove resources from instance
-			throw new Error("Not implemented");
+			return await removeResourcesFromInstance(ctx, input.resources);
 		}),
 });
 
