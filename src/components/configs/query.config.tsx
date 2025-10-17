@@ -6,7 +6,6 @@ import {
 	QueryClient,
 	QueryClientProvider,
 } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import TRPCConfig from "./query-trpc.config";
 
 function makeQueryClient() {
@@ -48,7 +47,6 @@ export default function QueryConfig({
 	return (
 		<QueryClientProvider client={queryClient}>
 			<TRPCConfig queryClient={queryClient}>{children}</TRPCConfig>
-			<ReactQueryDevtools buttonPosition="bottom-left" initialIsOpen={false} />
 		</QueryClientProvider>
 	);
 }

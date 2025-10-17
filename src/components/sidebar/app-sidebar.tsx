@@ -45,8 +45,6 @@ export function AppSidebar() {
 	const { data: quotaObject, isLoading } = useQuota();
 	const { mode } = useEnvState();
 
-	console.log(quotaObject);
-
 	return (
 		<Sidebar variant="inset" collapsible="icon">
 			<SidebarHeader>

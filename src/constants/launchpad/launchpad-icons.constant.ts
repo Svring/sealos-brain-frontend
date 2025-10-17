@@ -1,2 +1,3 @@
-export const LAUNCHPAD_DEFAULT_ICON =
-  "/app_launchpad_icon.svg";
+export const LAUNCHPAD_ICON_BASE_URL = "/launchpad";
+
+export const LAUNCHPAD_DEFAULT_ICON = "/launchpad/default.svg";

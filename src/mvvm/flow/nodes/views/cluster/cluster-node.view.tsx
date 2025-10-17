@@ -9,8 +9,7 @@ import NodeStatus from "@/components/flow/nodes/node-status";
 import NodeTitle from "@/components/flow/nodes/node-title";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import {
-	CLUSTER_DEFAULT_ICON,
-	CLUSTER_TYPE_ICON_MAP,
+	CLUSTER_ICON_BASE_URL,
 } from "@/constants/cluster/cluster-icons.constant";
 import { clusterParser } from "@/lib/sealos/cluster/cluster.parser";
 import type { ClusterObject } from "@/mvvm/sealos/cluster/models/cluster-object.model";
@@ -49,6 +48,9 @@ export function ClusterNodeView({
 	const storage = resource.storage;
 	const hasPublicAccess = Array.isArray(data.connection.publicConnection);
 
+	// Create icon URL using base URL and type
+	const iconURL = `${CLUSTER_ICON_BASE_URL}/${type}.svg`;
+
 	// Create target for node components
 	const target = clusterParser.toTarget(name);
 
@@ -60,7 +62,7 @@ export function ClusterNodeView({
 					<NodeTitle
 						resourceType={type}
 						name={name}
-						iconURL={CLUSTER_TYPE_ICON_MAP[type] || CLUSTER_DEFAULT_ICON}
+						iconURL={iconURL}
 					/>
 
 					{/* Actions Dropdown Menu */}

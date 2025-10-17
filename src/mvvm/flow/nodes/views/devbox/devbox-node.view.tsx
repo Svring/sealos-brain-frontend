@@ -26,7 +26,7 @@ interface DevboxNodeViewProps {
 	isDeleteConfirmationValid?: boolean;
 }
 
-export function DevboxNodeView({ 
+export function DevboxNodeView({
 	data,
 	onClick,
 	status = "Running",
@@ -49,7 +49,10 @@ export function DevboxNodeView({
 
 	return (
 		<BaseNode height={50}>
-			<div className="flex h-full flex-col gap-2 justify-between" onClick={onClick}>
+			<div
+				className="flex h-full flex-col gap-2 justify-between"
+				onClick={onClick}
+			>
 				{/* Header with Name and Dropdown */}
 				<div className="flex items-center justify-between">
 					<NodeTitle

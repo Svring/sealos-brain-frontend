@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type React from "react";
+import { DevboxToolConfig } from "@/components/configs/devbox-tool.config";
 import QueryConfig from "@/components/configs/query.config";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -26,6 +27,11 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
+			<head>
+				{process.env.MODE === "development" ? (
+					<script src="https://unpkg.com/react-scan/dist/auto.global.js" />
+				) : null}
+			</head>
 			<body>
 				<ThemeProvider
 					attribute="class"
@@ -37,20 +43,24 @@ export default function RootLayout({
 						<EnvProvider>
 							<AuthProvider>
 								<QueryConfig>
-									<ProxyProvider>
-										<LangGraphProvider>
-											<CopilotProvider>
-												<ProjectProvider>
-													<SidebarProvider defaultOpen={false}>
-														<AppSidebar />
-														<SidebarInset>
-															<main className="h-full w-full">{children}</main>
-														</SidebarInset>
-													</SidebarProvider>
-												</ProjectProvider>
-											</CopilotProvider>
-										</LangGraphProvider>
-									</ProxyProvider>
+									<DevboxToolConfig>
+										<ProxyProvider>
+											<LangGraphProvider>
+												<CopilotProvider>
+													<ProjectProvider>
+														<SidebarProvider defaultOpen={false}>
+															<AppSidebar />
+															<SidebarInset>
+																<main className="h-full w-full">
+																	{children}
+																</main>
+															</SidebarInset>
+														</SidebarProvider>
+													</ProjectProvider>
+												</CopilotProvider>
+											</LangGraphProvider>
+										</ProxyProvider>
+									</DevboxToolConfig>
 								</QueryConfig>
 							</AuthProvider>
 						</EnvProvider>

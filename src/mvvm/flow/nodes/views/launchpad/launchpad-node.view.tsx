@@ -7,6 +7,7 @@ import NodeMonitor from "@/components/flow/nodes/node-monitor";
 import NodeStatus from "@/components/flow/nodes/node-status";
 import NodeTitle from "@/components/flow/nodes/node-title";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
+import { LAUNCHPAD_DEFAULT_ICON } from "@/constants/launchpad/launchpad-icons.constant";
 import { launchpadParser } from "@/lib/sealos/launchpad/launchpad.parser";
 import type { LaunchpadObject } from "@/mvvm/sealos/launchpad/models/launchpad-object.model";
 import { LaunchpadMenuTrigger, LaunchpadMenuView } from "./launchpad-menu.view";
@@ -45,7 +46,7 @@ export function LaunchpadNodeView({
 	const { name, resourceType, image } = data;
 
 	// Extract data based on resource type
-	const iconURL = "/icons/launchpad/default.svg";
+	const iconURL = LAUNCHPAD_DEFAULT_ICON;
 
 	const storage =
 		data.resourceType === "statefulset"
@@ -57,7 +58,10 @@ export function LaunchpadNodeView({
 
 	return (
 		<BaseNode>
-			<div className="flex h-full flex-col gap-2 justify-between" onClick={onClick}>
+			<div
+				className="flex h-full flex-col gap-2 justify-between"
+				onClick={onClick}
+			>
 				{/* Header with Name and Dropdown */}
 				<div className="flex items-center justify-between gap-2">
 					<NodeTitle

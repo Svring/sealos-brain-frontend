@@ -1,3 +1,5 @@
+export const CLUSTER_ICON_BASE_URL = "/cluster/type";
+
 export const CLUSTER_DEFAULT_ICON =
   "https://dbprovider.bja.sealos.run/logo.svg";
 
@@ -13,5 +15,4 @@ export const CLUSTER_TYPE_ICON_MAP: Record<string, string> = {
   kafka: "/kafka-icon.svg",
   weaviate: "https://avatars.githubusercontent.com/u/43707538?s=200&v=4",
   milvus: "https://dbprovider.bja.sealos.run/images/milvus.svg",
-  pulsar: "https://pulsar.apache.org/img/pulsar.svg",
 };

@@ -1,5 +1,4 @@
-export const DEVBOX_ICON_BASE_URL =
-	"https://devbox.usw.sealos.io/images/brain/runtime";
+export const DEVBOX_ICON_BASE_URL = "/devbox/runtime";
 
 export const DEVBOX_DEFAULT_ICON = "https://devbox.bja.sealos.run/logo.svg";
 
