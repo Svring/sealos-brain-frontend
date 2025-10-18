@@ -8,37 +8,20 @@ import NodeTitle from "@/components/flow/nodes/node-title";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { DEVBOX_ICON_BASE_URL } from "@/constants/devbox/devbox-icons.constant";
 import { devboxParser } from "@/lib/sealos/devbox/devbox.parser";
+import { DevboxMenu } from "@/mvvm/flow/nodes/vms/devbox/devbox-menu.vm";
 import type { DevboxObject } from "@/mvvm/sealos/devbox/models/devbox-object.model";
-import { DevboxMenuTrigger, DevboxMenuView } from "./devbox-menu.view";
+import { DevboxMenuTrigger } from "./devbox-menu.view";
 
 interface DevboxNodeViewProps {
 	data: DevboxObject;
-	onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
-	status?: string;
-	showDeleteDialog?: boolean;
-	setShowDeleteDialog?: (show: boolean) => void;
-	deleteConfirmationValue?: string;
-	setDeleteConfirmationValue?: (value: string) => void;
-	handleDeleteClick?: () => void;
-	handleDeleteConfirm?: () => void;
-	executeAction?: (action: string, name: string) => void;
-	isPending?: (action: string) => boolean;
-	isDeleteConfirmationValid?: boolean;
+	onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+	onDelete?: (devboxName: string) => void;
 }
 
 export function DevboxNodeView({
 	data,
 	onClick,
-	status = "Running",
-	showDeleteDialog = false,
-	setShowDeleteDialog = () => {},
-	deleteConfirmationValue = "",
-	setDeleteConfirmationValue = () => {},
-	handleDeleteClick = () => {},
-	handleDeleteConfirm = () => {},
-	executeAction = () => {},
-	isPending = () => false,
-	isDeleteConfirmationValid = false,
+	onDelete,
 }: DevboxNodeViewProps) {
 	const { name, runtime, resourceType } = data;
 
@@ -49,9 +32,10 @@ export function DevboxNodeView({
 
 	return (
 		<BaseNode>
-			<div
-				className="flex h-full flex-col gap-2 justify-between"
+			<button
+				className="flex h-full flex-col gap-2 justify-between w-full text-left"
 				onClick={onClick}
+				type="button"
 			>
 				{/* Header with Name and Dropdown */}
 				<div className="flex items-center justify-between">
@@ -65,23 +49,14 @@ export function DevboxNodeView({
 					<div className="flex flex-row items-center gap-2 flex-shrink-0">
 						<DropdownMenu>
 							<DevboxMenuTrigger>
-								<div className="w-6 h-6 rounded bg-background hover:bg-muted cursor-pointer flex items-center justify-center">
+								<button
+									type="button"
+									className="w-6 h-6 rounded bg-background hover:bg-muted cursor-pointer flex items-center justify-center"
+								>
 									<MoreHorizontal className="h-4 w-4" />
-								</div>
+								</button>
 							</DevboxMenuTrigger>
-							<DevboxMenuView
-								devboxName={name}
-								status={status}
-								showDeleteDialog={showDeleteDialog}
-								setShowDeleteDialog={setShowDeleteDialog}
-								deleteConfirmationValue={deleteConfirmationValue}
-								setDeleteConfirmationValue={setDeleteConfirmationValue}
-								handleDeleteClick={handleDeleteClick}
-								handleDeleteConfirm={handleDeleteConfirm}
-								executeAction={executeAction}
-								isPending={isPending}
-								isDeleteConfirmationValid={isDeleteConfirmationValid}
-							/>
+							<DevboxMenu object={data} onDelete={onDelete} />
 						</DropdownMenu>
 					</div>
 				</div>
@@ -104,7 +79,7 @@ export function DevboxNodeView({
 						<NodeMonitor target={target} />
 					</div>
 				</div>
-			</div>
+			</button>
 		</BaseNode>
 	);
 }

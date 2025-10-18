@@ -10,14 +10,20 @@ export interface Resource {
 	target: ResourceTarget;
 }
 
+export interface Project {
+	uid: string;
+	target: ResourceTarget;
+	object: InstanceObject;
+}
+
 export interface ProjectContext {
-	project: InstanceObject | null;
+	project: Project | null;
 	allResources: Resource[];
 	activeResource: Resource | null;
 }
 
 export type ProjectEvent =
-	| { type: "SET_PROJECT"; project: InstanceObject }
+	| { type: "SET_PROJECT"; project: Project }
 	| { type: "CLEAR_PROJECT" }
 	| { type: "SET_ALL_RESOURCES"; resources: Resource[] }
 	| { type: "ADD_RESOURCE"; resource: Resource }

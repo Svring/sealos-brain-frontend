@@ -61,7 +61,7 @@ export function LaunchpadMenuView({
 	return (
 		<>
 			<DropdownMenuContent
-				className="rounded-xl bg-background-secondary"
+				className="rounded-xl bg-background-tertiary"
 				align="start"
 			>
 				{!isRunning && !isPendingStatus && (

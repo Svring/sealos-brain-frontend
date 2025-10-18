@@ -2,8 +2,12 @@
 
 import { createContext, use, useCallback } from "react";
 import type { EventFrom, StateFrom } from "xstate";
-import type { InstanceObject } from "@/mvvm/sealos/instance/models/instance-object.model";
-import type { ProjectContext, projectMachine, Resource } from "./project.state";
+import type {
+	Project,
+	ProjectContext,
+	projectMachine,
+	Resource,
+} from "./project.state";
 
 interface ProjectContextValue {
 	project: ProjectContext;
@@ -46,7 +50,7 @@ export function useProjectEvents() {
 
 	return {
 		setProject: useCallback(
-			(project: InstanceObject) => send({ type: "SET_PROJECT", project }),
+			(project: Project) => send({ type: "SET_PROJECT", project }),
 			[send],
 		),
 		clearProject: useCallback(() => send({ type: "CLEAR_PROJECT" }), [send]),

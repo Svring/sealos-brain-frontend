@@ -18,7 +18,7 @@ export function ChatboxView(props: ChatboxViewProps) {
 	const { messages, isLoading, onSend, onStop } = props;
 
 	return (
-		<div className="h-full w-full flex flex-col bg-background-secondary border rounded-lg">
+		<div className="h-full w-full flex flex-col bg-background-tertiary border rounded-lg">
 			{/* Header */}
 			<Header/>
 

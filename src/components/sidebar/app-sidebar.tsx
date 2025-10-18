@@ -1,7 +1,7 @@
 "use client";
 
 import { LayoutGrid, LogOut, MessageCirclePlus, Sparkles } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
 	Popover,
 	PopoverContent,
@@ -42,6 +42,7 @@ const mainItems = [
 export function AppSidebar() {
 	const { fail } = useAuthEvents();
 	const router = useRouter();
+	const pathname = usePathname();
 	const { data: quotaObject, isLoading } = useQuota();
 	const { mode } = useEnvState();
 
@@ -71,7 +72,7 @@ export function AppSidebar() {
 						<SidebarMenu>
 							{mainItems.map((item) => (
 								<SidebarMenuItem key={item.title}>
-									<SidebarMenuButton asChild>
+									<SidebarMenuButton asChild isActive={pathname === item.url}>
 										<a href={item.url}>
 											<item.icon />
 											<span>{item.title}</span>

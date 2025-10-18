@@ -53,7 +53,7 @@ export function DevboxMenuView({
 	return (
 		<>
 			<DropdownMenuContent
-				className="rounded-xl bg-background-secondary"
+				className="rounded-xl bg-background-tertiary"
 				align="start"
 			>
 				{status !== "Running" && (

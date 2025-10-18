@@ -14,7 +14,7 @@ export default function NodeTitle({
   return (
     <div className="flex items-center gap-2 truncate font-medium flex-1 min-w-0">
       <div className="flex flex-col items-start">
-        <span className="flex items-center gap-4">
+        <span className="flex items-center gap-2">
           <img
             src={iconURL}
             alt={`Icon`}

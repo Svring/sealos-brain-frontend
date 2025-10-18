@@ -12,7 +12,7 @@ interface ClusterMenuProps {
 
 export function ClusterMenu({ object, onDelete }: ClusterMenuProps) {
 	const { name: clusterName, status } = object;
-	const { executeAction, isPending } = useClusterLifecycle();
+	const { mutate: executeAction, isPending } = useClusterLifecycle();
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 	const [deleteConfirmationValue, setDeleteConfirmationValue] = useState("");
 

@@ -1,8 +1,32 @@
 import { formatUnixTimeInLocalTimezone } from "@/lib/date/date-utils";
+import type { ResourceTarget } from "@/mvvm/k8s/models/k8s.model";
 import type {
 	MonitorData,
 	MonitorDataPoint,
 } from "@/mvvm/resource/models/resource-monitor.model";
+
+// ============================================================================
+// RESOURCE ICON UTILITIES
+// ============================================================================
+
+/**
+ * Gets the appropriate icon path for a resource based on its target type
+ */
+export function getResourceIcon(target: ResourceTarget): string {
+	const { resourceType } = target;
+
+	switch (resourceType) {
+		case "devbox":
+		case "cluster":
+		case "instance":
+			return `/${resourceType}/default.svg`;
+		case "deployment":
+		case "statefulset":
+			return "/launchpad/default.svg";
+		default:
+			return "/launchpad/default.svg";
+	}
+}
 
 // ============================================================================
 // MONITOR DATA TRANSFORMATION

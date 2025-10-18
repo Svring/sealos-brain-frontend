@@ -133,11 +133,7 @@ export const ProjectCardView = ({
 
 	return (
 		<Link {...commonLinkProps}>
-			<motion.div
-				className="relative flex w-full cursor-pointer rounded-lg border bg-background-tertiary text-left shadow-sm min-h-[160px] flex-col p-4 py-3"
-				whileHover={{ y: -5 }}
-				transition={{ duration: 0.15, ease: "easeInOut" }}
-			>
+			<motion.div className="relative flex w-full cursor-pointer rounded-lg border bg-background-tertiary text-left shadow-sm min-h-[160px] flex-col p-4 py-3">
 				<div className="flex items-center w-full gap-2">
 					<div className="flex items-center space-x-1 min-w-0 group flex-1">
 						<p className="text-foreground truncate transition-colors">

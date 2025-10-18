@@ -15,7 +15,7 @@ export const BaseNode = ({
 	// Determine the appropriate styling based on props
 	const getNodeStyling = () => {
 		let baseStyles =
-			"relative cursor-pointer rounded-xl border bg-background-secondary p-5 text-card-foreground hover:brightness-120";
+			"relative cursor-pointer rounded-xl border bg-background-tertiary p-5 text-card-foreground hover:brightness-120";
 
 		// Add height and width classes
 		baseStyles += `h-50 h-${height} w-70`;

@@ -1,6 +1,9 @@
 "use client";
 
-import { useProjectEvents, useProjectState } from "@/contexts/project/project.context";
+import {
+	useProjectEvents,
+	useProjectState,
+} from "@/contexts/project/project.context";
 import { useAddChat } from "@/hooks/copilot/use-add-chat";
 import type { ResourceTarget } from "@/mvvm/k8s/models/k8s.model";
 
@@ -18,7 +21,7 @@ export function useNodeClick({ resourceUid, target }: UseNodeClickProps) {
 		if (event.target !== event.currentTarget) {
 			return;
 		}
-		
+
 		if (!resourceUid) {
 			console.warn("No resource ID provided for node click");
 			return;

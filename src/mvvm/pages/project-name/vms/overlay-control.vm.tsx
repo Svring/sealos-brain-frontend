@@ -16,5 +16,7 @@ export function OverlayControl({ children }: OverlayControlProps) {
 		return <>{children}</>;
 	}
 
-	return <OverlayControlView project={project}>{children}</OverlayControlView>;
+	return (
+		<OverlayControlView project={project.object}>{children}</OverlayControlView>
+	);
 }

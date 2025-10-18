@@ -7,10 +7,16 @@ export interface Chat {
 	metadata: Record<string, string>;
 }
 
+// View object interface
+export interface View {
+	type: 'chat' | 'info';
+}
+
 // Copilot context interface
 export interface CopilotContext {
 	chats: Chat[];
 	opened: boolean;
+	view: View;
 }
 
 export type CopilotEvent =
@@ -21,7 +27,9 @@ export type CopilotEvent =
 	| { type: "CLEAR_CHATS" }
 	| { type: "OPEN_COPILOT" }
 	| { type: "CLOSE_COPILOT" }
-	| { type: "TOGGLE_COPILOT" };
+	| { type: "TOGGLE_COPILOT" }
+	| { type: "SET_VIEW"; view: View }
+	| { type: "SET_VIEW_TYPE"; viewType: 'chat' | 'info' };
 
 export const copilotMachine = createMachine({
 	types: {} as {
@@ -33,6 +41,7 @@ export const copilotMachine = createMachine({
 	context: {
 		chats: [],
 		opened: false,
+		view: { type: 'chat' },
 	},
 	states: {
 		idle: {
@@ -71,6 +80,16 @@ export const copilotMachine = createMachine({
 				TOGGLE_COPILOT: {
 					actions: assign({
 						opened: ({ context }) => !context.opened,
+					}),
+				},
+				SET_VIEW: {
+					actions: assign({
+						view: ({ event }) => event.view,
+					}),
+				},
+				SET_VIEW_TYPE: {
+					actions: assign({
+						view: ({ event }) => ({ type: event.viewType }),
 					}),
 				},
 			},

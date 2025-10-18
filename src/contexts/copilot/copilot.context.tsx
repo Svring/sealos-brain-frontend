@@ -2,11 +2,12 @@
 
 import { createContext, use, useCallback } from "react";
 import type { EventFrom, StateFrom } from "xstate";
-import type { Chat, copilotMachine } from "./copilot.state";
+import type { Chat, copilotMachine, View } from "./copilot.state";
 
 interface CopilotMachineContextValue {
 	chats: Chat[];
 	opened: boolean;
+	view: View;
 	state: StateFrom<typeof copilotMachine>;
 	send: (event: EventFrom<typeof copilotMachine>) => void;
 }
@@ -31,6 +32,7 @@ export function useCopilotState() {
 	return {
 		chats: state.context.chats,
 		opened: state.context.opened,
+		view: state.context.view,
 		isIdle: state.matches("idle"),
 	};
 }
@@ -39,14 +41,34 @@ export function useCopilotEvents() {
 	const { send } = useCopilotMachineContext();
 
 	return {
-		addChat: useCallback((chat: Chat) => send({ type: "ADD_CHAT", chat }), [send]),
-		pushChat: useCallback((chat: Chat) => send({ type: "PUSH_CHAT", chat }), [send]),
-		updateChat: useCallback((index: number, chat: Partial<Chat>) =>
-			send({ type: "UPDATE_CHAT", index, chat }), [send]),
-		setChats: useCallback((chats: Chat[]) => send({ type: "SET_CHATS", chats }), [send]),
+		addChat: useCallback(
+			(chat: Chat) => send({ type: "ADD_CHAT", chat }),
+			[send],
+		),
+		pushChat: useCallback(
+			(chat: Chat) => send({ type: "PUSH_CHAT", chat }),
+			[send],
+		),
+		updateChat: useCallback(
+			(index: number, chat: Partial<Chat>) =>
+				send({ type: "UPDATE_CHAT", index, chat }),
+			[send],
+		),
+		setChats: useCallback(
+			(chats: Chat[]) => send({ type: "SET_CHATS", chats }),
+			[send],
+		),
 		clearChats: useCallback(() => send({ type: "CLEAR_CHATS" }), [send]),
 		open: useCallback(() => send({ type: "OPEN_COPILOT" }), [send]),
 		close: useCallback(() => send({ type: "CLOSE_COPILOT" }), [send]),
 		toggleCopilot: useCallback(() => send({ type: "TOGGLE_COPILOT" }), [send]),
+		setView: useCallback(
+			(view: View) => send({ type: "SET_VIEW", view }),
+			[send],
+		),
+		setViewType: useCallback(
+			(viewType: "chat" | "info") => send({ type: "SET_VIEW_TYPE", viewType }),
+			[send],
+		),
 	};
 }

@@ -1,6 +1,13 @@
 "use client";
 
-import { ChevronRight, Focus, History, Loader2, Plus } from "lucide-react";
+import {
+	ChevronRight,
+	Focus,
+	History,
+	Info,
+	Loader2,
+	Plus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -13,11 +20,14 @@ import { cn } from "@/lib/utils";
 
 interface HeaderViewProps {
 	title?: string;
+	iconUrl?: string | null;
+	currentView?: "chat" | "info";
 	// Button handlers
 	onNewChat?: () => void;
 	onClose?: () => void;
 	onFocusToggle?: (pressed: boolean) => void;
 	onThreadSelect?: (threadId: string) => void;
+	onToggleView?: () => void;
 	// State
 	isCreatingThread?: boolean;
 	isMaximized?: boolean;
@@ -33,10 +43,13 @@ interface HeaderViewProps {
 export function HeaderView(props: HeaderViewProps) {
 	const {
 		title = "Chat",
+		iconUrl,
+		currentView = "chat",
 		onNewChat = () => {},
 		onClose = () => {},
 		onFocusToggle = () => {},
 		onThreadSelect = () => {},
+		onToggleView = () => {},
 		isCreatingThread = false,
 		isMaximized = false,
 		showFocusToggle = false,
@@ -47,8 +60,38 @@ export function HeaderView(props: HeaderViewProps) {
 	return (
 		<div className="p-2 shrink-0 bg-transparent">
 			<div className="flex items-center justify-between gap-2">
-				<div className="flex items-center gap-2 min-w-0 flex-1">
-					<h2 className="text-sm font-medium truncate">{title}</h2>
+				<div className="flex items-center">
+					<div className="flex items-center gap-2 min-w-0 border rounded-md px-2 py-1">
+						{iconUrl && (
+							<img
+								src={iconUrl}
+								alt=""
+								className="h-5 w-5 flex-shrink-0 rounded-sm"
+							/>
+						)}
+						<h2 className="truncate flex-1 max-w-[12ch]">{title}</h2>
+						<Info className="h-4 w-4 flex-shrink-0" />
+					</div>
+
+					{/* Chat/Info Toggle Button */}
+					<Button
+						variant="ghost"
+						size="sm"
+						className="h-7 px-2 text-sm rounded-l-none border-l-0"
+						onClick={onToggleView}
+					>
+						<span
+							className={currentView === "chat" ? "" : "text-muted-foreground"}
+						>
+							Chat
+						</span>
+						<span className="text-muted-foreground"> / </span>
+						<span
+							className={currentView === "info" ? "" : "text-muted-foreground"}
+						>
+							Info
+						</span>
+					</Button>
 				</div>
 
 				<div className="flex items-center gap-1">
@@ -70,7 +113,11 @@ export function HeaderView(props: HeaderViewProps) {
 					{/* History Dropdown */}
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<Button variant="ghost" size="icon" className="h-8 w-8 transition-none">
+							<Button
+								variant="ghost"
+								size="icon"
+								className="h-8 w-8 transition-none"
+							>
 								<History className="h-4 w-4" />
 							</Button>
 						</DropdownMenuTrigger>
@@ -95,9 +142,7 @@ export function HeaderView(props: HeaderViewProps) {
 													</div>
 													{thread.updated_at && (
 														<div className="text-xs text-muted-foreground">
-															{new Date(
-																thread.updated_at,
-															).toLocaleDateString()}
+															{new Date(thread.updated_at).toLocaleDateString()}
 														</div>
 													)}
 												</div>
