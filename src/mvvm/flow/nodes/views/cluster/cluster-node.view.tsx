@@ -69,7 +69,7 @@ export function ClusterNodeView({
 					<div className="flex flex-row items-center gap-2 flex-shrink-0">
 						<DropdownMenu>
 							<ClusterMenuTrigger>
-								<div className="w-6 h-6 rounded bg-background hover:bg-muted cursor-pointer flex items-center justify-center">
+								<div className="w-6 h-6 rounded hover:bg-muted cursor-pointer flex items-center justify-center">
 									<MoreHorizontal className="h-4 w-4" />
 								</div>
 							</ClusterMenuTrigger>

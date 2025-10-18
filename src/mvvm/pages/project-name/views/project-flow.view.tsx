@@ -29,6 +29,7 @@ export function ProjectFlowView({
 			edgeTypes={edgeTypes}
 			nodeTypes={nodeTypes}
 			fitView
+			zoomOnDoubleClick={false}
 			fitViewOptions={FLOW_CONFIG.fitViewOptions}
 			nodes={nodes}
 			panOnScroll

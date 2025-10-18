@@ -49,9 +49,19 @@ async function createTemplateAxios(context: K8sContext, apiVersion?: string) {
 export const listTemplates = async (context: K8sContext) => {
 	const api = await createTemplateAxios(context, "v1/template");
 	const response = await api.get("/");
-	return response.data.data.map((template: unknown) =>
-		TemplateItemSchema.parse(template),
+	
+	// Parse the response structure: { code, message, data: { templates: [...], menuKeys: "..." } }
+	const { data } = response.data;
+	const templates = data.templates.map((template: unknown) =>
+		// TemplateItemSchema.parse(template),
+		template,
 	);
+	const menuKeys = data.menuKeys;
+	
+	return {
+		templates,
+		menuKeys,
+	};
 };
 
 /**

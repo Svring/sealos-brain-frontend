@@ -7,11 +7,7 @@ interface BaseNodeProps {
 	height?: number;
 }
 
-export const BaseNode = ({
-	children,
-	height = 50,
-}: BaseNodeProps) => {
-
+export const BaseNode = ({ children, height = 50 }: BaseNodeProps) => {
 	// Determine the appropriate styling based on props
 	const getNodeStyling = () => {
 		let baseStyles =

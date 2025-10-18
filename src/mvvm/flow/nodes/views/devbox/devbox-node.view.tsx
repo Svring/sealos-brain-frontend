@@ -33,7 +33,7 @@ export function DevboxNodeView({
 	return (
 		<BaseNode>
 			<button
-				className="flex h-full flex-col gap-2 justify-between w-full text-left"
+				className="flex h-full flex-col gap-2 justify-between w-full text-left cursor-pointer"
 				onClick={onClick}
 				type="button"
 			>
@@ -51,7 +51,7 @@ export function DevboxNodeView({
 							<DevboxMenuTrigger>
 								<button
 									type="button"
-									className="w-6 h-6 rounded bg-background hover:bg-muted cursor-pointer flex items-center justify-center"
+									className="w-6 h-6 rounded hover:bg-muted cursor-pointer flex items-center justify-center"
 								>
 									<MoreHorizontal className="h-4 w-4" />
 								</button>
