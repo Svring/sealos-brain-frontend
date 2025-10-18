@@ -4,13 +4,8 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import React from "react";
 import { AvatarCircles } from "@/components/ui/avatar-circles";
-import { 
-	CLUSTER_DEFAULT_ICON,
-	CLUSTER_TYPE_ICON_MAP 
-} from "@/constants/cluster/cluster-icons.constant";
-import { 
-	DEVBOX_ICON_BASE_URL
-} from "@/constants/devbox/devbox-icons.constant";
+import { CLUSTER_ICON_BASE_URL } from "@/constants/cluster/cluster-icons.constant";
+import { DEVBOX_ICON_BASE_URL } from "@/constants/devbox/devbox-icons.constant";
 import { LAUNCHPAD_DEFAULT_ICON } from "@/constants/launchpad/launchpad-icons.constant";
 import { OBJECTSTORAGE_DEFAULT_ICON } from "@/constants/osb/osb-icons.constant";
 import type { K8sItem } from "@/mvvm/k8s/models/k8s-resource.model";
@@ -51,14 +46,11 @@ export const ProjectCardView = ({
 						return `${DEVBOX_ICON_BASE_URL}/${item.runtime}.svg`;
 					case "cluster":
 						// Use the same logic as ClusterNodeView
-						return (
-							CLUSTER_TYPE_ICON_MAP[item.type as string] ||
-							CLUSTER_DEFAULT_ICON
-						);
+						return `${CLUSTER_ICON_BASE_URL}/${item.type}.svg`;
 					case "deployment":
 					case "statefulset":
 						// Use the same logic as LaunchpadNodeView
-						return "/icons/launchpad/default.svg";
+						return LAUNCHPAD_DEFAULT_ICON;
 					case "objectstorage":
 						// Use the same logic as OSBNodeView
 						return OBJECTSTORAGE_DEFAULT_ICON;
@@ -90,14 +82,12 @@ export const ProjectCardView = ({
 							break;
 						case "cluster":
 							// Use the same logic as ClusterNodeView
-							iconUrl =
-								CLUSTER_TYPE_ICON_MAP[item.type as string] ||
-								CLUSTER_DEFAULT_ICON;
+							iconUrl = `${CLUSTER_ICON_BASE_URL}/${item.type}.svg`;
 							break;
 						case "deployment":
 						case "statefulset":
 							// Use the same logic as LaunchpadNodeView
-							iconUrl = "/icons/launchpad/default.svg";
+							iconUrl = LAUNCHPAD_DEFAULT_ICON;
 							break;
 						case "objectstorage":
 							// Use the same logic as OSBNodeView
@@ -144,7 +134,7 @@ export const ProjectCardView = ({
 	return (
 		<Link {...commonLinkProps}>
 			<motion.div
-				className="relative flex w-full cursor-pointer rounded-lg border bg-background-secondary text-left shadow-sm min-h-[160px] flex-col p-4 py-3"
+				className="relative flex w-full cursor-pointer rounded-lg border bg-background-tertiary text-left shadow-sm min-h-[160px] flex-col p-4 py-3"
 				whileHover={{ y: -5 }}
 				transition={{ duration: 0.15, ease: "easeInOut" }}
 			>

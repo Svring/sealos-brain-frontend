@@ -36,7 +36,7 @@ export const ProjectDashboardView = ({
 					{/* Search */}
 					<div className="relative">
 						<Input
-							className="h-8 w-36 pl-8 bg-background-secondary"
+							className="h-8 w-36 pl-8 bg-background-tertiary"
 							placeholder="Search..."
 							value={searchTerm}
 							onChange={onSearchChange}
@@ -51,7 +51,7 @@ export const ProjectDashboardView = ({
 						size="sm"
 						variant="outline"
 						onClick={onCreateProject}
-						className="h-8 w-8 p-0 bg-background-secondary"
+						className="h-8 w-8 p-0 bg-background-tertiary"
 					>
 						<Plus size={16} />
 					</Button>

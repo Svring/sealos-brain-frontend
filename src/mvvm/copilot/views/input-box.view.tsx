@@ -53,7 +53,7 @@ export const InputBoxView = React.forwardRef<HTMLDivElement, InputBoxProps>(
 		return (
 			<div
 				className={cn(
-					"rounded-lg border bg-background-secondary p-2 shadow-[0_8px_30px_rgba(0,0,0,0.24)] transition-all duration-300 focus-within:border-border-primary flex flex-col",
+					"rounded-lg border bg-background-tertiary p-2 shadow-[0_8px_30px_rgba(0,0,0,0.24)] transition-all duration-300 focus-within:border-border-primary flex flex-col",
 					isLoading && "border-border-primary animate-shimmer-border",
 					className,
 				)}

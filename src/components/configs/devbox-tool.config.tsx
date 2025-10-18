@@ -13,17 +13,15 @@ export function DevboxToolConfig({ children }: DevboxToolConfigProps) {
 	return (
 		<>
 			{children}
-			{process.env.MODE === "development" ? (
-				<TanStackDevtools
-					plugins={[
-						FormDevtoolsPlugin(),
-						{
-							name: "TanStack Query",
-							render: <ReactQueryDevtoolsPanel />,
-						},
-					]}
-				/>
-			) : null}
+			<TanStackDevtools
+				plugins={[
+					FormDevtoolsPlugin(),
+					{
+						name: "TanStack Query",
+						render: <ReactQueryDevtoolsPanel />,
+					},
+				]}
+			/>
 		</>
 	);
 }

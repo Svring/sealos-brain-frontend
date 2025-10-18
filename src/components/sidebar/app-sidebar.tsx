@@ -97,7 +97,7 @@ export function AppSidebar() {
 								align="end"
 								side="right"
 								sideOffset={16}
-								className="w-80 bg-background-secondary"
+								className="w-80 bg-background-tertiary"
 							>
 								<div className="space-y-4">
 									{isLoading ? (

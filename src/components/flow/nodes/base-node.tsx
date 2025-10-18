@@ -18,7 +18,7 @@ export const BaseNode = ({
 			"relative cursor-pointer rounded-xl border bg-background-secondary p-5 text-card-foreground hover:brightness-120";
 
 		// Add height and width classes
-		baseStyles += ` h-${height} w-70`;
+		baseStyles += `h-50 h-${height} w-70`;
 
 		return baseStyles;
 	};
