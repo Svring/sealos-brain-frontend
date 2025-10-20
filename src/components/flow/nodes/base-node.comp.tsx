@@ -1,6 +1,7 @@
 "use client";
 
 import { Slot } from "@radix-ui/react-slot";
+import { Position, Handle as ReactFlowHandle } from "@xyflow/react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { MoreHorizontal, Square } from "lucide-react";
 import type { ComponentProps } from "react";
@@ -32,7 +33,7 @@ import type { ResourceTarget } from "@/mvvm/k8s/models/k8s.model";
 import type { ResourceObject } from "@/mvvm/resource/models/resource-object.model";
 
 const baseNodeVariants = cva(
-	"relative cursor-pointer rounded-xl border bg-background-tertiary p-5 text-card-foreground hover:brightness-120",
+	"relative cursor-pointer rounded-xl border bg-background-tertiary p-5 text-card-foreground hover:brightness-120 flex flex-col",
 	{
 		variants: {
 			size: {
@@ -164,7 +165,7 @@ export const Content = ({
 	return (
 		<Comp
 			data-slot="base-node-content"
-			className={cn("flex items-center gap-2 mt-2 px-1", className)}
+			className={cn("flex flex-1 items-start gap-2 mt-4 px-1", className)}
 			{...props}
 		/>
 	);
@@ -422,4 +423,16 @@ export const Widget = ({
 			)}
 		</Comp>
 	);
+};
+
+export const Handle = ({
+	position = Position.Top,
+	type = "source",
+	id,
+	...props
+}: ComponentProps<typeof ReactFlowHandle> & {
+	position?: Position;
+	type?: "source" | "target";
+}) => {
+	return <ReactFlowHandle position={position} type={type} id={id} {...props} />;
 };

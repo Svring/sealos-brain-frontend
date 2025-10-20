@@ -1,5 +1,6 @@
 "use client";
 
+import { Position } from "@xyflow/react";
 import {
 	Activity,
 	MoreVertical,
@@ -71,6 +72,8 @@ export function DevboxNodeBlock({ data }: DevboxNodeBlockProps) {
 
 	return (
 		<BaseNode.Root target={target}>
+			<BaseNode.Handle position={Position.Top} type="source" />
+			<BaseNode.Handle position={Position.Bottom} type="target" />
 			<BaseNode.Header>
 				<BaseNode.Title />
 				<BaseNode.Menu>
@@ -124,9 +127,11 @@ export function DevboxNodeBlock({ data }: DevboxNodeBlockProps) {
 			</BaseNode.Header>
 
 			<BaseNode.Content>
-				<Package className="h-4 w-4 text-muted-foreground" />
-				<div className="text-md text-muted-foreground truncate flex-1">
-					Runtime: {devbox.runtime}
+				<div className="flex items-center gap-2">
+					<Package className="h-4 w-4 text-muted-foreground" />
+					<div className="text-md text-muted-foreground truncate flex-1">
+						Runtime: {devbox.runtime}
+					</div>
 				</div>
 			</BaseNode.Content>
 

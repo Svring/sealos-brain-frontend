@@ -1,5 +1,6 @@
 "use client";
 
+import { Position } from "@xyflow/react";
 import {
 	Activity,
 	Globe,
@@ -78,6 +79,8 @@ export function ClusterNodeBlock({ data }: ClusterNodeBlockProps) {
 
 	return (
 		<BaseNode.Root target={target}>
+			<BaseNode.Handle position={Position.Top} type="source" />
+			<BaseNode.Handle position={Position.Bottom} type="target" />
 			<BaseNode.Header>
 				<BaseNode.Title />
 				<BaseNode.Menu>
@@ -132,28 +135,32 @@ export function ClusterNodeBlock({ data }: ClusterNodeBlockProps) {
 			</BaseNode.Header>
 
 			<BaseNode.Content>
-				<Globe
-					className={`h-4 w-4 ${
-						hasPublicAccess ? "text-theme-green" : "text-muted-foreground"
-					}`}
-				/>
-				<div className="text-md text-muted-foreground truncate flex-1">
-					{hasPublicAccess ? "Public Access" : "Private Access"}
+				<div className="flex items-center gap-2">
+					<Globe
+						className={`h-4 w-4 ${
+							hasPublicAccess ? "text-theme-green" : "text-muted-foreground"
+						}`}
+					/>
+					<div className="text-md text-muted-foreground truncate flex-1">
+						{hasPublicAccess ? "Public Access" : "Private Access"}
+					</div>
 				</div>
 			</BaseNode.Content>
 
 			<BaseNode.Footer>
 				<BaseNode.Status onClick={handleStatusClick} />
-				<BaseNode.Widget
-					icon={Activity}
-					onClick={handleMonitorClick}
-					tooltip="Analyze resource usage"
-				/>
-				<BaseNode.Widget
-					icon={HardDrive}
-					onClick={handleBackupClick}
-					tooltip="Backup management"
-				/>
+				<div className="flex items-center gap-2">
+					<BaseNode.Widget
+						icon={Activity}
+						onClick={handleMonitorClick}
+						tooltip="Analyze resource usage"
+					/>
+					<BaseNode.Widget
+						icon={HardDrive}
+						onClick={handleBackupClick}
+						tooltip="Backup management"
+					/>
+				</div>
 			</BaseNode.Footer>
 		</BaseNode.Root>
 	);
