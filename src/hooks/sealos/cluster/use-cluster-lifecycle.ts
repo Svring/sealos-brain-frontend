@@ -11,32 +11,29 @@ export const useClusterLifecycle = () => {
 	const pauseMutation = useMutation(cluster.pause.mutationOptions());
 	const restartMutation = useMutation(cluster.restart.mutationOptions());
 
-	const executeAction = async (action: string, clusterName: string) => {
+	const start = async (clusterName: string) => {
 		const target = clusterParser.toTarget(clusterName);
-		switch (action) {
-			case "start":
-				await startMutation.mutateAsync(target);
-				break;
-			case "pause":
-				await pauseMutation.mutateAsync(target);
-				break;
-			case "restart":
-				await restartMutation.mutateAsync(target);
-				break;
-		}
+		await startMutation.mutateAsync(target);
+	};
+
+	const pause = async (clusterName: string) => {
+		const target = clusterParser.toTarget(clusterName);
+		await pauseMutation.mutateAsync(target);
+	};
+
+	const restart = async (clusterName: string) => {
+		const target = clusterParser.toTarget(clusterName);
+		await restartMutation.mutateAsync(target);
 	};
 
 	return {
-		mutate: executeAction,
-		isPending: (action: string) => {
-			switch (action) {
-				case "start":
-					return startMutation.isPending;
-				case "pause":
-					return pauseMutation.isPending;
-				case "restart":
-					return restartMutation.isPending;
-			}
+		start,
+		pause,
+		restart,
+		isPending: {
+			start: startMutation.isPending,
+			pause: pauseMutation.isPending,
+			restart: restartMutation.isPending,
 		},
 	};
 };

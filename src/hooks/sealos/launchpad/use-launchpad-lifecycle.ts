@@ -11,32 +11,29 @@ export const useLaunchpadLifecycle = () => {
 	const pauseMutation = useMutation(launchpad.pause.mutationOptions());
 	const restartMutation = useMutation(launchpad.restart.mutationOptions());
 
-	const executeAction = async (action: string, launchpadName: string) => {
+	const start = async (launchpadName: string) => {
 		const target = launchpadParser.toTarget(launchpadName);
-		switch (action) {
-			case "start":
-				await startMutation.mutateAsync(target);
-				break;
-			case "pause":
-				await pauseMutation.mutateAsync(target);
-				break;
-			case "restart":
-				await restartMutation.mutateAsync(target);
-				break;
-		}
+		await startMutation.mutateAsync(target);
+	};
+
+	const pause = async (launchpadName: string) => {
+		const target = launchpadParser.toTarget(launchpadName);
+		await pauseMutation.mutateAsync(target);
+	};
+
+	const restart = async (launchpadName: string) => {
+		const target = launchpadParser.toTarget(launchpadName);
+		await restartMutation.mutateAsync(target);
 	};
 
 	return {
-		mutate: executeAction,
-		isPending: (action: string) => {
-			switch (action) {
-				case "start":
-					return startMutation.isPending;
-				case "pause":
-					return pauseMutation.isPending;
-				case "restart":
-					return restartMutation.isPending;
-			}
+		start,
+		pause,
+		restart,
+		isPending: {
+			start: startMutation.isPending,
+			pause: pauseMutation.isPending,
+			restart: restartMutation.isPending,
 		},
 	};
 };

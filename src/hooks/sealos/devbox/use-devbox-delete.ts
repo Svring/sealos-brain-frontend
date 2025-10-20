@@ -9,13 +9,13 @@ export const useDevboxDelete = () => {
 
 	const mutation = useMutation(devbox.delete.mutationOptions());
 
-	const deleteDevbox = async (devboxName: string) => {
+	const del = async (devboxName: string) => {
 		const target = devboxParser.toTarget(devboxName);
 		return await mutation.mutateAsync(target);
 	};
 
 	return {
 		...mutation,
-		deleteDevbox,
+		del,
 	};
 };

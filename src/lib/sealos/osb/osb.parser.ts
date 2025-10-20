@@ -1,5 +1,5 @@
 import type { CustomResourceTarget } from "@/mvvm/k8s/models/k8s-custom.model";
-import { OsbObjectSchema } from "@/mvvm/sealos/osb/models/osb-object.model";
+import { OsbObjectSchema, type OsbObject } from "@/mvvm/sealos/osb/models/osb-object.model";
 import type { ObjectStorageBucketResource } from "@/mvvm/sealos/osb/models/osb-resource.model";
 import { ObjectStorageBucketResourceSchema } from "@/mvvm/sealos/osb/models/osb-resource.model";
 
@@ -31,10 +31,21 @@ const toItem = (resource: ObjectStorageBucketResource): OsbItem => {
 };
 
 /**
- * Convert ObjectStorageBucketResource to target for API operations
+ * Convert ObjectStorageBucketResource, OsbObject, or string to target for API operations
  */
-const toTarget = (input: ObjectStorageBucketResource | string): CustomResourceTarget => {
-	const name = typeof input === "string" ? input : input.metadata.name;
+const toTarget = (input: ObjectStorageBucketResource | OsbObject | string): CustomResourceTarget => {
+	let name: string;
+	
+	if (typeof input === "string") {
+		name = input;
+	} else if ("metadata" in input) {
+		// ObjectStorageBucketResource
+		name = input.metadata.name;
+	} else {
+		// OsbObject
+		name = input.name;
+	}
+	
 	return {
 		type: "custom",
 		resourceType: "objectstoragebucket",

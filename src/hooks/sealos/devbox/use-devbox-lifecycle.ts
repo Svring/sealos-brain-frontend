@@ -13,44 +13,43 @@ export const useDevboxLifecycle = () => {
 	const shutdownMutation = useMutation(devbox.shutdown.mutationOptions());
 	const autostartMutation = useMutation(devbox.autostart.mutationOptions());
 
-	const executeAction = async (action: string, devboxName: string) => {
+	const start = async (devboxName: string) => {
 		const target = devboxParser.toTarget(devboxName);
-		switch (action) {
-			case "start":
-				await startMutation.mutateAsync(target);
-				break;
-			case "pause":
-				await pauseMutation.mutateAsync(target);
-				break;
-			case "restart":
-				await restartMutation.mutateAsync(target);
-				break;
-			case "shutdown":
-				await shutdownMutation.mutateAsync(target);
-				break;
-			case "autostart":
-				await autostartMutation.mutateAsync(target);
-				break;
-		}
+		return await startMutation.mutateAsync(target);
+	};
+
+	const pause = async (devboxName: string) => {
+		const target = devboxParser.toTarget(devboxName);
+		return await pauseMutation.mutateAsync(target);
+	};
+
+	const restart = async (devboxName: string) => {
+		const target = devboxParser.toTarget(devboxName);
+		return await restartMutation.mutateAsync(target);
+	};
+
+	const shutdown = async (devboxName: string) => {
+		const target = devboxParser.toTarget(devboxName);
+		return await shutdownMutation.mutateAsync(target);
+	};
+
+	const autostart = async (devboxName: string) => {
+		const target = devboxParser.toTarget(devboxName);
+		return await autostartMutation.mutateAsync(target);
 	};
 
 	return {
-		mutate: executeAction,
-		isPending: (action: string) => {
-			switch (action) {
-				case "start":
-					return startMutation.isPending;
-				case "pause":
-					return pauseMutation.isPending;
-				case "restart":
-					return restartMutation.isPending;
-				case "shutdown":
-					return shutdownMutation.isPending;
-				case "autostart":
-					return autostartMutation.isPending;
-				default:
-					return false;
-			}
+		start,
+		pause,
+		restart,
+		shutdown,
+		autostart,
+		isPending: {
+			start: startMutation.isPending,
+			pause: pauseMutation.isPending,
+			restart: restartMutation.isPending,
+			shutdown: shutdownMutation.isPending,
+			autostart: autostartMutation.isPending,
 		},
 	};
 };

@@ -8,5 +8,12 @@ export const useClusterDelete = () => {
 
 	const mutation = useMutation(cluster.delete.mutationOptions());
 
-	return mutation;
+	const del = async (clusterName: string) => {
+		return await mutation.mutateAsync({ clusterName });
+	};
+
+	return {
+		...mutation,
+		del,
+	};
 };
