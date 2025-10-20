@@ -35,27 +35,13 @@ const toItem = (
 };
 
 const toTarget = (
-	input: DeploymentResource | StatefulSetResource | string,
-	resourceType?: "deployment" | "statefulset",
+	name: string,
+	resourceType: "deployment" | "statefulset" = "deployment",
 ): BuiltinResourceTarget => {
-	if (typeof input === "string") {
-		if (!resourceType) {
-			throw new Error("Resource type must be specified when using string input");
-		}
-		return {
-			type: "builtin",
-			resourceType,
-			name: input,
-		};
-	}
-	
-	const isDeployment = input.kind === "Deployment";
-	const type = isDeployment ? "deployment" : "statefulset";
-
 	return {
 		type: "builtin",
-		resourceType: type,
-		name: input.metadata.name,
+		resourceType,
+		name,
 	};
 };
 
@@ -65,15 +51,8 @@ const toItems = (
 	return resources.map(toItem);
 };
 
-const toTargets = (
-	resources: (DeploymentResource | StatefulSetResource)[],
-): BuiltinResourceTarget[] => {
-	return resources.map((resource) => toTarget(resource));
-};
-
 export const launchpadParser = {
 	toItem,
 	toTarget,
 	toItems,
-	toTargets,
 };

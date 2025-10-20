@@ -10,6 +10,7 @@ import {
 	DropdownMenuContent,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Spinner } from "@/components/ui/spinner";
 import {
 	Tooltip,
 	TooltipContent,
@@ -25,11 +26,10 @@ import {
 } from "@/constants/devbox/devbox-icons.constant";
 import { LAUNCHPAD_DEFAULT_ICON } from "@/constants/launchpad/launchpad-icons.constant";
 import { OBJECTSTORAGE_DEFAULT_ICON } from "@/constants/osb/osb-icons.constant";
+import { useResourceObject } from "@/hooks/resource/use-resource-object";
 import { cn } from "@/lib/utils";
 import type { ResourceTarget } from "@/mvvm/k8s/models/k8s.model";
 import type { ResourceObject } from "@/mvvm/resource/models/resource-object.model";
-import { useResourceObject } from "@/hooks/resource/use-resource-object";
-import { Spinner } from "@/components/ui/spinner";
 
 const baseNodeVariants = cva(
 	"relative cursor-pointer rounded-xl border bg-background-tertiary p-5 text-card-foreground hover:brightness-120",

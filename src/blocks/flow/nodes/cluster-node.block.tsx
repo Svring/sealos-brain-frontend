@@ -17,44 +17,62 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Spinner } from "@/components/ui/spinner";
+import { useResourceObject } from "@/hooks/resource/use-resource-object";
 import { useClusterDelete } from "@/hooks/sealos/cluster/use-cluster-delete";
 import { useClusterLifecycle } from "@/hooks/sealos/cluster/use-cluster-lifecycle";
-import { clusterParser } from "@/lib/sealos/cluster/cluster.parser";
-import type { ClusterObject } from "@/mvvm/sealos/cluster/models/cluster-object.model";
+import type { CustomResourceTarget } from "@/models/k8s/k8s-custom.model";
+import { ClusterObjectSchema } from "@/models/sealos/cluster/cluster-object.model";
 
 interface ClusterNodeBlockProps {
-	data: ClusterObject;
+	data: {
+		target: CustomResourceTarget;
+	};
 }
 
 export function ClusterNodeBlock({ data }: ClusterNodeBlockProps) {
-	const { name, type, resource, connection } = data;
+	const { target } = data;
+	const { data: object, isLoading } = useResourceObject(target);
+
 	const { start, pause, restart, isPending } = useClusterLifecycle();
 	const { del, isPending: isDeleting } = useClusterDelete();
 
-	// Create target for node components
-	const target = clusterParser.toTarget(name);
+	if (isLoading || !object) {
+		return (
+			<BaseNode.Root target={target}>
+				<BaseNode.Header>
+					<BaseNode.Title />
+				</BaseNode.Header>
+				<BaseNode.Content>
+					<Spinner className="h-4 w-4" />
+				</BaseNode.Content>
+			</BaseNode.Root>
+		);
+	}
 
-	const hasPublicAccess = Array.isArray(connection.publicConnection);
+	const cluster = ClusterObjectSchema.parse(object);
+
+	const hasPublicAccess = Array.isArray(cluster.connection.publicConnection);
 
 	const handleMonitorClick = () => {
-		console.log("Monitor clicked for cluster:", name);
+		console.log("Monitor clicked for cluster:", cluster.name);
 	};
 
 	const handleStatusClick = () => {
-		console.log("Status clicked for cluster:", name);
+		console.log("Status clicked for cluster:", cluster.name);
 	};
 
 	const handleBackupClick = () => {
-		console.log("Backup clicked for cluster:", name);
+		console.log("Backup clicked for cluster:", cluster.name);
 	};
 
 	const handleDelete = async () => {
 		if (
 			window.confirm(
-				`Are you sure you want to delete cluster "${name}"? This action cannot be undone.`,
+				`Are you sure you want to delete cluster "${cluster.name}"? This action cannot be undone.`,
 			)
 		) {
-			await del(name);
+			await del(cluster.name);
 		}
 	};
 
@@ -71,30 +89,31 @@ export function ClusterNodeBlock({ data }: ClusterNodeBlockProps) {
 							className="rounded-xl bg-background-tertiary"
 							align="start"
 						>
-							{data.status !== "Running" && (
+							{cluster.status !== "Running" && (
 								<DropdownMenuItem
-									onClick={() => start(name)}
-									disabled={data.status === "Pending" || isPending.start}
-									className={data.status === "Pending" ? "opacity-50" : ""}
+									onClick={() => start(cluster.name)}
+									disabled={cluster.status === "Pending" || isPending.start}
+									className={cluster.status === "Pending" ? "opacity-50" : ""}
 								>
 									<Play className="mr-2 h-4 w-4" />
 									Start
 								</DropdownMenuItem>
 							)}
-							{data.status !== "Stopped" && data.status !== "Shutdown" && (
-								<DropdownMenuItem
-									onClick={() => pause(name)}
-									disabled={data.status === "Pending" || isPending.pause}
-									className={data.status === "Pending" ? "opacity-50" : ""}
-								>
-									<Pause className="mr-2 h-4 w-4" />
-									Pause
-								</DropdownMenuItem>
-							)}
+							{cluster.status !== "Stopped" &&
+								cluster.status !== "Shutdown" && (
+									<DropdownMenuItem
+										onClick={() => pause(cluster.name)}
+										disabled={cluster.status === "Pending" || isPending.pause}
+										className={cluster.status === "Pending" ? "opacity-50" : ""}
+									>
+										<Pause className="mr-2 h-4 w-4" />
+										Pause
+									</DropdownMenuItem>
+								)}
 							<DropdownMenuItem
-								onClick={() => restart(name)}
-								disabled={data.status === "Pending" || isPending.restart}
-								className={data.status === "Pending" ? "opacity-50" : ""}
+								onClick={() => restart(cluster.name)}
+								disabled={cluster.status === "Pending" || isPending.restart}
+								className={cluster.status === "Pending" ? "opacity-50" : ""}
 							>
 								<RotateCcw className="mr-2 h-4 w-4" />
 								Restart

@@ -23,8 +23,7 @@ const toItem = (resource: DevboxResource): DevboxItem => {
 	};
 };
 
-const toTarget = (input: DevboxResource | string): CustomResourceTarget => {
-	const name = typeof input === "string" ? input : input.metadata.name;
+const toTarget = (name: string): CustomResourceTarget => {
 	return {
 		type: "custom",
 		resourceType: "devbox",
@@ -36,13 +35,8 @@ const toItems = (resources: DevboxResource[]): DevboxItem[] => {
 	return resources.map(toItem);
 };
 
-const toTargets = (resources: DevboxResource[]): CustomResourceTarget[] => {
-	return resources.map(toTarget);
-};
-
 export const devboxParser = {
 	toItem,
 	toTarget,
 	toItems,
-	toTargets,
 };

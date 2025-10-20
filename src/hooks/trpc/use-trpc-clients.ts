@@ -8,7 +8,7 @@ import {
 	launchpadClient,
 	osbClient,
 	templateClient,
-} from "@/components/configs/query-trpc.config";
+} from "@/configs/query-trpc.config";
 
 export const useTRPCClients = () => {
 	const k8sTrpcClient = k8sClient.useTRPC();

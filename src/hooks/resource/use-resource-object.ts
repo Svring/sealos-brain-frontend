@@ -1,16 +1,7 @@
 "use client";
 
 import { useQueries } from "@tanstack/react-query";
-import { resourceParser } from "@/lib/resource/resource.parser";
-import type {
-	BuiltinResourceTarget,
-	CustomResourceTarget,
-	ResourceTarget,
-} from "@/mvvm/k8s/models/k8s.model";
-import type {
-	K8sItem,
-	K8sResource,
-} from "@/mvvm/k8s/models/k8s-resource.model";
+import type { ResourceTarget } from "@/models/k8s/k8s.model";
 import { useTRPCClients } from "../trpc/use-trpc-clients";
 
 /**
@@ -18,12 +9,8 @@ import { useTRPCClients } from "../trpc/use-trpc-clients";
  * @param resource - Single K8sItem, K8sResource, or ResourceTarget object
  * @returns Query result with data, loading states, and errors for the single resource
  */
-export const useResourceObject = (
-	resource: K8sItem | K8sResource | ResourceTarget,
-) => {
+export const useResourceObject = (target: ResourceTarget) => {
 	const { devbox, cluster, osb, launchpad } = useTRPCClients();
-
-	const target = resourceParser.toTarget(resource);
 
 	// Create queries for the single target
 	const queries = useQueries({
@@ -31,14 +18,14 @@ export const useResourceObject = (
 			(() => {
 				switch (target.resourceType) {
 					case "devbox":
-						return devbox.get.queryOptions(target as CustomResourceTarget);
+						return devbox.get.queryOptions(target);
 					case "cluster":
-						return cluster.get.queryOptions(target as CustomResourceTarget);
+						return cluster.get.queryOptions(target);
 					case "objectstoragebucket":
-						return osb.get.queryOptions(target as CustomResourceTarget);
+						return osb.get.queryOptions(target);
 					case "deployment":
 					case "statefulset":
-						return launchpad.get.queryOptions(target as BuiltinResourceTarget);
+						return launchpad.get.queryOptions(target);
 					default:
 						return {
 							queryKey: [],

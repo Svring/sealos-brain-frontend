@@ -17,8 +17,7 @@ const toItem = (resource: ClusterResource): ClusterItem => {
 	};
 };
 
-const toTarget = (input: ClusterResource | string): CustomResourceTarget => {
-	const name = typeof input === "string" ? input : input.metadata.name;
+const toTarget = (name: string): CustomResourceTarget => {
 	return {
 		type: "custom",
 		resourceType: "cluster",
@@ -30,13 +29,8 @@ const toItems = (resources: ClusterResource[]): ClusterItem[] => {
 	return resources.map(toItem);
 };
 
-const toTargets = (resources: ClusterResource[]): CustomResourceTarget[] => {
-	return resources.map(toTarget);
-};
-
 export const clusterParser = {
 	toItem,
 	toTarget,
 	toItems,
-	toTargets,
 };

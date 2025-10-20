@@ -3,8 +3,8 @@
 import { type Edge, type Node, ReactFlow } from "@xyflow/react";
 import FloatingConnectionLine from "@/components/flow/edges/floating-connection-line";
 import { FLOW_CONFIG } from "@/constants/flow/flow-config.constant";
+import nodeTypes from "@/models/flow/nodes/node.types";
 import edgeTypes from "@/mvvm/flow/edges/models/edge.types";
-import nodeTypes from "@/mvvm/flow/nodes/models/node.types";
 
 import "@xyflow/react/dist/style.css";
 

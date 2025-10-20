@@ -29,8 +29,7 @@ const toObjects = (instances: InstanceResource[]): InstanceObject[] => {
 };
 
 // Convert InstanceResource or name to target for API operations
-const toTarget = (input: InstanceResource | string): CustomResourceTarget => {
-	const name = typeof input === "string" ? input : input.metadata.name;
+const toTarget = (name: string): CustomResourceTarget => {
 	return {
 		type: "custom",
 		resourceType: "instance",
@@ -38,14 +37,8 @@ const toTarget = (input: InstanceResource | string): CustomResourceTarget => {
 	};
 };
 
-// Convert array of InstanceResource to targets
-const toTargets = (instances: InstanceResource[]): CustomResourceTarget[] => {
-	return instances.map(toTarget);
-};
-
 export const instanceParser = {
 	toObject,
 	toObjects,
 	toTarget,
-	toTargets,
 };

@@ -17,44 +17,62 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Spinner } from "@/components/ui/spinner";
+import { useResourceObject } from "@/hooks/resource/use-resource-object";
 import { useLaunchpadDelete } from "@/hooks/sealos/launchpad/use-launchpad-delete";
 import { useLaunchpadLifecycle } from "@/hooks/sealos/launchpad/use-launchpad-lifecycle";
-import { launchpadParser } from "@/lib/sealos/launchpad/launchpad.parser";
-import type { LaunchpadObject } from "@/mvvm/sealos/launchpad/models/launchpad-object.model";
+import type { BuiltinResourceTarget } from "@/models/k8s/k8s-builtin.model";
+import { LaunchpadObjectSchema } from "@/models/sealos/launchpad/launchpad-object.model";
 
 interface LaunchpadNodeBlockProps {
-	data: LaunchpadObject;
+	data: {
+		target: BuiltinResourceTarget;
+	};
 }
 
 export function LaunchpadNodeBlock({ data }: LaunchpadNodeBlockProps) {
-	const { name, resource, ports } = data;
+	const { target } = data;
+	const { data: object, isLoading } = useResourceObject(target);
+
 	const { start, pause, restart, isPending } = useLaunchpadLifecycle();
 	const { deleteLaunchpad, isPending: isDeleting } = useLaunchpadDelete();
 
-	// Create target for node components
-	const target = launchpadParser.toTarget(name);
+	if (isLoading || !object) {
+		return (
+			<BaseNode.Root target={target}>
+				<BaseNode.Header>
+					<BaseNode.Title />
+				</BaseNode.Header>
+				<BaseNode.Content>
+					<Spinner className="h-4 w-4" />
+				</BaseNode.Content>
+			</BaseNode.Root>
+		);
+	}
 
-	const hasPublicAccess = ports && ports.some(port => port.publicAddress);
+	const launchpad = LaunchpadObjectSchema.parse(object);
+
+	const hasPublicAccess = launchpad.ports?.some((port) => port.publicAddress);
 
 	const handleMonitorClick = () => {
-		console.log("Monitor clicked for launchpad:", name);
+		console.log("Monitor clicked for launchpad:", launchpad.name);
 	};
 
 	const handleStatusClick = () => {
-		console.log("Status clicked for launchpad:", name);
+		console.log("Status clicked for launchpad:", launchpad.name);
 	};
 
 	const handleSettingsClick = () => {
-		console.log("Settings clicked for launchpad:", name);
+		console.log("Settings clicked for launchpad:", launchpad.name);
 	};
 
 	const handleDelete = async () => {
 		if (
 			window.confirm(
-				`Are you sure you want to delete launchpad "${name}"? This action cannot be undone.`,
+				`Are you sure you want to delete launchpad "${launchpad.name}"? This action cannot be undone.`,
 			)
 		) {
-			await deleteLaunchpad(name);
+			await deleteLaunchpad(launchpad.name);
 		}
 	};
 
@@ -71,30 +89,33 @@ export function LaunchpadNodeBlock({ data }: LaunchpadNodeBlockProps) {
 							className="rounded-xl bg-background-tertiary"
 							align="start"
 						>
-							{data.status !== "Running" && (
+							{launchpad.status !== "Running" && (
 								<DropdownMenuItem
-									onClick={() => start(name)}
-									disabled={data.status === "Pending" || isPending.start}
-									className={data.status === "Pending" ? "opacity-50" : ""}
+									onClick={() => start(launchpad.name)}
+									disabled={launchpad.status === "Pending" || isPending.start}
+									className={launchpad.status === "Pending" ? "opacity-50" : ""}
 								>
 									<Play className="mr-2 h-4 w-4" />
 									Start
 								</DropdownMenuItem>
 							)}
-							{data.status !== "Stopped" && data.status !== "Shutdown" && (
-								<DropdownMenuItem
-									onClick={() => pause(name)}
-									disabled={data.status === "Pending" || isPending.pause}
-									className={data.status === "Pending" ? "opacity-50" : ""}
-								>
-									<Pause className="mr-2 h-4 w-4" />
-									Pause
-								</DropdownMenuItem>
-							)}
+							{launchpad.status !== "Stopped" &&
+								launchpad.status !== "Shutdown" && (
+									<DropdownMenuItem
+										onClick={() => pause(launchpad.name)}
+										disabled={launchpad.status === "Pending" || isPending.pause}
+										className={
+											launchpad.status === "Pending" ? "opacity-50" : ""
+										}
+									>
+										<Pause className="mr-2 h-4 w-4" />
+										Pause
+									</DropdownMenuItem>
+								)}
 							<DropdownMenuItem
-								onClick={() => restart(name)}
-								disabled={data.status === "Pending" || isPending.restart}
-								className={data.status === "Pending" ? "opacity-50" : ""}
+								onClick={() => restart(launchpad.name)}
+								disabled={launchpad.status === "Pending" || isPending.restart}
+								className={launchpad.status === "Pending" ? "opacity-50" : ""}
 							>
 								<RotateCcw className="mr-2 h-4 w-4" />
 								Restart
