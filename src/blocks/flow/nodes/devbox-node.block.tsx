@@ -3,7 +3,6 @@
 import { Position } from "@xyflow/react";
 import {
 	Activity,
-	MoreVertical,
 	Package,
 	Pause,
 	Play,
@@ -11,12 +10,7 @@ import {
 	Trash2,
 } from "lucide-react";
 import * as BaseNode from "@/components/flow/nodes/base-node.comp";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Spinner } from "@/components/ui/spinner";
 import { useResourceObject } from "@/hooks/resource/use-resource-object";
 import { useDevboxDelete } from "@/hooks/sealos/devbox/use-devbox-delete";
@@ -77,52 +71,42 @@ export function DevboxNodeBlock({ data }: DevboxNodeBlockProps) {
 			<BaseNode.Header>
 				<BaseNode.Title />
 				<BaseNode.Menu>
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<BaseNode.Widget icon={MoreVertical} />
-						</DropdownMenuTrigger>
-						<DropdownMenuContent
-							className="rounded-xl bg-background-tertiary"
-							align="start"
+					{devbox.status !== "Running" && (
+						<DropdownMenuItem
+							onClick={() => start(devbox.name)}
+							disabled={devbox.status === "Pending" || isPending.start}
+							className={devbox.status === "Pending" ? "opacity-50" : ""}
 						>
-							{devbox.status !== "Running" && (
-								<DropdownMenuItem
-									onClick={() => start(devbox.name)}
-									disabled={devbox.status === "Pending" || isPending.start}
-									className={devbox.status === "Pending" ? "opacity-50" : ""}
-								>
-									<Play className="mr-2 h-4 w-4" />
-									Start
-								</DropdownMenuItem>
-							)}
-							{devbox.status !== "Stopped" && devbox.status !== "Shutdown" && (
-								<DropdownMenuItem
-									onClick={() => pause(devbox.name)}
-									disabled={devbox.status === "Pending" || isPending.pause}
-									className={devbox.status === "Pending" ? "opacity-50" : ""}
-								>
-									<Pause className="mr-2 h-4 w-4" />
-									Pause
-								</DropdownMenuItem>
-							)}
-							<DropdownMenuItem
-								onClick={() => restart(devbox.name)}
-								disabled={devbox.status === "Pending" || isPending.restart}
-								className={devbox.status === "Pending" ? "opacity-50" : ""}
-							>
-								<RotateCcw className="mr-2 h-4 w-4" />
-								Restart
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								onClick={handleDelete}
-								className="text-destructive"
-								disabled={isDeleting}
-							>
-								<Trash2 className="mr-2 h-4 w-4" />
-								{isDeleting ? "Deleting..." : "Delete"}
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+							<Play className="mr-2 h-4 w-4" />
+							Start
+						</DropdownMenuItem>
+					)}
+					{devbox.status !== "Stopped" && devbox.status !== "Shutdown" && (
+						<DropdownMenuItem
+							onClick={() => pause(devbox.name)}
+							disabled={devbox.status === "Pending" || isPending.pause}
+							className={devbox.status === "Pending" ? "opacity-50" : ""}
+						>
+							<Pause className="mr-2 h-4 w-4" />
+							Pause
+						</DropdownMenuItem>
+					)}
+					<DropdownMenuItem
+						onClick={() => restart(devbox.name)}
+						disabled={devbox.status === "Pending" || isPending.restart}
+						className={devbox.status === "Pending" ? "opacity-50" : ""}
+					>
+						<RotateCcw className="mr-2 h-4 w-4" />
+						Restart
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						onClick={handleDelete}
+						className="text-destructive"
+						disabled={isDeleting}
+					>
+						<Trash2 className="mr-2 h-4 w-4" />
+						{isDeleting ? "Deleting..." : "Delete"}
+					</DropdownMenuItem>
 				</BaseNode.Menu>
 			</BaseNode.Header>
 

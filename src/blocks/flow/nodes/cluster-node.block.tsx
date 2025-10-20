@@ -5,19 +5,14 @@ import {
 	Activity,
 	Globe,
 	HardDrive,
-	MoreVertical,
+	NotebookText,
 	Pause,
 	Play,
 	RotateCcw,
 	Trash2,
 } from "lucide-react";
 import * as BaseNode from "@/components/flow/nodes/base-node.comp";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Spinner } from "@/components/ui/spinner";
 import { useResourceObject } from "@/hooks/resource/use-resource-object";
 import { useClusterDelete } from "@/hooks/sealos/cluster/use-cluster-delete";
@@ -67,6 +62,10 @@ export function ClusterNodeBlock({ data }: ClusterNodeBlockProps) {
 		console.log("Backup clicked for cluster:", cluster.name);
 	};
 
+	const handleLogClick = () => {
+		console.log("Log analysis clicked for cluster:", cluster.name);
+	};
+
 	const handleDelete = async () => {
 		if (
 			window.confirm(
@@ -84,53 +83,42 @@ export function ClusterNodeBlock({ data }: ClusterNodeBlockProps) {
 			<BaseNode.Header>
 				<BaseNode.Title />
 				<BaseNode.Menu>
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<BaseNode.Widget icon={MoreVertical} />
-						</DropdownMenuTrigger>
-						<DropdownMenuContent
-							className="rounded-xl bg-background-tertiary"
-							align="start"
+					{cluster.status !== "Running" && (
+						<DropdownMenuItem
+							onClick={() => start(cluster.name)}
+							disabled={cluster.status === "Pending" || isPending.start}
+							className={cluster.status === "Pending" ? "opacity-50" : ""}
 						>
-							{cluster.status !== "Running" && (
-								<DropdownMenuItem
-									onClick={() => start(cluster.name)}
-									disabled={cluster.status === "Pending" || isPending.start}
-									className={cluster.status === "Pending" ? "opacity-50" : ""}
-								>
-									<Play className="mr-2 h-4 w-4" />
-									Start
-								</DropdownMenuItem>
-							)}
-							{cluster.status !== "Stopped" &&
-								cluster.status !== "Shutdown" && (
-									<DropdownMenuItem
-										onClick={() => pause(cluster.name)}
-										disabled={cluster.status === "Pending" || isPending.pause}
-										className={cluster.status === "Pending" ? "opacity-50" : ""}
-									>
-										<Pause className="mr-2 h-4 w-4" />
-										Pause
-									</DropdownMenuItem>
-								)}
-							<DropdownMenuItem
-								onClick={() => restart(cluster.name)}
-								disabled={cluster.status === "Pending" || isPending.restart}
-								className={cluster.status === "Pending" ? "opacity-50" : ""}
-							>
-								<RotateCcw className="mr-2 h-4 w-4" />
-								Restart
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								onClick={handleDelete}
-								className="text-destructive"
-								disabled={isDeleting}
-							>
-								<Trash2 className="mr-2 h-4 w-4" />
-								{isDeleting ? "Deleting..." : "Delete"}
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+							<Play className="mr-2 h-4 w-4" />
+							Start
+						</DropdownMenuItem>
+					)}
+					{cluster.status !== "Stopped" && cluster.status !== "Shutdown" && (
+						<DropdownMenuItem
+							onClick={() => pause(cluster.name)}
+							disabled={cluster.status === "Pending" || isPending.pause}
+							className={cluster.status === "Pending" ? "opacity-50" : ""}
+						>
+							<Pause className="mr-2 h-4 w-4" />
+							Pause
+						</DropdownMenuItem>
+					)}
+					<DropdownMenuItem
+						onClick={() => restart(cluster.name)}
+						disabled={cluster.status === "Pending" || isPending.restart}
+						className={cluster.status === "Pending" ? "opacity-50" : ""}
+					>
+						<RotateCcw className="mr-2 h-4 w-4" />
+						Restart
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						onClick={handleDelete}
+						className="text-destructive"
+						disabled={isDeleting}
+					>
+						<Trash2 className="mr-2 h-4 w-4" />
+						{isDeleting ? "Deleting..." : "Delete"}
+					</DropdownMenuItem>
 				</BaseNode.Menu>
 			</BaseNode.Header>
 
@@ -151,14 +139,19 @@ export function ClusterNodeBlock({ data }: ClusterNodeBlockProps) {
 				<BaseNode.Status onClick={handleStatusClick} />
 				<div className="flex items-center gap-2">
 					<BaseNode.Widget
+						icon={HardDrive}
+						onClick={handleBackupClick}
+						tooltip="Backup management"
+					/>
+					<BaseNode.Widget
 						icon={Activity}
 						onClick={handleMonitorClick}
 						tooltip="Analyze resource usage"
 					/>
 					<BaseNode.Widget
-						icon={HardDrive}
-						onClick={handleBackupClick}
-						tooltip="Backup management"
+						icon={NotebookText}
+						onClick={handleLogClick}
+						tooltip="Analyze logs"
 					/>
 				</div>
 			</BaseNode.Footer>

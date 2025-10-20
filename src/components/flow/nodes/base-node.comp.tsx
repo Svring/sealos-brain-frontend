@@ -285,7 +285,12 @@ export const Menu = ({
 						<MoreHorizontal className="h-4 w-4" />
 					</button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent>{children}</DropdownMenuContent>
+				<DropdownMenuContent
+					align="start"
+					className="rounded-xl bg-background-tertiary"
+				>
+					{children}
+				</DropdownMenuContent>
 			</DropdownMenu>
 		</Comp>
 	);
@@ -313,14 +318,12 @@ const statusVariants = cva("h-3 w-3", {
 export const Status = ({
 	className,
 	asChild = false,
-	variant = "pending",
 	onClick,
 	...props
-}: ComponentProps<"button"> &
-	VariantProps<typeof statusVariants> & {
-		asChild?: boolean;
-		onClick?: (e: React.MouseEvent) => void;
-	}) => {
+}: ComponentProps<"button"> & {
+	asChild?: boolean;
+	onClick?: (e: React.MouseEvent) => void;
+}) => {
 	const Comp = asChild ? Slot : "button";
 	const { object } = useBaseNode();
 
@@ -339,6 +342,27 @@ export const Status = ({
 		return "Pending";
 	}, [object]);
 
+	// Map status to variant
+	const statusVariant = useMemo(() => {
+		const status = computedStatus.toLowerCase();
+		switch (status) {
+			case "running":
+				return "running";
+			case "stopped":
+			case "stopping":
+			case "shutdown":
+				return "stopped";
+			case "error":
+			case "abnormal":
+				return "error";
+			case "deleting":
+			case "restarting":
+				return "deleting";
+			default:
+				return "pending";
+		}
+	}, [computedStatus]);
+
 	return (
 		<Comp data-slot="base-node-status" {...props}>
 			<Tooltip>
@@ -351,7 +375,7 @@ export const Status = ({
 						)}
 						onClick={handleClick}
 					>
-						<Square className={statusVariants({ variant })} />
+						<Square className={statusVariants({ variant: statusVariant })} />
 						<span className="text-sm">{computedStatus}</span>
 					</button>
 				</TooltipTrigger>

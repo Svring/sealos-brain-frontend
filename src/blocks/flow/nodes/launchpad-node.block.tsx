@@ -3,20 +3,16 @@
 import { Position } from "@xyflow/react";
 import {
 	Activity,
-	Globe,
-	MoreVertical,
+	NotebookText,
+	Package,
 	Pause,
 	Play,
 	RotateCcw,
-	Settings,
 	Trash2,
 } from "lucide-react";
 import * as BaseNode from "@/components/flow/nodes/base-node.comp";
 import {
-	DropdownMenu,
-	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Spinner } from "@/components/ui/spinner";
 import { useResourceObject } from "@/hooks/resource/use-resource-object";
@@ -53,8 +49,6 @@ export function LaunchpadNodeBlock({ data }: LaunchpadNodeBlockProps) {
 
 	const launchpad = LaunchpadObjectSchema.parse(object);
 
-	const hasPublicAccess = launchpad.ports?.some((port) => port.publicAddress);
-
 	const handleMonitorClick = () => {
 		console.log("Monitor clicked for launchpad:", launchpad.name);
 	};
@@ -63,8 +57,8 @@ export function LaunchpadNodeBlock({ data }: LaunchpadNodeBlockProps) {
 		console.log("Status clicked for launchpad:", launchpad.name);
 	};
 
-	const handleSettingsClick = () => {
-		console.log("Settings clicked for launchpad:", launchpad.name);
+	const handleLogClick = () => {
+		console.log("Log analysis clicked for launchpad:", launchpad.name);
 	};
 
 	const handleDelete = async () => {
@@ -84,67 +78,53 @@ export function LaunchpadNodeBlock({ data }: LaunchpadNodeBlockProps) {
 			<BaseNode.Header>
 				<BaseNode.Title />
 				<BaseNode.Menu>
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<BaseNode.Widget icon={MoreVertical} />
-						</DropdownMenuTrigger>
-						<DropdownMenuContent
-							className="rounded-xl bg-background-tertiary"
-							align="start"
+					{launchpad.status !== "Running" && (
+						<DropdownMenuItem
+							onClick={() => start(launchpad.name)}
+							disabled={launchpad.status === "Pending" || isPending.start}
+							className={launchpad.status === "Pending" ? "opacity-50" : ""}
 						>
-							{launchpad.status !== "Running" && (
-								<DropdownMenuItem
-									onClick={() => start(launchpad.name)}
-									disabled={launchpad.status === "Pending" || isPending.start}
-									className={launchpad.status === "Pending" ? "opacity-50" : ""}
-								>
-									<Play className="mr-2 h-4 w-4" />
-									Start
-								</DropdownMenuItem>
-							)}
-							{launchpad.status !== "Stopped" &&
-								launchpad.status !== "Shutdown" && (
-									<DropdownMenuItem
-										onClick={() => pause(launchpad.name)}
-										disabled={launchpad.status === "Pending" || isPending.pause}
-										className={
-											launchpad.status === "Pending" ? "opacity-50" : ""
-										}
-									>
-										<Pause className="mr-2 h-4 w-4" />
-										Pause
-									</DropdownMenuItem>
-								)}
+							<Play className="mr-2 h-4 w-4" />
+							Start
+						</DropdownMenuItem>
+					)}
+					{launchpad.status !== "Stopped" &&
+						launchpad.status !== "Shutdown" && (
 							<DropdownMenuItem
-								onClick={() => restart(launchpad.name)}
-								disabled={launchpad.status === "Pending" || isPending.restart}
-								className={launchpad.status === "Pending" ? "opacity-50" : ""}
+								onClick={() => pause(launchpad.name)}
+								disabled={launchpad.status === "Pending" || isPending.pause}
+								className={
+									launchpad.status === "Pending" ? "opacity-50" : ""
+								}
 							>
-								<RotateCcw className="mr-2 h-4 w-4" />
-								Restart
+								<Pause className="mr-2 h-4 w-4" />
+								Pause
 							</DropdownMenuItem>
-							<DropdownMenuItem
-								onClick={handleDelete}
-								className="text-destructive"
-								disabled={isDeleting}
-							>
-								<Trash2 className="mr-2 h-4 w-4" />
-								{isDeleting ? "Deleting..." : "Delete"}
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
+						)}
+					<DropdownMenuItem
+						onClick={() => restart(launchpad.name)}
+						disabled={launchpad.status === "Pending" || isPending.restart}
+						className={launchpad.status === "Pending" ? "opacity-50" : ""}
+					>
+						<RotateCcw className="mr-2 h-4 w-4" />
+						Restart
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						onClick={handleDelete}
+						className="text-destructive"
+						disabled={isDeleting}
+					>
+						<Trash2 className="mr-2 h-4 w-4" />
+						{isDeleting ? "Deleting..." : "Delete"}
+					</DropdownMenuItem>
 				</BaseNode.Menu>
 			</BaseNode.Header>
 
 			<BaseNode.Content>
 				<div className="flex items-center gap-2">
-					<Globe
-						className={`h-4 w-4 ${
-							hasPublicAccess ? "text-theme-green" : "text-muted-foreground"
-						}`}
-					/>
+					<Package className="h-4 w-4 text-muted-foreground" />
 					<div className="text-md text-muted-foreground truncate flex-1">
-						{hasPublicAccess ? "Public Access" : "Private Access"}
+						Image: {launchpad.image.imageName}
 					</div>
 				</div>
 			</BaseNode.Content>
@@ -158,9 +138,9 @@ export function LaunchpadNodeBlock({ data }: LaunchpadNodeBlockProps) {
 						tooltip="Analyze resource usage"
 					/>
 					<BaseNode.Widget
-						icon={Settings}
-						onClick={handleSettingsClick}
-						tooltip="Application settings"
+						icon={NotebookText}
+						onClick={handleLogClick}
+						tooltip="Analyze logs"
 					/>
 				</div>
 			</BaseNode.Footer>
