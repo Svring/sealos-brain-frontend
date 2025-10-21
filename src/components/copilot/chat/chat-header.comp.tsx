@@ -4,6 +4,7 @@ import { Slot } from "@radix-ui/react-slot";
 import {
 	ChevronRight,
 	History as HistoryIcon,
+	Info,
 	Loader2,
 	Plus,
 } from "lucide-react";
@@ -35,7 +36,7 @@ export const Header = ({
 		<Comp
 			data-slot="chat-header"
 			className={cn(
-				"flex items-center justify-between p-4 border-b",
+				"flex items-center justify-between p-2",
 				className,
 			)}
 			{...props}
@@ -107,6 +108,7 @@ export const Title = ({
 				/>
 			)}
 			<h2 className="truncate flex-1 max-w-[12ch]">{title}</h2>
+			<Info className="h-4 w-4 flex-shrink-0" />
 		</Comp>
 	);
 };

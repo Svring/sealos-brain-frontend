@@ -84,9 +84,8 @@ export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 	return (
 		<copilotAdapterContext.Provider
 			value={{
-				// @ts-expect-error Suppress iterable type error for threads
-				threads: threads,
-				threadId: threadId || "",
+				threads: threads ?? [],
+				threadId: threadId ?? "",
 				metadata,
 				setThreadId,
 				createNewThread,

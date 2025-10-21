@@ -29,10 +29,12 @@ export const Root = ({
 	const Comp = asChild ? Slot : "div";
 
 	return (
-		<Comp data-slot="chat-root" className={cn(className)} {...props}>
-			<CopilotAdapter metadata={metadata}>
-				{children}
-			</CopilotAdapter>
+		<Comp
+			data-slot="chat-root"
+			className={cn("h-full w-full", className)}
+			{...props}
+		>
+			<CopilotAdapter metadata={metadata}>{children}</CopilotAdapter>
 		</Comp>
 	);
 };

@@ -2,28 +2,28 @@
 
 import { Slot } from "@radix-ui/react-slot";
 import type { ComponentProps } from "react";
-import { flowMachineContext } from "@/contexts/flow/flow.context";
+import { copilotMachineContext } from "@/contexts/copilot/copilot.context";
 import { cn } from "@/lib/utils";
 
-// Root container
+// Root - provides copilot context
 export const Root = ({
 	className,
 	asChild = false,
 	context,
 	...props
-}: ComponentProps<"div"> & { 
+}: ComponentProps<"div"> & {
 	asChild?: boolean;
-	context: React.ContextType<typeof flowMachineContext>;
+	context: React.ContextType<typeof copilotMachineContext>;
 }) => {
 	const Comp = asChild ? Slot : "div";
 	return (
-		<flowMachineContext.Provider value={context}>
+		<copilotMachineContext.Provider value={context}>
 			<Comp
-				data-slot="flow-root"
+				data-slot="copilot-root"
 				className={cn("h-full w-full", className)}
 				{...props}
 			/>
-		</flowMachineContext.Provider>
+		</copilotMachineContext.Provider>
 	);
 };
 
@@ -36,9 +36,10 @@ export const Content = ({
 	const Comp = asChild ? Slot : "div";
 	return (
 		<Comp
-			data-slot="flow-content"
-			className={cn("h-full w-full", className)}
+			data-slot="copilot-content"
+			className={cn("h-full w-full p-2 relative", className)}
 			{...props}
 		/>
 	);
 };
+

@@ -5,7 +5,6 @@ import { SendHorizonal } from "lucide-react";
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
-
 // Footer section
 export const Footer = ({
 	className,
@@ -16,18 +15,20 @@ export const Footer = ({
 	return (
 		<Comp
 			data-slot="chat-footer"
-			className={cn("flex items-center justify-between p-4 border-t", className)}
+			className={cn(
+				"flex items-center justify-between p-2",
+				className,
+			)}
 			{...props}
 		/>
 	);
 };
 
-
 // TextArea component
 export const TextArea = ({
 	className,
 	asChild = false,
-	placeholder = "Type your message...",
+	placeholder = "",
 	value,
 	onChange,
 	onKeyDown,
@@ -42,7 +43,7 @@ export const TextArea = ({
 	disabled?: boolean;
 }) => {
 	const Comp = asChild ? Slot : "textarea";
-	
+
 	return (
 		<div className="flex-1 relative">
 			<Comp
@@ -77,7 +78,7 @@ export const Send = ({
 	canSend?: boolean;
 }) => {
 	const Comp = asChild ? Slot : "button";
-	
+
 	return (
 		<div className="flex items-end justify-end gap-2 p-0 mt-auto">
 			<Comp
@@ -98,4 +99,3 @@ export const Send = ({
 		</div>
 	);
 };
-
