@@ -4,7 +4,7 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { MoreHorizontal, Plus, Search } from "lucide-react";
 import type { ComponentProps } from "react";
-import { createContext, useContext } from "react";
+import { AvatarCircles } from "@/components/ui/avatar-circles";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -12,9 +12,8 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { projectMachineContext } from "@/contexts/project/project.context";
 import { cn } from "@/lib/utils";
-import type { K8sItem } from "@/mvvm/k8s/models/k8s-resource.model";
-import type { InstanceObject } from "@/mvvm/sealos/instance/models/instance-object.model";
 
 const cardVariants = cva(
 	"relative flex w-full cursor-pointer rounded-lg border bg-background-tertiary text-left shadow-sm flex-col p-4 py-3 transition-all duration-200 hover:brightness-120 ease-out",
@@ -30,45 +29,21 @@ const cardVariants = cva(
 	},
 );
 
-type ProjectCardContextProps = {
-	project: InstanceObject;
-	resources?: K8sItem[];
-};
-
-const ProjectCardContext = createContext<ProjectCardContextProps | null>(null);
-
-const useProjectCard = () => {
-	const context = useContext(ProjectCardContext);
-	if (!context) {
-		throw new Error("useProjectCard must be used within a Card Root");
-	}
-	return context;
-};
-
-// Card Root
+// Project Root - Only provides context
 export const Root = ({
 	className,
-	size = "default",
 	asChild = false,
-	project,
-	resources,
+	context,
 	...props
-}: ComponentProps<"div"> &
-	VariantProps<typeof cardVariants> & {
-		asChild?: boolean;
-		project: InstanceObject;
-		resources?: K8sItem[];
-	}) => {
+}: ComponentProps<"div"> & {
+	asChild?: boolean;
+	context: React.ContextType<typeof projectMachineContext>;
+}) => {
 	const Comp = asChild ? Slot : "div";
 	return (
-		<ProjectCardContext.Provider value={{ project, resources }}>
-			<Comp
-				data-slot="project-card-root"
-				data-size={size}
-				className={cn(cardVariants({ size, className }))}
-				{...props}
-			/>
-		</ProjectCardContext.Provider>
+		<projectMachineContext.Provider value={context}>
+			<Comp data-slot="project-root" className={cn(className)} {...props} />
+		</projectMachineContext.Provider>
 	);
 };
 
@@ -92,19 +67,9 @@ export const Dashboard = ({
 export const DashboardHeader = ({
 	className,
 	asChild = false,
-	title = "Projects",
-	searchValue,
-	onSearchChange,
-	onCreateClick,
-	searchPlaceholder = "Search...",
 	...props
 }: ComponentProps<"div"> & {
 	asChild?: boolean;
-	title?: string;
-	searchValue?: string;
-	onSearchChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-	onCreateClick?: () => void;
-	searchPlaceholder?: string;
 }) => {
 	const Comp = asChild ? Slot : "div";
 	return (
@@ -115,35 +80,128 @@ export const DashboardHeader = ({
 				className,
 			)}
 			{...props}
+		/>
+	);
+};
+
+// Dashboard Header Title
+export const DashboardHeaderTitle = ({
+	className,
+	asChild = false,
+	title = "Projects",
+	...props
+}: ComponentProps<"h1"> & {
+	asChild?: boolean;
+	title?: string;
+}) => {
+	const Comp = asChild ? Slot : "h1";
+	return (
+		<Comp
+			data-slot="project-dashboard-header-title"
+			className={cn("text-lg font-semibold", className)}
+			{...props}
 		>
-			<h1 className="text-lg font-semibold">{title}</h1>
-			<div className="flex items-center gap-2">
-				{onSearchChange && (
-					<div className="relative">
-						<Input
-							className="h-8 w-36 pl-8 bg-background-tertiary"
-							placeholder={searchPlaceholder}
-							value={searchValue}
-							onChange={onSearchChange}
-						/>
-						<Search
-							className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
-							size={16}
-						/>
-					</div>
-				)}
-				{onCreateClick && (
-					<Button
-						size="sm"
-						variant="outline"
-						onClick={onCreateClick}
-						className="h-8 w-8 p-0 bg-background-tertiary"
-					>
-						<Plus size={16} />
-					</Button>
-				)}
-			</div>
+			{title}
 		</Comp>
+	);
+};
+
+// Dashboard Header Search Bar
+export const DashboardHeaderSearchBar = ({
+	className,
+	asChild = false,
+	searchValue,
+	onSearchChange,
+	placeholder = "Search...",
+	...props
+}: ComponentProps<"div"> & {
+	asChild?: boolean;
+	searchValue?: string;
+	onSearchChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+	placeholder?: string;
+}) => {
+	const Comp = asChild ? Slot : "div";
+	return (
+		<Comp
+			data-slot="project-dashboard-header-search"
+			className={cn("relative", className)}
+			{...props}
+		>
+			<Input
+				className="h-8 w-36 pl-8 bg-background-tertiary"
+				placeholder={placeholder}
+				value={searchValue}
+				onChange={onSearchChange}
+			/>
+			<Search
+				className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+				size={16}
+			/>
+		</Comp>
+	);
+};
+
+// Dashboard Header New Button
+export const DashboardHeaderNew = ({
+	className,
+	asChild = false,
+	onCreateClick,
+	...props
+}: ComponentProps<"button"> & {
+	asChild?: boolean;
+	onCreateClick?: () => void;
+}) => {
+	const Comp = asChild ? Slot : Button;
+	return (
+		<Comp
+			data-slot="project-dashboard-header-new"
+			size="sm"
+			variant="outline"
+			onClick={onCreateClick}
+			className={cn("h-8 w-8 p-0 bg-background-tertiary", className)}
+			{...props}
+		>
+			<Plus size={16} />
+		</Comp>
+	);
+};
+
+// Dashboard Content
+export const DashboardContent = ({
+	className,
+	asChild = false,
+	...props
+}: ComponentProps<"div"> & {
+	asChild?: boolean;
+}) => {
+	const Comp = asChild ? Slot : "div";
+	return (
+		<Comp
+			data-slot="project-dashboard-content"
+			className={cn("w-full max-w-4xl", className)}
+			{...props}
+		/>
+	);
+};
+
+// Card
+export const Card = ({
+	className,
+	size = "default",
+	asChild = false,
+	...props
+}: ComponentProps<"div"> &
+	VariantProps<typeof cardVariants> & {
+		asChild?: boolean;
+	}) => {
+	const Comp = asChild ? Slot : "div";
+	return (
+		<Comp
+			data-slot="project-card"
+			data-size={size}
+			className={cn(cardVariants({ size, className }))}
+			{...props}
+		/>
 	);
 };
 
@@ -157,7 +215,7 @@ export const CardHeader = ({
 	return (
 		<Comp
 			data-slot="project-card-header"
-			className={cn("flex items-center w-full gap-2", className)}
+			className={cn("flex w-full gap-2", className)}
 			{...props}
 		/>
 	);
@@ -167,23 +225,31 @@ export const CardHeader = ({
 export const CardTitle = ({
 	className,
 	asChild = false,
+	displayName,
+	name,
 	...props
-}: ComponentProps<"div"> & { asChild?: boolean }) => {
+}: ComponentProps<"div"> & {
+	asChild?: boolean;
+	displayName?: string;
+	name?: string;
+}) => {
 	const Comp = asChild ? Slot : "div";
-	const { project } = useProjectCard();
 
 	return (
 		<Comp
 			data-slot="project-card-title"
 			className={cn(
-				"flex items-center space-x-1 min-w-0 group flex-1",
+				"flex flex-col items-start space-x-1 min-w-0 group flex-1",
 				className,
 			)}
 			{...props}
 		>
 			<p className="text-foreground truncate transition-colors">
-				{project.displayName}
+				{displayName || name || "Unknown Project"}
 			</p>
+			{displayName && displayName !== name && (
+				<p className="text-xs text-muted-foreground">{name}</p>
+			)}
 		</Comp>
 	);
 };
@@ -200,7 +266,7 @@ export const CardMenu = ({
 		<Comp
 			data-slot="project-card-menu"
 			className={cn(
-				"flex flex-row items-center gap-2 flex-shrink-0",
+				"flex flex-row items-start gap-2 flex-shrink-0",
 				className,
 			)}
 			{...props}
@@ -210,18 +276,11 @@ export const CardMenu = ({
 					<button
 						type="button"
 						className="w-6 h-6 rounded hover:bg-muted cursor-pointer flex items-center justify-center"
-						onClick={(e) => {
-							e.preventDefault();
-							e.stopPropagation();
-						}}
 					>
 						<MoreHorizontal className="h-4 w-4" />
 					</button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent
-					align="start"
-					className="rounded-xl bg-background-tertiary"
-				>
+				<DropdownMenuContent align="start" className="bg-background-tertiary">
 					{children}
 				</DropdownMenuContent>
 			</DropdownMenu>
@@ -250,13 +309,14 @@ export const CardDate = ({
 	className,
 	asChild = false,
 	format = "short",
+	date,
 	...props
 }: ComponentProps<"div"> & {
 	asChild?: boolean;
 	format?: "short" | "long" | "relative";
+	date?: string;
 }) => {
 	const Comp = asChild ? Slot : "div";
-	const { project } = useProjectCard();
 
 	const formatDate = (date: string) => {
 		const d = new Date(date);
@@ -291,7 +351,7 @@ export const CardDate = ({
 			)}
 			{...props}
 		>
-			{formatDate(project.createdAt)}
+			{date ? formatDate(date) : "Unknown Date"}
 		</Comp>
 	);
 };
@@ -300,47 +360,92 @@ export const CardDate = ({
 export const CardWidget = ({
 	className,
 	asChild = false,
-	icon: Icon,
-	onClick,
-	disabled = false,
+	avatarUrls = [],
+	numPeople = 0,
 	...props
-}: ComponentProps<"button"> & {
+}: ComponentProps<"div"> & {
 	asChild?: boolean;
-	icon: React.ComponentType<{ className?: string }>;
-	onClick?: (e: React.MouseEvent) => void;
-	disabled?: boolean;
+	avatarUrls?: string[];
+	numPeople?: number;
 }) => {
-	const Comp = asChild ? Slot : "button";
-
-	const handleClick = (e: React.MouseEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		if (onClick && !disabled) {
-			onClick(e);
-		}
-	};
+	const Comp = asChild ? Slot : "div";
 
 	return (
 		<Comp
 			data-slot="project-card-widget"
 			className={cn(
-				"p-1 border-2 rounded-full transition-all duration-200 ease-out",
-				disabled
-					? "border-muted-foreground/20 cursor-not-allowed opacity-50"
-					: "border-muted-foreground/20 hover:border-muted-foreground/40 cursor-pointer",
+				"scale-75 origin-right absolute bottom-4 right-4",
 				className,
 			)}
-			onClick={handleClick}
-			type="button"
-			disabled={disabled}
 			{...props}
 		>
-			<Icon
+			{avatarUrls.length > 0 && (
+				<AvatarCircles
+					numPeople={numPeople > 0 ? numPeople : undefined}
+					avatarUrls={avatarUrls}
+					disableLink
+				/>
+			)}
+		</Comp>
+	);
+};
+
+// Empty State
+export const Empty = ({
+	className,
+	asChild = false,
+	type = "no-projects",
+	searchTerm,
+	onCreateProject,
+	...props
+}: ComponentProps<"div"> & {
+	asChild?: boolean;
+	type?: "no-projects" | "search-empty";
+	searchTerm?: string;
+	onCreateProject?: () => void;
+}) => {
+	const Comp = asChild ? Slot : "div";
+
+	if (type === "search-empty") {
+		return (
+			<Comp
+				data-slot="project-empty"
 				className={cn(
-					"h-4 w-4",
-					disabled ? "text-theme-gray" : "text-theme-green",
+					"flex flex-col items-center py-12 text-center",
+					className,
 				)}
-			/>
+				{...props}
+			>
+				<h3 className="text-lg font-medium text-muted-foreground mb-2">
+					No projects found
+				</h3>
+				<p className="text-sm text-muted-foreground">
+					No projects match "{searchTerm}". Try a different search term.
+				</p>
+			</Comp>
+		);
+	}
+
+	return (
+		<Comp
+			data-slot="project-empty"
+			className={cn("flex flex-col items-center py-12 text-center", className)}
+			{...props}
+		>
+			<h3 className="text-lg font-medium text-muted-foreground mb-2">
+				No projects yet
+			</h3>
+			<p className="text-sm text-muted-foreground mb-4">
+				Create your first project to get started.
+			</p>
+			{onCreateProject && (
+				<Button
+					onClick={onCreateProject}
+					className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+				>
+					Create Project
+				</Button>
+			)}
 		</Comp>
 	);
 };

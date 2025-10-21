@@ -1,5 +1,5 @@
-import { Page } from "@/mvvm/pages/project/vms/page.vm";
+import { ProjectBlock } from "@/blocks/project/project.block";
 
 export default function ProjectPage() {
-	return <Page />;
+	return <ProjectBlock />;
 }
