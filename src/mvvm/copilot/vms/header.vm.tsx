@@ -8,7 +8,7 @@ import { getResourceIcon } from "@/lib/resource/resource.utils";
 import { HeaderView } from "../views/header.view";
 
 export const Header = () => {
-	const { close, setViewType } = useCopilotEvents();
+	const { close, setView: setViewType } = useCopilotEvents();
 	const { project, activeResource } = useProjectState();
 	const { metadata, threads, threadId } = useCopilotAdapterContext();
 	const { view } = useCopilotState();

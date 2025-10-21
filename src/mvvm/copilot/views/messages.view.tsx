@@ -60,7 +60,7 @@ export function MessagesView({
 		return (
 			<div className="w-full px-4 h-full flex items-center justify-center">
 				<div className="text-center text-muted-foreground">
-					Messages will appear here...
+					
 				</div>
 			</div>
 		);

@@ -17,6 +17,7 @@ export function CopilotProvider({ children }: CopilotProviderProps) {
 			value={{
 				chats: state.context.chats,
 				opened: state.context.opened,
+				view: state.context.view,
 				state,
 				send,
 			}}

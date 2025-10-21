@@ -23,8 +23,6 @@ export const useFlow = (instance: CustomResourceTarget) => {
 	const { nodes, edges } = useMemo(() => {
 		if (!objects || isLoadingObjects) return { nodes: [], edges: [] };
 
-		// console.log("useFlowObjects", objects);
-
 		const baseNodes = convertObjectsToNodes(objects);
 
 		const reliances = inferObjectsReliances(objects);

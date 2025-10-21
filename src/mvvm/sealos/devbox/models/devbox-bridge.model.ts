@@ -159,7 +159,7 @@ export const DevboxBridgeSchema = z.object({
 			}),
 		)
 		.transform((envVars: Env[]) => {
-			if (!envVars.length) {
+			if (!envVars || !envVars.length) {
 				return [];
 			}
 			return envVars.map((envVar: Env) => {
@@ -223,7 +223,12 @@ export const DevboxBridgeSchema = z.object({
 			if (!namespace || !regionUrl) {
 				return [];
 			}
-			return await composePortsFromResources(services, ingresses, namespace, regionUrl);
+			return await composePortsFromResources(
+				services,
+				ingresses,
+				namespace,
+				regionUrl,
+			);
 		}),
 	pods: z
 		.any()

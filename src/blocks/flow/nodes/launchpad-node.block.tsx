@@ -133,14 +133,14 @@ export function LaunchpadNodeBlock({ data }: LaunchpadNodeBlockProps) {
 				<BaseNode.Status onClick={handleStatusClick} />
 				<div className="flex items-center gap-2">
 					<BaseNode.Widget
-						icon={Activity}
-						onClick={handleMonitorClick}
-						tooltip="Analyze resource usage"
-					/>
-					<BaseNode.Widget
 						icon={NotebookText}
 						onClick={handleLogClick}
 						tooltip="Analyze logs"
+					/>
+					<BaseNode.Widget
+						icon={Activity}
+						onClick={handleMonitorClick}
+						tooltip="Analyze resource usage"
 					/>
 				</div>
 			</BaseNode.Footer>

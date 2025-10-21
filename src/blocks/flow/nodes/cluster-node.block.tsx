@@ -144,14 +144,14 @@ export function ClusterNodeBlock({ data }: ClusterNodeBlockProps) {
 						tooltip="Backup management"
 					/>
 					<BaseNode.Widget
-						icon={Activity}
-						onClick={handleMonitorClick}
-						tooltip="Analyze resource usage"
-					/>
-					<BaseNode.Widget
 						icon={NotebookText}
 						onClick={handleLogClick}
 						tooltip="Analyze logs"
+					/>
+					<BaseNode.Widget
+						icon={Activity}
+						onClick={handleMonitorClick}
+						tooltip="Analyze resource usage"
 					/>
 				</div>
 			</BaseNode.Footer>

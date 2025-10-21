@@ -21,14 +21,14 @@ function CopilotChat({ chat, index, totalChats }: CopilotChatProps) {
 	const scaleValue = 1 - computedIndex * 0.02;
 	const translateValue = `${computedIndex * -3}%`;
 
+	if (computedIndex > 1) {
+		return null;
+	}
+
 	return (
 		<div
-			className={`absolute inset-2 grid-area-[1/1] transition-all duration-[0.2s] ${
-				computedIndex > 1
-					? "opacity-0"
-					: mounted
-						? "opacity-100"
-						: "opacity-0 translate-x-full"
+			className={`absolute inset-2 grid-area-[1/1] transition-all duration-[0.15s] ${
+				mounted ? "opacity-100" : "opacity-0 translate-x-full"
 			} [--index:${computedIndex}]`}
 			data-mounted={mounted}
 			style={
