@@ -84,7 +84,10 @@ export function CopilotAdapter({ children, metadata }: CopilotAdapterProps) {
 	return (
 		<copilotAdapterContext.Provider
 			value={{
-				threads: threads ?? [],
+				threads: (threads ?? []).map((thread) => ({
+					...thread,
+					metadata: thread.metadata ?? {},
+				})),
 				threadId: threadId ?? "",
 				metadata,
 				setThreadId,

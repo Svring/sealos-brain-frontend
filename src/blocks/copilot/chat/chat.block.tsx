@@ -78,9 +78,9 @@ export function ChatBlock({
 						</div>
 
 						<div className="flex items-center gap-1">
-							{/* <Chat.NewChat />
-						<Chat.History />
-						<Chat.Close /> */}
+							<Chat.NewChat />
+							<Chat.History />
+							<Chat.Close />
 						</div>
 					</Chat.Header>
 

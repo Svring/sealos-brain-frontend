@@ -131,7 +131,7 @@ export const ProjectCrumb = ({
 	return (
 		<Comp
 			data-slot="control-project-crumb"
-			className={cn("", className)}
+			className={cn("pointer-events-auto", className)}
 			{...props}
 		>
 			<Breadcrumb>
@@ -177,7 +177,7 @@ export const ResetFlow = ({
 	return (
 		<Comp
 			data-slot="control-reset-flow"
-			className={cn("", className)}
+			className={cn("pointer-events-auto", className)}
 			{...props}
 		>
 			<TooltipProvider>

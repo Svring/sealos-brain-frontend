@@ -77,7 +77,7 @@ export function FlowBlock() {
 			</Flow.Root>
 
 			<Control.Overlay>
-				<Control.Pad className="top-2 left-2 z-50">
+				<Control.Pad className="top-2 left-2">
 					<Control.SidebarTrigger />
 					<Control.ProjectCrumb
 						project={{
@@ -89,7 +89,7 @@ export function FlowBlock() {
 						}}
 					/>
 				</Control.Pad>
-				<Control.Pad className="top-2 right-2 z-40">
+				<Control.Pad className="top-2 right-2">
 					<Control.ResetFlow onReset={handleReset} />
 				</Control.Pad>
 			</Control.Overlay>
