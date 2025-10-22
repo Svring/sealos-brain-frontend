@@ -3,20 +3,20 @@
 import type { Operation } from "fast-json-patch";
 import { load } from "js-yaml";
 import _ from "lodash";
-import { CUSTOM_RESOURCES } from "@/constants/k8s/k8s-custom.constant";
-import { escapeSlash } from "@/lib/k8s/k8s-client.utils";
+import { CUSTOM_RESOURCES } from "@/registry/dark/constants/k8s/k8s-custom.constant";
+import { escapeSlash } from "@/registry/dark/lib/k8s/k8s-client.utils";
 import {
 	getApiClients,
 	getBuiltinApiClient,
 	getCurrentNamespace,
 	invokeApiMethod,
-} from "@/lib/k8s/k8s-server.utils";
+} from "@/registry/dark/lib/k8s/k8s-server.utils";
 import type {
 	BuiltinResourceTarget,
 	CustomResourceTarget,
 	ResourceTarget,
-} from "@/models/k8s/k8s.model";
-import type { K8sContext } from "@/models/k8s/k8s-context.model";
+} from "@/registry/dark/models/k8s/k8s.model";
+import type { K8sContext } from "@/registry/dark/models/k8s/k8s-context.model";
 
 /**
  * Delete a custom resource by name in Kubernetes.

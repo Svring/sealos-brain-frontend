@@ -5,9 +5,6 @@ import { k8sParser } from "@/lib/k8s/k8s.parser";
 import {
 	deleteResource,
 	getResource,
-	getResourceEvents,
-	getResourceLogs,
-	getResourcePods,
 	listResources,
 	patchResource,
 	patchResourceMetadata,
@@ -16,6 +13,9 @@ import {
 	strategicMergePatchResource,
 	upsertResource,
 } from "@/lib/k8s/k8s-service.api";
+import { getResourceEvents } from "@/lib/sealos/event/event.api";
+import { getResourceLogs } from "@/lib/sealos/log/log.api";
+import { getResourcePods } from "@/lib/sealos/pod/pod.api";
 import { quotaParser } from "@/lib/sealos/quota/quota.parser";
 import { createErrorFormatter } from "@/lib/trpc/trpc.utils";
 import {

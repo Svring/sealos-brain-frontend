@@ -1,12 +1,12 @@
-import { BUILTIN_RESOURCES } from "@/constants/k8s/k8s-builtin.constant";
-import { CUSTOM_RESOURCES } from "@/constants/k8s/k8s-custom.constant";
+import { BUILTIN_RESOURCES } from "@/registry/dark/constants/k8s/k8s-builtin.constant";
+import { CUSTOM_RESOURCES } from "@/registry/dark/constants/k8s/k8s-custom.constant";
 import type {
 	BuiltinResourceTarget,
 	BuiltinResourceTypeTarget,
 	CustomResourceTarget,
 	CustomResourceTypeTarget,
-} from "@/models/k8s/k8s.model";
-import type { K8sResource } from "@/models/k8s/k8s-resource.model";
+} from "@/registry/dark/models/k8s/k8s.model";
+import type { K8sResource } from "@/registry/dark/models/k8s/k8s-resource.model";
 
 /**
  * Convert a resource type string to a resource type target

@@ -6,7 +6,8 @@
     "lint": "next lint",
     "tag-image": "docker tag $IMAGEID puddlecat/sealos-brain-frontend:$VERSION",
     "build-image": "docker build --platform linux/amd64 -t sealos-brain-frontend:$VERSION .",
-    "push-image": "docker push puddlecat/sealos-brain-frontend:$VERSION"
+    "push-image": "docker push puddlecat/sealos-brain-frontend:$VERSION",
+    "registry:build": "shadcn build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -75,7 +76,7 @@
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.454.0",
-    "motion": "^12.23.12",
+    "motion": "^12.23.24",
     "nanoid": "^5.1.6",
     "next": "15.2.4",
     "next-themes": "latest",
@@ -92,6 +93,7 @@
     "recharts": "2.15.0",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
+    "shadcn": "^2.9.3-canary.0",
     "sharp": "^0.34.4",
     "sonner": "^1.7.1",
     "tailwind-animate": "^0.2.10",

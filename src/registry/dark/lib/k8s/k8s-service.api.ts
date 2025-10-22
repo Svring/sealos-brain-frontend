@@ -2,17 +2,6 @@
 
 import type { Operation } from "fast-json-patch";
 import _ from "lodash";
-import type {
-	BuiltinResourceTarget,
-	BuiltinResourceTypeTarget,
-	CustomResourceTarget,
-	CustomResourceTypeTarget,
-	ResourceTarget,
-	ResourceTypeTarget,
-} from "@/models/k8s/k8s.model";
-import type { K8sContext } from "@/models/k8s/k8s-context.model";
-import type { K8sResource } from "@/models/k8s/k8s-resource.model";
-import { K8sResourceListSchema } from "@/models/k8s/k8s-resource.model";
 import {
 	applyResource as applyResourceMutation,
 	deleteBuiltinResource,
@@ -27,13 +16,24 @@ import {
 	strategicMergePatchCustomResource,
 	upsertBuiltinResource,
 	upsertCustomResource,
-} from "./k8s-mutation.api";
+} from "@/registry/dark/lib/k8s/k8s-mutation.api";
 import {
 	getBuiltinResource,
 	getCustomResource,
 	listBuiltinResources,
 	listCustomResources,
-} from "./k8s-query.api";
+} from "@/registry/dark/lib/k8s/k8s-query.api";
+import type {
+	BuiltinResourceTarget,
+	BuiltinResourceTypeTarget,
+	CustomResourceTarget,
+	CustomResourceTypeTarget,
+	ResourceTarget,
+	ResourceTypeTarget,
+} from "@/registry/dark/models/k8s/k8s.model";
+import type { K8sContext } from "@/registry/dark/models/k8s/k8s-context.model";
+import type { K8sResource } from "@/registry/dark/models/k8s/k8s-resource.model";
+import { K8sResourceListSchema } from "@/registry/dark/models/k8s/k8s-resource.model";
 
 // ============================================================================
 // Resource Selection Functions
@@ -406,7 +406,3 @@ export const applyResource = async (
 ) => {
 	return await applyResourceMutation(context, target, resourceContent);
 };
-
-
-
-
