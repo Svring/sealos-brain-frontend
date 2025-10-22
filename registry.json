@@ -11,31 +11,31 @@
       "dependencies": ["zod"],
       "files": [
         {
-          "path": "registry/dark/models/k8s/k8s-builtin.model.ts",
+          "path": "src/registry/new-york/models/k8s/k8s-builtin.model.ts",
           "type": "registry:item"
         },
         {
-          "path": "registry/dark/models/k8s/k8s-clients.model.ts",
+          "path": "src/registry/new-york/models/k8s/k8s-clients.model.ts",
           "type": "registry:item"
         },
         {
-          "path": "registry/dark/models/k8s/k8s-context.model.ts",
+          "path": "src/registry/new-york/models/k8s/k8s-context.model.ts",
           "type": "registry:item"
         },
         {
-          "path": "registry/dark/models/k8s/k8s-custom.model.ts",
+          "path": "src/registry/new-york/models/k8s/k8s-custom.model.ts",
           "type": "registry:item"
         },
         {
-          "path": "registry/dark/models/k8s/k8s-object.model.ts",
+          "path": "src/registry/new-york/models/k8s/k8s-object.model.ts",
           "type": "registry:item"
         },
         {
-          "path": "registry/dark/models/k8s/k8s-resource.model.ts",
+          "path": "src/registry/new-york/models/k8s/k8s-resource.model.ts",
           "type": "registry:item"
         },
         {
-          "path": "registry/dark/models/k8s/k8s.model.ts",
+          "path": "src/registry/new-york/models/k8s/k8s.model.ts",
           "type": "registry:item"
         }
       ]
@@ -49,15 +49,15 @@
       "registryDependencies": ["k8s-models"],
       "files": [
         {
-          "path": "registry/dark/constants/k8s/k8s-builtin.constant.ts",
+          "path": "src/registry/new-york/constants/k8s/k8s-builtin.constant.ts",
           "type": "registry:item"
         },
         {
-          "path": "registry/dark/constants/k8s/k8s-custom.constant.ts",
+          "path": "src/registry/new-york/constants/k8s/k8s-custom.constant.ts",
           "type": "registry:item"
         },
         {
-          "path": "registry/dark/constants/k8s/k8s.constant.ts",
+          "path": "src/registry/new-york/constants/k8s/k8s.constant.ts",
           "type": "registry:item"
         }
       ]
@@ -76,27 +76,27 @@
       "registryDependencies": ["k8s-models", "k8s-constants"],
       "files": [
         {
-          "path": "registry/dark/lib/k8s/k8s-client.utils.ts",
+          "path": "src/registry/new-york/lib/k8s/k8s-client.utils.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/dark/lib/k8s/k8s-mutation.api.ts",
+          "path": "src/registry/new-york/lib/k8s/k8s-mutation.api.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/dark/lib/k8s/k8s-query.api.ts",
+          "path": "src/registry/new-york/lib/k8s/k8s-query.api.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/dark/lib/k8s/k8s-server.utils.ts",
+          "path": "src/registry/new-york/lib/k8s/k8s-server.utils.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/dark/lib/k8s/k8s-service.api.ts",
+          "path": "src/registry/new-york/lib/k8s/k8s-service.api.ts",
           "type": "registry:lib"
         },
         {
-          "path": "registry/dark/lib/k8s/k8s.parser.ts",
+          "path": "src/registry/new-york/lib/k8s/k8s.parser.ts",
           "type": "registry:lib"
         }
       ]
